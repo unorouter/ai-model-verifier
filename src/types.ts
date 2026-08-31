@@ -1,5 +1,7 @@
 import type { SignatureResult } from "./detectors/thinking-signature";
 import type { TokenTruthResult } from "./detectors/token-truth";
+import type { ResponseMetadata } from "./detectors/response-metadata";
+import type { ThroughputSample } from "./detectors/throughput";
 
 export type VerifyProvider = "anthropic" | "openai" | "gemini";
 
@@ -59,6 +61,10 @@ export type VerifyResult = {
   signature?: SignatureResult;
   /** Present only when the token-accounting check was requested. */
   tokenTruth?: TokenTruthResult;
+  /** Envelope observations, free: read from responses already collected. */
+  responseMetadata?: ResponseMetadata;
+  /** Output rate, when a probe generated enough tokens to measure one. */
+  throughput?: ThroughputSample | null;
   connectivityError:
     "cors-needs-backend" | "unreachable" | "invalid-key" | "no-format" | null;
 };

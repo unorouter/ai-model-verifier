@@ -1,3 +1,4 @@
+import type { ResponseMetadata } from "./detectors/response-metadata";
 import { detectTierMismatch } from "./signals";
 import { detectSubstitution } from "./substitution";
 import type { ProviderConfig } from "./providers/config";
@@ -8,7 +9,15 @@ import type {
   VerifyVerdict,
 } from "./types";
 
-export type ProbeEval = ProbeOutcome & { text: string | undefined };
+/**
+ * A probe's outcome plus the working values the runner needs but never stores:
+ * the reply text, and the envelope facts read while the raw payload was still
+ * in scope.
+ */
+export type ProbeEval = ProbeOutcome & {
+  text: string | undefined;
+  envelope?: ResponseMetadata;
+};
 
 export type VerdictResult = {
   verdict: VerifyVerdict;

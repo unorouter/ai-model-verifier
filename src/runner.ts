@@ -1,5 +1,7 @@
 import { checkThinkingSignature } from "./detectors/thinking-signature";
 import { checkTokenTruth } from "./detectors/token-truth";
+import { readResponseMetadata } from "./detectors/response-metadata";
+import { sampleThroughput } from "./detectors/throughput";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
@@ -125,6 +127,9 @@ async function runProbe(args: {
     const meta = args.cfg.extractMeta(res.data);
     const pass = probe.evaluate(text, args.cfg);
     return {
+      // Derived here because this is the only scope holding the raw payload;
+      // the envelope facts are small, the payload itself is not carried.
+      envelope: readResponseMetadata(res.data, args.cfg.provider),
       label: probe.label,
       pass,
       signal,
@@ -322,6 +327,22 @@ export async function runVerification(opts: {
         })
       : undefined;
 
+  // Free metadata: derived from probe responses we already paid for.
+  const richest = results.reduce<(typeof results)[number] | null>(
+    (best, r) =>
+      (r.usage?.completion ?? 0) > (best?.usage?.completion ?? 0) ? r : best,
+    null,
+  );
+  const responseMetadata = richest?.envelope;
+  const throughput = richest
+    ? sampleThroughput({
+        lane: hostOf(opts.baseUrl),
+        model: opts.model,
+        outputTokens: richest.usage?.completion ?? null,
+        elapsedMs: richest.latencyMs,
+      })
+    : null;
+
   const detectedModel =
     results.find((r) => r.detectedModel)?.detectedModel ?? null;
   const verdict = aggregateVerdict({
@@ -364,6 +385,8 @@ export async function runVerification(opts: {
     resolvedProvider,
     ...(signature ? { signature } : {}),
     ...(tokenTruth ? { tokenTruth } : {}),
+    ...(responseMetadata ? { responseMetadata } : {}),
+    ...(throughput ? { throughput } : {}),
     connectivityError: null,
   };
 }
