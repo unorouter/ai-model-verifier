@@ -1,6 +1,6 @@
 {
   "name": "@unorouter/verify-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Authenticity and capability checks for AI API relays: is this endpoint really the Claude / GPT / Gemini model it claims?",
   "license": "AGPL-3.0-only",
   "type": "module",

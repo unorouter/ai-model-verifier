@@ -1,4 +1,5 @@
 import { checkThinkingSignature } from "./detectors/thinking-signature";
+import { checkTokenTruth } from "./detectors/token-truth";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
@@ -225,6 +226,15 @@ export async function runVerification(opts) {
             timeoutMs,
         })
         : undefined;
+    const tokenTruth = opts.checkTokenTruth && resolvedProvider === "anthropic"
+        ? await checkTokenTruth({
+            transport,
+            baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+            apiKey: opts.apiKey,
+            model: opts.model,
+            timeoutMs,
+        })
+        : undefined;
     const detectedModel = results.find((r) => r.detectedModel)?.detectedModel ?? null;
     const verdict = aggregateVerdict({
         model: opts.model,
@@ -263,6 +273,7 @@ export async function runVerification(opts) {
         totalUsage: sumUsage(results.map((r) => r.usage)),
         resolvedProvider,
         ...(signature ? { signature } : {}),
+        ...(tokenTruth ? { tokenTruth } : {}),
         connectivityError: null,
     };
 }

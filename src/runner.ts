@@ -1,4 +1,5 @@
 import { checkThinkingSignature } from "./detectors/thinking-signature";
+import { checkTokenTruth } from "./detectors/token-truth";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
@@ -258,6 +259,11 @@ export async function runVerification(opts: {
    * generation and only applies to Claude models that support thinking.
    */
   checkSignature?: boolean;
+  /**
+   * Verify the endpoint's token accounting (billing inflation, and the
+   * tokenizer band that doubles as a tier check). Opt-in: three extra requests.
+   */
+  checkTokenTruth?: boolean;
 }): Promise<VerifyResult> {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const transport = opts.transport ?? probeTransport;
@@ -297,6 +303,17 @@ export async function runVerification(opts: {
   const signature =
     opts.checkSignature && resolvedProvider === "anthropic"
       ? await checkThinkingSignature({
+          transport,
+          baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+          apiKey: opts.apiKey,
+          model: opts.model,
+          timeoutMs,
+        })
+      : undefined;
+
+  const tokenTruth =
+    opts.checkTokenTruth && resolvedProvider === "anthropic"
+      ? await checkTokenTruth({
           transport,
           baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
           apiKey: opts.apiKey,
@@ -346,6 +363,7 @@ export async function runVerification(opts: {
     totalUsage: sumUsage(results.map((r) => r.usage)),
     resolvedProvider,
     ...(signature ? { signature } : {}),
+    ...(tokenTruth ? { tokenTruth } : {}),
     connectivityError: null,
   };
 }

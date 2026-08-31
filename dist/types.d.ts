@@ -1,4 +1,5 @@
 import type { SignatureResult } from "./detectors/thinking-signature";
+import type { TokenTruthResult } from "./detectors/token-truth";
 export type VerifyProvider = "anthropic" | "openai" | "gemini";
 export type VerifyVerdict = "genuine" | "suspicious" | "unverified";
 export type ProbeLabel = "emotional" | "creative" | "identity" | "model-name";
@@ -41,6 +42,8 @@ export type VerifyResult = {
     resolvedProvider: VerifyProvider;
     /** Present only when the signature check was requested and could run. */
     signature?: SignatureResult;
+    /** Present only when the token-accounting check was requested. */
+    tokenTruth?: TokenTruthResult;
     connectivityError: "cors-needs-backend" | "unreachable" | "invalid-key" | "no-format" | null;
 };
 //# sourceMappingURL=types.d.ts.map
