@@ -1,3 +1,4 @@
+import type { SignatureResult } from "./detectors/thinking-signature";
 export type VerifyProvider = "anthropic" | "openai" | "gemini";
 export type VerifyVerdict = "genuine" | "suspicious" | "unverified";
 export type ProbeLabel = "emotional" | "creative" | "identity" | "model-name";
@@ -38,6 +39,8 @@ export type VerifyResult = {
     detectedModel: string | null;
     totalUsage: ProbeUsage | null;
     resolvedProvider: VerifyProvider;
+    /** Present only when the signature check was requested and could run. */
+    signature?: SignatureResult;
     connectivityError: "cors-needs-backend" | "unreachable" | "invalid-key" | "no-format" | null;
 };
 //# sourceMappingURL=types.d.ts.map

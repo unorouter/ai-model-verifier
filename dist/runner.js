@@ -1,8 +1,9 @@
+import { checkThinkingSignature } from "./detectors/thinking-signature";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
 import { PROBES } from "./probes";
-import { PROVIDER_CONFIGS } from "./providers/config";
+import { normalizeProbeBaseUrl, PROVIDER_CONFIGS, } from "./providers/config";
 import { detectSignal, isTransientError } from "./signals";
 import { probeTransport } from "./transport";
 import { aggregateVerdict, probeReason } from "./verdict";
@@ -213,6 +214,17 @@ export async function runVerification(opts) {
         timeoutMs,
         transport,
     })));
+    // Runs concurrently with nothing else pending, after the probes, so a
+    // signature failure can never mask a probe result.
+    const signature = opts.checkSignature && resolvedProvider === "anthropic"
+        ? await checkThinkingSignature({
+            transport,
+            baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+            apiKey: opts.apiKey,
+            model: opts.model,
+            timeoutMs,
+        })
+        : undefined;
     const detectedModel = results.find((r) => r.detectedModel)?.detectedModel ?? null;
     const verdict = aggregateVerdict({
         model: opts.model,
@@ -250,6 +262,7 @@ export async function runVerification(opts) {
         detectedModel,
         totalUsage: sumUsage(results.map((r) => r.usage)),
         resolvedProvider,
+        ...(signature ? { signature } : {}),
         connectivityError: null,
     };
 }

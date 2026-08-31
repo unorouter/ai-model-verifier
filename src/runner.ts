@@ -1,8 +1,13 @@
+import { checkThinkingSignature } from "./detectors/thinking-signature";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
 import { PROBES, type ProbeDef } from "./probes";
-import { PROVIDER_CONFIGS, type ProviderConfig } from "./providers/config";
+import {
+  normalizeProbeBaseUrl,
+  PROVIDER_CONFIGS,
+  type ProviderConfig,
+} from "./providers/config";
 import { detectSignal, isTransientError } from "./signals";
 import { probeTransport, type TransportFn } from "./transport";
 import { aggregateVerdict, probeReason, type ProbeEval } from "./verdict";
@@ -248,6 +253,11 @@ export async function runVerification(opts: {
   mode: TransportMode;
   timeoutMs?: number;
   transport?: TransportFn;
+  /**
+   * Run the Anthropic thinking-signature check too. Opt-in: it costs one extra
+   * generation and only applies to Claude models that support thinking.
+   */
+  checkSignature?: boolean;
 }): Promise<VerifyResult> {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const transport = opts.transport ?? probeTransport;
@@ -281,6 +291,19 @@ export async function runVerification(opts: {
       }),
     ),
   );
+
+  // Runs concurrently with nothing else pending, after the probes, so a
+  // signature failure can never mask a probe result.
+  const signature =
+    opts.checkSignature && resolvedProvider === "anthropic"
+      ? await checkThinkingSignature({
+          transport,
+          baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+          apiKey: opts.apiKey,
+          model: opts.model,
+          timeoutMs,
+        })
+      : undefined;
 
   const detectedModel =
     results.find((r) => r.detectedModel)?.detectedModel ?? null;
@@ -322,6 +345,7 @@ export async function runVerification(opts: {
     detectedModel,
     totalUsage: sumUsage(results.map((r) => r.usage)),
     resolvedProvider,
+    ...(signature ? { signature } : {}),
     connectivityError: null,
   };
 }
