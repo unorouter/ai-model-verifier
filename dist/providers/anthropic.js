@@ -1,22 +1,19 @@
 import { rec } from "../internal/utils";
 import { foreignPatternsExcept } from "../patterns";
 import { normalizeProbeBaseUrl, } from "./config";
-function isAnthropicHost(baseUrl) {
-    try {
-        return new URL(baseUrl).host.endsWith("api.anthropic.com");
-    }
-    catch {
-        return false;
-    }
-}
+// Anthropic refuses a browser preflight unless the caller opts in with this
+// header, and every relay that reimplements their API inherits the rule. The
+// header is meaningless to endpoints that do not check it, so send it on every
+// direct Anthropic-format probe rather than guessing which hosts enforce it.
+const BROWSER_ACCESS_HEADER = "anthropic-dangerous-direct-browser-access";
 function buildRequest(args) {
     const headers = {
         "content-type": "application/json",
         "x-api-key": args.apiKey,
         "anthropic-version": "2023-06-01",
     };
-    if (args.direct && isAnthropicHost(args.baseUrl))
-        headers["anthropic-dangerous-direct-browser-access"] = "true";
+    if (args.direct)
+        headers[BROWSER_ACCESS_HEADER] = "true";
     return {
         url: `${normalizeProbeBaseUrl(args.baseUrl)}/v1/messages`,
         headers,
