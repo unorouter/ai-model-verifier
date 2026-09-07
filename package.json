@@ -1,6 +1,6 @@
 {
   "name": "ai-model-verifier",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Verify an AI API endpoint really serves the model it claims: model substitution, Claude thinking signatures, token-billing accuracy, response-envelope and throughput evidence.",
   "license": "AGPL-3.0-only",
   "type": "module",

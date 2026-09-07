@@ -7,7 +7,7 @@ export type HandshakeOutcome = {
     status: number;
 } | {
     ok: false;
-    reason: "cors-needs-backend" | "unreachable" | "invalid-key" | "model-rejected" | "no-format";
+    reason: "cors-needs-backend" | "unreachable" | "invalid-key" | "model-rejected" | "endpoint-busy" | "no-format";
     status: number | null;
     corsBlocked: boolean;
 };

@@ -73,6 +73,7 @@ export async function runHandshake(opts) {
     const order = opts.provider === "openai" ? ["openai"] : [opts.provider, "openai"];
     let sawAuth = false;
     let sawModelRejected = false;
+    let sawTransient = false;
     let lastStatus = null;
     for (const provider of order) {
         const r = await tryFormat({ ...opts, provider, transport });
@@ -95,6 +96,8 @@ export async function runHandshake(opts) {
             sawAuth = true;
         if (r.outcome === "model")
             sawModelRejected = true;
+        if (r.outcome === "transient")
+            sawTransient = true;
     }
     // Before the key check: a gateway that rejects the model name often answers
     // 403 on the second format too, which would otherwise read as a bad key.
@@ -117,6 +120,15 @@ export async function runHandshake(opts) {
             ok: false,
             reason: "unreachable",
             status: null,
+            corsBlocked: false,
+        };
+    // Every format answered 429/5xx: the endpoint is having a bad moment, which
+    // is never evidence that it speaks no supported format.
+    if (sawTransient)
+        return {
+            ok: false,
+            reason: "endpoint-busy",
+            status: lastStatus,
             corsBlocked: false,
         };
     return {

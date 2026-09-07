@@ -70,6 +70,7 @@ export type VerifyResult = {
     | "unreachable"
     | "invalid-key"
     | "model-rejected"
+    | "endpoint-busy"
     | "no-format"
     | null;
 };
