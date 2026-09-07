@@ -13,7 +13,11 @@ export type HandshakeOutcome =
   | {
       ok: false;
       reason:
-        "cors-needs-backend" | "unreachable" | "invalid-key" | "no-format";
+        | "cors-needs-backend"
+        | "unreachable"
+        | "invalid-key"
+        | "model-rejected"
+        | "no-format";
       status: number | null;
       corsBlocked: boolean;
     };
@@ -31,6 +35,36 @@ function classifyStatus(
   return "transient";
 }
 
+// An error body naming the model (OpenAI's `model_not_found`, and the same
+// shape from every gateway that copies it) means the endpoint understood the
+// request and rejected the MODEL. Reporting that as a format failure sends
+// people looking for a protocol bug when they only mistyped a model name.
+const MODEL_ERROR_CODES = [
+  "model_not_found",
+  "model_not_supported",
+  "invalid_model",
+  "unknown_model",
+];
+
+function rejectsModel(data: unknown): boolean {
+  const err = (data as { error?: unknown } | null)?.error;
+  if (typeof err !== "object" || err === null) return false;
+  const fields = err as { code?: unknown; type?: unknown; message?: unknown };
+  const code = typeof fields.code === "string" ? fields.code.toLowerCase() : "";
+  const type = typeof fields.type === "string" ? fields.type.toLowerCase() : "";
+  if (MODEL_ERROR_CODES.includes(code) || MODEL_ERROR_CODES.includes(type))
+    return true;
+  const msg =
+    typeof fields.message === "string" ? fields.message.toLowerCase() : "";
+  return (
+    msg.includes("model") &&
+    (msg.includes("not found") ||
+      msg.includes("not offered") ||
+      msg.includes("not supported") ||
+      msg.includes("does not exist"))
+  );
+}
+
 async function tryFormat(args: {
   provider: VerifyProvider;
   baseUrl: string;
@@ -40,7 +74,7 @@ async function tryFormat(args: {
   timeoutMs: number;
   transport: TransportFn;
 }): Promise<{
-  outcome: "ok" | "auth" | "format" | "transient" | "cors";
+  outcome: "ok" | "auth" | "format" | "transient" | "cors" | "model";
   status: number | null;
   corsBlocked: boolean;
 }> {
@@ -65,8 +99,9 @@ async function tryFormat(args: {
     return { outcome: "cors", status: null, corsBlocked: true };
   if (res.status === null)
     return { outcome: "transient", status: null, corsBlocked: false };
+  const outcome = classifyStatus(res.status);
   return {
-    outcome: classifyStatus(res.status),
+    outcome: outcome !== "ok" && rejectsModel(res.data) ? "model" : outcome,
     status: res.status,
     corsBlocked: false,
   };
@@ -86,6 +121,7 @@ export async function runHandshake(opts: {
     opts.provider === "openai" ? ["openai"] : [opts.provider, "openai"];
 
   let sawAuth = false;
+  let sawModelRejected = false;
   let lastStatus: number | null = null;
 
   for (const provider of order) {
@@ -107,8 +143,18 @@ export async function runHandshake(opts: {
         status: r.status!,
       };
     if (r.outcome === "auth") sawAuth = true;
+    if (r.outcome === "model") sawModelRejected = true;
   }
 
+  // Before the key check: a gateway that rejects the model name often answers
+  // 403 on the second format too, which would otherwise read as a bad key.
+  if (sawModelRejected)
+    return {
+      ok: false,
+      reason: "model-rejected",
+      status: lastStatus,
+      corsBlocked: false,
+    };
   if (sawAuth)
     return {
       ok: false,

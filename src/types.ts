@@ -66,5 +66,10 @@ export type VerifyResult = {
   /** Output rate, when a probe generated enough tokens to measure one. */
   throughput?: ThroughputSample | null;
   connectivityError:
-    "cors-needs-backend" | "unreachable" | "invalid-key" | "no-format" | null;
+    | "cors-needs-backend"
+    | "unreachable"
+    | "invalid-key"
+    | "model-rejected"
+    | "no-format"
+    | null;
 };
