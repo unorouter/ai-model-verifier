@@ -2,6 +2,7 @@ import { checkThinkingSignature } from "./detectors/thinking-signature";
 import { checkTokenTruth } from "./detectors/token-truth";
 import { readResponseMetadata } from "./detectors/response-metadata";
 import { sampleThroughput } from "./detectors/throughput";
+import { probeThinkingFloor, } from "./detectors/thinking-floor";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
@@ -240,6 +241,20 @@ export async function runVerification(opts) {
             timeoutMs,
         })
         : undefined;
+    const thinkingFloor = opts.checkThinkingFloor &&
+        (resolvedProvider === "openai" || resolvedProvider === "gemini")
+        ? await probeThinkingFloor({
+            transport,
+            baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+            apiKey: opts.apiKey,
+            model: opts.model,
+            provider: resolvedProvider,
+            timeoutMs,
+            options: typeof opts.checkThinkingFloor === "object"
+                ? opts.checkThinkingFloor
+                : undefined,
+        })
+        : undefined;
     // Free metadata: derived from probe responses we already paid for.
     const richest = results.reduce((best, r) => (r.usage?.completion ?? 0) > (best?.usage?.completion ?? 0) ? r : best, null);
     const responseMetadata = richest?.envelope;
@@ -252,12 +267,21 @@ export async function runVerification(opts) {
         })
         : null;
     const detectedModel = results.find((r) => r.detectedModel)?.detectedModel ?? null;
-    const verdict = aggregateVerdict({
+    const aggregated = aggregateVerdict({
         model: opts.model,
         cfg,
         results,
         detectedModel,
     });
+    // The floor is hard evidence the probes cannot see: the reply echoed the
+    // right name and read fine, it just never thought.
+    const verdict = thinkingFloor?.state === "no-thinking"
+        ? {
+            ...aggregated,
+            verdict: "suspicious",
+            reasons: [`no-thinking: ${thinkingFloor.reason}`],
+        }
+        : aggregated;
     const corsBlocked = hs.mode === "direct" && results.some((r) => r.corsBlocked);
     return {
         provider: opts.provider,
@@ -290,6 +314,7 @@ export async function runVerification(opts) {
         resolvedProvider,
         ...(signature ? { signature } : {}),
         ...(tokenTruth ? { tokenTruth } : {}),
+        ...(thinkingFloor ? { thinkingFloor } : {}),
         ...(responseMetadata ? { responseMetadata } : {}),
         ...(throughput ? { throughput } : {}),
         connectivityError: null,

@@ -33,7 +33,9 @@ import { anthropicConfig } from "ai-model-verifier/providers/anthropic";
 `coding-tool` refusals (Kiro/Amazon Q wearing a Claude badge), scam pages,
 CJK language leaks from a substituted Chinese model, response-mixing proxies,
 foreign vendor identity, Claude tier substitution (opus billed, sonnet served),
-and envelope-level model substitution.
+envelope-level model substitution, and (opt-in, `checkThinkingFloor`) a
+model that cannot switch thinking off answering with no reasoning tokens, the
+signature of a flash tier sold as Gemini 2.5 Pro.
 
 ## License
 

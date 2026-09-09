@@ -1,5 +1,6 @@
 import type { SignatureResult } from "./detectors/thinking-signature";
 import type { TokenTruthResult } from "./detectors/token-truth";
+import type { ThinkingFloorResult } from "./detectors/thinking-floor";
 import type { ResponseMetadata } from "./detectors/response-metadata";
 import type { ThroughputSample } from "./detectors/throughput";
 
@@ -61,6 +62,8 @@ export type VerifyResult = {
   signature?: SignatureResult;
   /** Present only when the token-accounting check was requested. */
   tokenTruth?: TokenTruthResult;
+  /** Present only when the thinking-floor check was requested. */
+  thinkingFloor?: ThinkingFloorResult;
   /** Envelope observations, free: read from responses already collected. */
   responseMetadata?: ResponseMetadata;
   /** Output rate, when a probe generated enough tokens to measure one. */
