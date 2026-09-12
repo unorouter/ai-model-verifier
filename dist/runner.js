@@ -3,6 +3,8 @@ import { checkTokenTruth } from "./detectors/token-truth";
 import { readResponseMetadata } from "./detectors/response-metadata";
 import { sampleThroughput } from "./detectors/throughput";
 import { probeThinkingFloor, } from "./detectors/thinking-floor";
+import { judgeTokenizerFingerprint, measureTokenizerFingerprint, } from "./detectors/tokenizer-fingerprint";
+import { providerForModel } from "./models";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
@@ -255,6 +257,21 @@ export async function runVerification(opts) {
                 : undefined,
         })
         : undefined;
+    const tokenizerFingerprint = opts.checkTokenizerFingerprint &&
+        providerForModel(opts.model) === "anthropic" &&
+        resolvedProvider !== "gemini"
+        ? await measureTokenizerFingerprint({
+            transport,
+            baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+            apiKey: opts.apiKey,
+            model: opts.model,
+            wire: resolvedProvider === "anthropic" ? "anthropic" : "openai",
+            timeoutMs,
+            signatures: typeof opts.checkTokenizerFingerprint === "object"
+                ? opts.checkTokenizerFingerprint.signatures
+                : undefined,
+        })
+        : undefined;
     // Free metadata: derived from probe responses we already paid for.
     const richest = results.reduce((best, r) => (r.usage?.completion ?? 0) > (best?.usage?.completion ?? 0) ? r : best, null);
     const responseMetadata = richest?.envelope;
@@ -275,13 +292,24 @@ export async function runVerification(opts) {
     });
     // The floor is hard evidence the probes cannot see: the reply echoed the
     // right name and read fine, it just never thought.
+    const fingerprintTier = tokenizerFingerprint && cfg.tiers
+        ? judgeTokenizerFingerprint(opts.model, tokenizerFingerprint, cfg.tiers)
+        : null;
     const verdict = thinkingFloor?.state === "no-thinking"
         ? {
             ...aggregated,
             verdict: "suspicious",
             reasons: [`no-thinking: ${thinkingFloor.reason}`],
         }
-        : aggregated;
+        : fingerprintTier
+            ? {
+                ...aggregated,
+                verdict: "suspicious",
+                reasons: [
+                    `tokenizer-fingerprint: delta ${tokenizerFingerprint.delta} is the ${fingerprintTier} signature, requested ${opts.model}`,
+                ],
+            }
+            : aggregated;
     const corsBlocked = hs.mode === "direct" && results.some((r) => r.corsBlocked);
     return {
         provider: opts.provider,
@@ -315,6 +343,7 @@ export async function runVerification(opts) {
         ...(signature ? { signature } : {}),
         ...(tokenTruth ? { tokenTruth } : {}),
         ...(thinkingFloor ? { thinkingFloor } : {}),
+        ...(tokenizerFingerprint ? { tokenizerFingerprint } : {}),
         ...(responseMetadata ? { responseMetadata } : {}),
         ...(throughput ? { throughput } : {}),
         connectivityError: null,

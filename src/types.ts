@@ -1,6 +1,7 @@
 import type { SignatureResult } from "./detectors/thinking-signature";
 import type { TokenTruthResult } from "./detectors/token-truth";
 import type { ThinkingFloorResult } from "./detectors/thinking-floor";
+import type { TokenizerFingerprintResult } from "./detectors/tokenizer-fingerprint";
 import type { ResponseMetadata } from "./detectors/response-metadata";
 import type { ThroughputSample } from "./detectors/throughput";
 
@@ -64,6 +65,8 @@ export type VerifyResult = {
   tokenTruth?: TokenTruthResult;
   /** Present only when the thinking-floor check was requested. */
   thinkingFloor?: ThinkingFloorResult;
+  /** Present only when the tokenizer fingerprint was requested (Claude only). */
+  tokenizerFingerprint?: TokenizerFingerprintResult;
   /** Envelope observations, free: read from responses already collected. */
   responseMetadata?: ResponseMetadata;
   /** Output rate, when a probe generated enough tokens to measure one. */

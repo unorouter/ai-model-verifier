@@ -11,10 +11,7 @@
  * without re-measuring: the loose-looking bounds exist because real Anthropic
  * responses sat near them.
  */
-const SHORT_PROMPT = "Reply with exactly: ok";
-/** The long variant adds a fixed run of tokens; the delta is what we check. */
-const LONG_PROMPT = `${SHORT_PROMPT}\n\nReference text:${" apple".repeat(80)}`;
-const MAX_TOKENS = 16;
+import { COUNT_PROBE_MAX_TOKENS as MAX_TOKENS, LONG_PROMPT, SHORT_PROMPT, } from "../internal/fixed-text";
 /**
  * Expected `input_tokens` growth between the short and long prompt.
  *

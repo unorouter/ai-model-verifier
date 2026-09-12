@@ -6,6 +6,12 @@ import {
   probeThinkingFloor,
   type ThinkingFloorOptions,
 } from "./detectors/thinking-floor";
+import {
+  judgeTokenizerFingerprint,
+  measureTokenizerFingerprint,
+  type TierSignatures,
+} from "./detectors/tokenizer-fingerprint";
+import { providerForModel } from "./models";
 import { sleep } from "./internal/utils";
 import { echoesNonce, makeNonce } from "./nonce";
 import { runHandshake } from "./handshake";
@@ -280,6 +286,12 @@ export async function runVerification(opts: {
    * model list or the floor.
    */
   checkThinkingFloor?: boolean | ThinkingFloorOptions;
+  /**
+   * Measure the input-token delta for a fixed text and compare it with the
+   * tier signatures (haiku by default). Claude only, over either wire. Opt-in:
+   * two short requests. Pass `{ signatures }` to supply your own calibration.
+   */
+  checkTokenizerFingerprint?: boolean | { signatures?: TierSignatures };
 }): Promise<VerifyResult> {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const transport = opts.transport ?? probeTransport;
@@ -355,6 +367,24 @@ export async function runVerification(opts: {
         })
       : undefined;
 
+  const tokenizerFingerprint =
+    opts.checkTokenizerFingerprint &&
+    providerForModel(opts.model) === "anthropic" &&
+    resolvedProvider !== "gemini"
+      ? await measureTokenizerFingerprint({
+          transport,
+          baseUrl: normalizeProbeBaseUrl(opts.baseUrl),
+          apiKey: opts.apiKey,
+          model: opts.model,
+          wire: resolvedProvider === "anthropic" ? "anthropic" : "openai",
+          timeoutMs,
+          signatures:
+            typeof opts.checkTokenizerFingerprint === "object"
+              ? opts.checkTokenizerFingerprint.signatures
+              : undefined,
+        })
+      : undefined;
+
   // Free metadata: derived from probe responses we already paid for.
   const richest = results.reduce<(typeof results)[number] | null>(
     (best, r) =>
@@ -381,6 +411,10 @@ export async function runVerification(opts: {
   });
   // The floor is hard evidence the probes cannot see: the reply echoed the
   // right name and read fine, it just never thought.
+  const fingerprintTier =
+    tokenizerFingerprint && cfg.tiers
+      ? judgeTokenizerFingerprint(opts.model, tokenizerFingerprint, cfg.tiers)
+      : null;
   const verdict =
     thinkingFloor?.state === "no-thinking"
       ? {
@@ -388,7 +422,15 @@ export async function runVerification(opts: {
           verdict: "suspicious" as const,
           reasons: [`no-thinking: ${thinkingFloor.reason}`],
         }
-      : aggregated;
+      : fingerprintTier
+        ? {
+            ...aggregated,
+            verdict: "suspicious" as const,
+            reasons: [
+              `tokenizer-fingerprint: delta ${tokenizerFingerprint!.delta} is the ${fingerprintTier} signature, requested ${opts.model}`,
+            ],
+          }
+        : aggregated;
   const corsBlocked =
     hs.mode === "direct" && results.some((r) => r.corsBlocked);
 
@@ -424,6 +466,7 @@ export async function runVerification(opts: {
     ...(signature ? { signature } : {}),
     ...(tokenTruth ? { tokenTruth } : {}),
     ...(thinkingFloor ? { thinkingFloor } : {}),
+    ...(tokenizerFingerprint ? { tokenizerFingerprint } : {}),
     ...(responseMetadata ? { responseMetadata } : {}),
     ...(throughput ? { throughput } : {}),
     connectivityError: null,

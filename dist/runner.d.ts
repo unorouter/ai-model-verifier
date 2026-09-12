@@ -1,4 +1,5 @@
 import { type ThinkingFloorOptions } from "./detectors/thinking-floor";
+import { type TierSignatures } from "./detectors/tokenizer-fingerprint";
 import { type TransportFn } from "./transport";
 import type { TransportMode, VerifyProvider, VerifyResult } from "./types";
 export declare function runVerification(opts: {
@@ -26,5 +27,13 @@ export declare function runVerification(opts: {
      * model list or the floor.
      */
     checkThinkingFloor?: boolean | ThinkingFloorOptions;
+    /**
+     * Measure the input-token delta for a fixed text and compare it with the
+     * tier signatures (haiku by default). Claude only, over either wire. Opt-in:
+     * two short requests. Pass `{ signatures }` to supply your own calibration.
+     */
+    checkTokenizerFingerprint?: boolean | {
+        signatures?: TierSignatures;
+    };
 }): Promise<VerifyResult>;
 //# sourceMappingURL=runner.d.ts.map

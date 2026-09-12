@@ -11,3 +11,7 @@ export type {
   ProbeMeta,
 } from "./providers/config";
 export type { TransportFn, TransportArgs, TransportResult } from "./transport";
+export type {
+  TokenizerFingerprintResult,
+  TierSignatures,
+} from "./detectors/tokenizer-fingerprint";
