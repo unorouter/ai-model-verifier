@@ -21,11 +21,32 @@ engine runs in the browser, on a server, and inside our sync pipeline.
   that only checks Anthropic never bundles the Gemini config.
 - **Zero required dependencies.**
 
+## Install
+
+Published on npm as [ai-model-verifier](https://www.npmjs.com/package/ai-model-verifier).
+
+```sh
+npm i ai-model-verifier
+# or
+bun add ai-model-verifier
+```
+
 ## Use
 
 ```ts
 import { runVerification } from "ai-model-verifier";
 import { anthropicConfig } from "ai-model-verifier/providers/anthropic";
+
+const result = await runVerification({
+  provider: "anthropic",
+  baseUrl: "https://relay.example.com",
+  apiKey: process.env.RELAY_KEY!,
+  model: "claude-opus-4-6",
+  mode: "server",
+  checkSignature: true,
+  checkTokenTruth: true,
+});
+console.log(result.verdict, result.reasons);
 ```
 
 ## What it detects
