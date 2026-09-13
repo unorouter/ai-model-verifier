@@ -36,12 +36,13 @@ foreign vendor identity, Claude tier substitution (opus billed, sonnet served),
 envelope-level model substitution, and (opt-in, `checkThinkingFloor`) a
 model that cannot switch thinking off answering with no reasoning tokens, the
 signature of a flash tier sold as Gemini 2.5 Pro, and (opt-in,
-`checkTokenizerFingerprint`) the input-token count for a fixed text, which no
-system prompt can coach: on the lanes it was calibrated against, every Claude
-Haiku backend billed the same delta to the token while Opus and Fable did not,
-so an "Opus" lane carrying the Haiku count is exposed even when it echoes the
-right model name. The same measurement, kept per lane, reveals a backend swap
-the moment the count changes.
+`checkTokenizerFingerprint`) the input-token delta for a fixed text, which no
+system prompt can coach. Its job is drift: the delta is deterministic per
+endpoint, so a lane whose delta moves between two measurements changed its
+backend whatever the reply now calls itself. It does not name a tier on its
+own (Opus 4.6, Sonnet 4.6 and Haiku 4.5 share a tokenizer, and relays count
+differently from one another), so the signature table ships empty and is a
+per-endpoint calibration the caller supplies.
 
 ## License
 

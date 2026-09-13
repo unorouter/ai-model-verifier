@@ -1,36 +1,29 @@
 /**
  * Tokenizer fingerprint: how many input tokens the endpoint bills for a fixed
- * run of text.
+ * run of text, measured as the difference between a long and a short prompt so
+ * anything a relay injects cancels out.
  *
- * Every other tier signal can be coached: a system prompt teaches the model to
- * say "Opus", a relay rewrites the `model` field. The token count for a fixed
- * text cannot be coached, because the model never sees the question. It is
- * decided by the tokenizer behind the endpoint, and Claude generations do not
- * share one: on 2026-09-12, across 68 marketplace lanes measured twice each,
- * every lane whose reply named claude-haiku-4-5 billed a delta of exactly 90
- * (18 of 18), while lanes serving opus-4-6 and fable clustered at 84 on the
- * same relay path. Two of the lanes at 90 echoed an opus name in the `model`
- * field and were haiku by every other measure.
+ * What it is good for: drift. The delta is deterministic per endpoint (68
+ * marketplace lanes measured twice each agreed to the token on every repeat),
+ * so a change between two measurements of the same lane means the backend
+ * changed, whatever the reply now calls itself. Keep the prior per lane and
+ * compare with `fingerprintDrifted`.
  *
- * Two uses, in order of confidence:
- *
- *  1. Drift. The delta is deterministic per lane (identical on repeat), so a
- *     change between two measurements of the same lane means the backend
- *     changed, whatever the reply now calls itself. The caller keeps the prior.
- *  2. Signature. A delta known to belong to a cheaper tier than the one
- *     requested. The table is calibration, not law: relays that count tokens
- *     themselves produce their own values (211, 609 were both seen), so an
- *     unknown delta proves nothing and only a listed one is judged.
+ * What it is NOT good for: naming the tier from the number alone. Opus 4.6,
+ * Sonnet 4.6 and Haiku 4.5 share one tokenizer, so they bill the same delta on
+ * the same path, and relays count differently from each other (77, 90, 134,
+ * 160, 211 and 609 were all seen for one text on lanes echoing one model name)
+ * or invent usage outright (13 tokens for eighty words, negative deltas on
+ * repeat). A signature table therefore ships EMPTY: only a caller who has
+ * calibrated a table on a specific endpoint family, per model generation and
+ * across several text lengths, should pass one, and even then only
+ * between-model differences on the same endpoint are evidence.
  */
 import type { TransportFn } from "../transport";
 /** Wire format the endpoint speaks; Claude is sold over both. */
 export type CountWire = "anthropic" | "openai";
 export type TierSignatures = Readonly<Record<string, readonly number[]>>;
-/**
- * Deltas measured on lanes whose reply named the tier, 2026-09-12. Only haiku
- * is listed: its 18 samples agreed to the token, while opus and fable spread
- * across relay counting paths and would condemn honest lanes.
- */
+/** Empty on purpose; see the module note. Pass your own calibration. */
 export declare const DEFAULT_TIER_SIGNATURES: TierSignatures;
 export type TokenizerFingerprintState = "measured" | "unmeasured";
 export type TokenizerFingerprintResult = {
