@@ -1,7 +1,14 @@
-// Root export: types, the runner and the rule registry. Providers and detectors
-// have their own entry points so a consumer only bundles what it enables.
+// Root export: the engine, the tables and every type. Vendors, rules, models,
+// transport and highlight have their own entry points for consumers that only
+// want a piece.
 export * from "./types";
-export * from "./rules";
-export { runVerification } from "./runner";
-export { normalizeProbeBaseUrl } from "./providers/config";
+export { verify, runRules, verifyWith, runRulesWith, callWire } from "./verify";
+export { createVerifier } from "./registry";
+export { defineVendor } from "./vendors/types";
+export { VENDORS, vendorFor } from "./vendors/table";
+export { defineRule } from "./rules/types";
+export { RULES, DETECTION_RULES, DETECTION_EXCEPTIONS, RULE_FOR_SIGNAL, } from "./rules/table";
+export { defineModelFacts, resolveModelFacts } from "./models/facts";
+export { PROBES, PROBE_SIGNALS } from "./probes/table";
+export { directTransport, browserTransport } from "./transport";
 //# sourceMappingURL=index.js.map

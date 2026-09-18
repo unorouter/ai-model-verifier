@@ -1,4 +1,4 @@
-import type { TransportMode } from "./types";
+export type TransportMode = "direct" | "server";
 export type TransportResult = {
     status: number | null;
     data: unknown;
@@ -13,5 +13,13 @@ export type TransportArgs = {
     timeoutMs: number;
 };
 export type TransportFn = (args: TransportArgs) => Promise<TransportResult>;
-export declare function probeTransport(args: TransportArgs): Promise<TransportResult>;
+/** Plain fetch from wherever the code runs. */
+export declare const directTransport: TransportFn;
+/**
+ * From a browser through the caller's own backend, which forwards
+ * `{ url, headers, reqBody }` and answers `{ data: { status, data } }`.
+ */
+export declare function browserTransport(opts: {
+    serverProxyUrl: string;
+}): TransportFn;
 //# sourceMappingURL=transport.d.ts.map

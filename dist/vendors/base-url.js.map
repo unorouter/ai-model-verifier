@@ -1,0 +1,1 @@
+{"version":3,"file":"base-url.js","sourceRoot":"","sources":["../../src/vendors/base-url.ts"],"names":[],"mappings":"AAAA,MAAM,cAAc,GAAG,gCAAgC,CAAC;AAExD,kFAAkF;AAClF,MAAM,UAAU,gBAAgB,CAAC,OAAe;IAC9C,OAAO,OAAO,CAAC,IAAI,EAAE,CAAC,OAAO,CAAC,MAAM,EAAE,EAAE,CAAC,CAAC,OAAO,CAAC,cAAc,EAAE,EAAE,CAAC,CAAC;AACxE,CAAC"}

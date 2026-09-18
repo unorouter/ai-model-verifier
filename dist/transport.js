@@ -16,7 +16,8 @@ async function corsBlockedNotUnreachable(url, timeoutMs) {
         return false;
     }
 }
-async function direct(args) {
+/** Plain fetch from wherever the code runs. */
+export const directTransport = async (args) => {
     try {
         const res = await fetch(args.url, {
             method: "POST",
@@ -39,41 +40,48 @@ async function direct(args) {
                 (await corsBlockedNotUnreachable(args.url, args.timeoutMs)),
         };
     }
-}
-async function viaServer(args) {
-    try {
-        const res = await fetch("/api/models/verify/probe", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-                url: args.url,
-                headers: args.headers,
-                reqBody: args.reqBody,
-            }),
-            signal: AbortSignal.timeout(args.timeoutMs + 5000),
-        });
-        const wrapped = rec(await res.json().catch(() => null));
-        const inner = rec(wrapped?.data);
-        if (!inner || typeof inner.status !== "number")
+};
+/**
+ * From a browser through the caller's own backend, which forwards
+ * `{ url, headers, reqBody }` and answers `{ data: { status, data } }`.
+ */
+export function browserTransport(opts) {
+    return async (args) => {
+        try {
+            const res = await fetch(opts.serverProxyUrl, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    url: args.url,
+                    headers: args.headers,
+                    reqBody: args.reqBody,
+                }),
+                signal: AbortSignal.timeout(args.timeoutMs + 5000),
+            });
+            const wrapped = rec(await res.json().catch(() => null));
+            const inner = rec(wrapped?.data);
+            if (!inner || typeof inner.status !== "number")
+                return {
+                    status: null,
+                    data: null,
+                    error: `proxy HTTP ${res.status}`,
+                    corsBlocked: false,
+                };
+            return {
+                status: inner.status,
+                data: inner.data,
+                error: null,
+                corsBlocked: false,
+            };
+        }
+        catch (err) {
             return {
                 status: null,
                 data: null,
-                error: `proxy HTTP ${res.status}`,
+                error: errMessage(err),
                 corsBlocked: false,
             };
-        return {
-            status: inner.status,
-            data: inner.data,
-            error: null,
-            corsBlocked: false,
-        };
-    }
-    catch (err) {
-        const msg = errMessage(err);
-        return { status: null, data: null, error: msg, corsBlocked: false };
-    }
-}
-export function probeTransport(args) {
-    return args.mode === "server" ? viaServer(args) : direct(args);
+        }
+    };
 }
 //# sourceMappingURL=transport.js.map

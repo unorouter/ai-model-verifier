@@ -1,7 +1,7 @@
 {
   "name": "ai-model-verifier",
-  "version": "1.4.1",
-  "description": "Verify an AI API endpoint really serves the model it claims: model substitution, Claude thinking signatures, token-billing accuracy, response-envelope and throughput evidence.",
+  "version": "2.0.0",
+  "description": "Verify an AI API endpoint really serves the model it claims: a vendor adapter per wire, a rule table over shared evidence, and per model facts. Model substitution, Claude thinking signatures, token billing accuracy, envelope and throughput evidence.",
   "license": "AGPL-3.0-only",
   "type": "module",
   "repository": {
@@ -21,7 +21,9 @@
     "claude",
     "openai",
     "gemini",
-    "token-billing"
+    "token-billing",
+    "rule-engine",
+    "adapter"
   ],
   "sideEffects": false,
   "files": [
@@ -32,19 +34,32 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./providers/*": {
-      "types": "./dist/providers/*.d.ts",
-      "default": "./dist/providers/*.js"
+    "./vendors": {
+      "types": "./dist/vendors/index.d.ts",
+      "default": "./dist/vendors/index.js"
     },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "default": "./dist/*.js"
+    "./rules": {
+      "types": "./dist/rules/index.d.ts",
+      "default": "./dist/rules/index.js"
+    },
+    "./models": {
+      "types": "./dist/models/index.d.ts",
+      "default": "./dist/models/index.js"
+    },
+    "./transport": {
+      "types": "./dist/transport.d.ts",
+      "default": "./dist/transport.js"
+    },
+    "./highlight": {
+      "types": "./dist/highlight.d.ts",
+      "default": "./dist/highlight.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run build"
+    "test": "bun test",
+    "prepublishOnly": "bun run typecheck && bun run build"
   },
   "devDependencies": {
     "typescript": "^7.0.2"

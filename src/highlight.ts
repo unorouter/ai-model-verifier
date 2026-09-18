@@ -1,11 +1,10 @@
+import { VENDORS, vendorFor } from "./vendors/table";
 import {
   CJK_CHAR,
   CODING_TOOL_NAMES,
   CODING_TOOL_REFUSAL_PATTERNS,
   SCAM_PAGE_PATTERNS,
-} from "./patterns";
-import { PROVIDER_CONFIGS } from "./providers/config";
-import type { VerifyProvider } from "./types";
+} from "./identity/patterns";
 
 export type HighlightKind =
   "foreign" | "cjk" | "coding-tool" | "scam" | "home" | null;
@@ -14,7 +13,11 @@ export type HighlightSegment = { text: string; kind: HighlightKind };
 
 type Match = { start: number; end: number; kind: HighlightKind };
 
-function collectPhrase(lower: string, phrases: string[], kind: HighlightKind) {
+function collectPhrase(
+  lower: string,
+  phrases: readonly string[],
+  kind: HighlightKind,
+) {
   const out: Match[] = [];
   for (const phrase of phrases) {
     if (!phrase) continue;
@@ -30,28 +33,29 @@ function collectPhrase(lower: string, phrases: string[], kind: HighlightKind) {
   return out;
 }
 
+/** Marks the phrases the signals react to, for a UI to colour a reply. */
 export function highlightSpans(
   text: string,
-  providerKind: VerifyProvider,
+  vendorId: string,
   probeLabel: string,
 ): HighlightSegment[] {
   if (!text) return [];
-  const cfg = PROVIDER_CONFIGS[providerKind];
-  if (!cfg) return [{ text, kind: null }];
+  const wire = vendorFor(VENDORS, vendorId);
+  if (!wire) return [{ text, kind: null }];
 
   const lower = text.toLowerCase();
   const matches: Match[] = [
     ...collectPhrase(lower, CODING_TOOL_NAMES, "coding-tool"),
     ...collectPhrase(lower, CODING_TOOL_REFUSAL_PATTERNS, "coding-tool"),
     ...collectPhrase(lower, SCAM_PAGE_PATTERNS, "scam"),
-    ...collectPhrase(lower, cfg.foreignIdentityPatterns, "foreign"),
-    ...collectPhrase(lower, cfg.homeIdentityPatterns, "home"),
-    ...collectPhrase(lower, cfg.homeModelNamePatterns, "home"),
+    ...collectPhrase(lower, wire.identity.foreign, "foreign"),
+    ...collectPhrase(lower, wire.identity.home, "home"),
+    ...collectPhrase(lower, wire.identity.homeModelNames, "home"),
   ];
 
   if (probeLabel === "model-name")
     matches.push(
-      ...collectPhrase(lower, cfg.cloudModelNamePatterns, "foreign"),
+      ...collectPhrase(lower, wire.identity.cloudModelNames, "foreign"),
     );
 
   for (const m of text.matchAll(CJK_CHAR))
