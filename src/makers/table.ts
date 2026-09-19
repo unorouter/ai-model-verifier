@@ -157,6 +157,19 @@ export const MAKERS = [
     cjkNative: false,
   },
   {
+    id: "writer",
+    name: "Writer",
+    wire: "openai",
+    models: ["palmyra*"],
+    // "writer" is ordinary English and would land in every other maker's
+    // foreign list; the model name is the tell.
+    home: [],
+    modelNames: ["palmyra"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: false,
+  },
+  {
     id: "tencent",
     name: "Tencent",
     wire: "openai",

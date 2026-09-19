@@ -20,7 +20,7 @@ export declare function createVerifier<V extends string = never, R extends strin
     omit?: readonly RuleId[];
     modelFacts?: readonly FactsEntry<MakerId | M>[];
 }): {
-    registry: Registry<"anthropic" | "gemini" | "openai" | V, "cjk-leak" | "coding-tool" | "envelope" | "foreign" | "mux" | "quorum" | "scam" | "served-model-mismatch" | "signature" | "substituted" | "thinking-floor" | "throughput" | "tier-self-report" | "token-truth" | "tokenizer-fingerprint" | R, "alibaba" | "anthropic" | "deepseek" | "google" | "meta" | "minimax" | "mistral" | "moonshot" | "openai" | "tencent" | "xai" | "xiaomi" | "zhipu" | M>;
+    registry: Registry<"anthropic" | "gemini" | "openai" | V, "cjk-leak" | "coding-tool" | "envelope" | "foreign" | "mux" | "quorum" | "scam" | "served-model-mismatch" | "signature" | "substituted" | "thinking-floor" | "throughput" | "tier-self-report" | "token-truth" | "tokenizer-fingerprint" | R, "alibaba" | "anthropic" | "deepseek" | "google" | "meta" | "minimax" | "mistral" | "moonshot" | "openai" | "tencent" | "writer" | "xai" | "xiaomi" | "zhipu" | M>;
     verify: (opts: VerifyOptions<VendorId | V>) => Promise<VerifyResult<VendorId | V, RuleId | R, MakerId | M>>;
     runRules: (opts: VerifyOptions<VendorId | V> & {
         only: readonly (RuleId | R)[];

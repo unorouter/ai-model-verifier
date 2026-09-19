@@ -121,6 +121,16 @@ export declare const MAKERS: readonly [{
     readonly tiers: null;
     readonly cjkNative: false;
 }, {
+    readonly id: "writer";
+    readonly name: "Writer";
+    readonly wire: "openai";
+    readonly models: readonly ["palmyra*"];
+    readonly home: readonly [];
+    readonly modelNames: readonly ["palmyra"];
+    readonly acceptsCloudHost: false;
+    readonly tiers: null;
+    readonly cjkNative: false;
+}, {
     readonly id: "tencent";
     readonly name: "Tencent";
     readonly wire: "openai";

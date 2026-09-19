@@ -42,6 +42,9 @@ export declare const MODEL_FACTS: readonly [{
     readonly match: "gemini-2-5-pro*";
     readonly alwaysThinks: true;
 }, {
+    readonly match: readonly ["gemini-2-5*", "gemini-3*"];
+    readonly minOutputTokens: 2000;
+}, {
     readonly match: readonly ["gpt-5*", "o1*", "o2*", "o3*", "o4*", "o5*", "o6*", "o7*", "o8*", "o9*"];
     readonly minOutputTokens: 2000;
 }];

@@ -565,6 +565,35 @@ describe("makers", () => {
     expect(claude.reasons).toEqual(["foreign-identity: identity"]);
   });
 
+  test("Gemini over the OpenAI wire gets reasoning room", async () => {
+    const seen: number[] = [];
+    const inner = makerWire("Google", "Gemini 3.8 Flash");
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "gemini-3.8-flash",
+      transport: async (a) => {
+        const b = bodyOf(a);
+        if (typeof b["max_completion_tokens"] === "number")
+          seen.push(b["max_completion_tokens"]);
+        return inner(a);
+      },
+    });
+    expect(r.verdict).toBe("genuine");
+    expect(seen.length).toBeGreaterThan(0);
+    expect(Math.min(...seen)).toBeGreaterThanOrEqual(2000);
+  });
+
+  test("a Palmyra answering under a Mistral label is foreign", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "mistral-large-3",
+      transport: makerWire("Mistral", "palmyra-instruct-32b-0719-v1"),
+    });
+    expect(r.reasons).toEqual(["foreign-identity: model-name"]);
+  });
+
   test("catalog: wire and maker per model id", () => {
     expect(wireForModel("deepseek-v3.1")).toBe("openai");
     expect(wireForModel("claude-opus-4-6")).toBe("anthropic");

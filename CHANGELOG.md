@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.1
+
+- Gemini 2.5 and 3.x get reasoning room over the OpenAI wire
+  (`max_completion_tokens` 2000): the probes' small caps were spent on hidden
+  thought and a few characters of visible reply failed every probe.
+- New maker `writer` (Palmyra), so a Palmyra answering under another label
+  reads as foreign.
+
 ## 3.0.0
 
 Makers split from wires. A maker is who trained the model; a wire is how the
