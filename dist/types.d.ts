@@ -5,7 +5,7 @@ import type { TransportFn, TransportMode } from "./transport";
 import type { VendorId } from "./vendors/table";
 import type { BuiltRequest, ProbeUsage } from "./vendors/types";
 import type { TierSignatures } from "./rules/tokenizer-fingerprint";
-export type { ProbeUsage, ProbeLabel, ProbeSignal, TransportMode, VendorId, RuleId };
+export type { ProbeUsage, ProbeLabel, ProbeSignal, TransportMode, VendorId, RuleId, };
 export type VerifyVerdict = "genuine" | "suspicious" | "unverified";
 export type ProbeOutcome = {
     label: ProbeLabel;

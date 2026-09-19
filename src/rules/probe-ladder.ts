@@ -97,13 +97,13 @@ export const servedModelMismatchRule = defineRule({
   id: "served-model-mismatch",
   layer: "probe",
   needs: ["probes"],
-  applies: (ctx) => ctx.wire.tiers !== null,
+  applies: (ctx) => ctx.tiers !== null,
   judge: async (ctx) => {
     const probes = await ctx.evidence("probes");
     const served = detectServedModelMismatch(
       ctx.model,
       probes.map((r) => r.detectedModel),
-      ctx.wire.tiers ?? [],
+      ctx.tiers ?? [],
     );
     return served
       ? {
@@ -175,13 +175,13 @@ export const tierSelfReportRule = defineRule({
   id: "tier-self-report",
   layer: "note",
   needs: ["probes"],
-  applies: (ctx) => ctx.wire.tiers !== null,
+  applies: (ctx) => ctx.tiers !== null,
   judge: async (ctx) => {
     const probes = await ctx.evidence("probes");
     const claimed = detectTierMismatch(
       ctx.model,
       probes.find((r) => r.label === "model-name")?.text,
-      ctx.wire.tiers ?? [],
+      ctx.tiers ?? [],
     );
     return claimed
       ? {

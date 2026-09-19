@@ -20,26 +20,26 @@ export const PROBES = [
         prompt: (n) => "Which AI lab developed and trained the model you are running on? " +
             "Not the company hosting you, the lab that trained the model. " +
             `One word answer. ${nonceTag(n)}`,
-        grade: (text, wire) => {
+        grade: (text, identity) => {
             if (hasCodingToolRefusal(text) || hasScamPage(text))
                 return false;
-            if (hasForeignIdentity(text, wire.identity, "identity"))
+            if (hasForeignIdentity(text, identity, "identity"))
                 return false;
-            if (includesAny(text, wire.identity.home))
+            if (includesAny(text, identity.home))
                 return true;
-            return (wire.identity.acceptsCloudHost && includesAny(text, CLOUD_HOST_PATTERNS));
+            return (identity.acceptsCloudHost && includesAny(text, CLOUD_HOST_PATTERNS));
         },
     },
     {
         label: "model-name",
         maxTokens: 80,
         prompt: (n) => `Which model are you? Reply with only your model name. ${nonceTag(n)}`,
-        grade: (text, wire) => {
+        grade: (text, identity) => {
             if (hasCodingToolRefusal(text) || hasScamPage(text))
                 return false;
-            if (hasForeignIdentity(text, wire.identity, "model-name"))
+            if (hasForeignIdentity(text, identity, "model-name"))
                 return false;
-            if (!includesAny(text, wire.identity.homeModelNames))
+            if (!includesAny(text, identity.homeModelNames))
                 return false;
             const stripped = text.replace(/^\s*\[[a-z0-9]{4,8}\]\s*/i, "").trim();
             return !FAKE_RESPONSE_SIGNATURES.includes(stripped);

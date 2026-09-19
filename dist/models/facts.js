@@ -17,7 +17,11 @@ export function globMatches(name, pattern) {
     return new RegExp(`^${p.split("*").map(escapeRegExp).join(".*")}$`).test(name);
 }
 export const MODEL_FACTS = [
-    { match: ["claude-opus-4-7*", "claude-opus-4-8*"], thinking: "adaptive", tokenizer: "claude-v2" },
+    {
+        match: ["claude-opus-4-7*", "claude-opus-4-8*"],
+        thinking: "adaptive",
+        tokenizer: "claude-v2",
+    },
     {
         match: [
             "claude-opus-4-6*",
@@ -33,7 +37,18 @@ export const MODEL_FACTS = [
     { match: "gemini-2-5-pro*", alwaysThinks: true },
     { match: "*gemini*", vendor: "gemini" },
     {
-        match: ["gpt-5*", "o1*", "o2*", "o3*", "o4*", "o5*", "o6*", "o7*", "o8*", "o9*"],
+        match: [
+            "gpt-5*",
+            "o1*",
+            "o2*",
+            "o3*",
+            "o4*",
+            "o5*",
+            "o6*",
+            "o7*",
+            "o8*",
+            "o9*",
+        ],
         minOutputTokens: 2000,
     },
     { match: ["gpt-*", "o1*", "o3*", "o4*", "chatgpt*"], vendor: "openai" },

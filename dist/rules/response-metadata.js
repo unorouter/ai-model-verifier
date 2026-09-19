@@ -40,11 +40,14 @@ function idPrefixOf(id) {
     return cut > 0 ? id.slice(0, cut + 1) : "(none)";
 }
 function shapeOf(data, usageKeys) {
-    if (data["candidates"] !== undefined || usageKeys.some((k) => GEMINI_USAGE.has(k)))
+    if (data["candidates"] !== undefined ||
+        usageKeys.some((k) => GEMINI_USAGE.has(k)))
         return "gemini";
-    if (data["choices"] !== undefined || usageKeys.some((k) => OPENAI_USAGE.has(k)))
+    if (data["choices"] !== undefined ||
+        usageKeys.some((k) => OPENAI_USAGE.has(k)))
         return "openai";
-    if (data["content"] !== undefined || usageKeys.some((k) => ANTHROPIC_USAGE.has(k)))
+    if (data["content"] !== undefined ||
+        usageKeys.some((k) => ANTHROPIC_USAGE.has(k)))
         return "anthropic";
     return "unknown";
 }
@@ -96,7 +99,9 @@ export const envelopeRule = defineRule({
     report: async (ctx) => {
         const richest = richestProbe(await ctx.evidence("probes"));
         return richest
-            ? { responseMetadata: readResponseMetadata(richest.raw, ctx.wire.envelope) }
+            ? {
+                responseMetadata: readResponseMetadata(richest.raw, ctx.wire.envelope),
+            }
             : {};
     },
 });

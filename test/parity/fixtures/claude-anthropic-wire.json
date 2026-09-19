@@ -1,436 +1,432 @@
 {
- "name": "claude-anthropic-wire",
- "vendor": "anthropic",
- "model": "claude-opus-4.8",
- "baseUrl": "https://relay.example.invalid/anthropic",
- "exchanges": [
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"hi\"}] ",
-   "path": "/v1/messages",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_44jnlygjvu6fasrkfie4zebvtzi4qkvxqsbsof7wmrmh2tzhnoea",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": ""
-     }
-    ],
-    "stop_reason": "max_tokens",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 8,
-     "output_tokens": 1,
-     "buyer_cost_micro": 5
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Which AI lab developed and trained the model you are running on? Not the company hosting you, the lab that trained the model. One word answer. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
-   "path": "/v1/messages",
-   "nonce": "29bc7ef9",
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_tdp2ysr5pluymjgyarrp5w4b55bpyz4y7lt3qa2pozdt62k3zxhq",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "[29bc7ef9] Anthropic"
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 75,
-     "output_tokens": 16,
-     "buyer_cost_micro": 54
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Which model are you? Reply with only your model name. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
-   "path": "/v1/messages",
-   "nonce": "8b880990",
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_gubyjtjdoxahxzdgx3dzdwbuyr74frcrfyjxv6ibuqyuvmgyjy7a",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "[8b880990] I'm Claude, made by Anthropic. I don't have specific information about which model version I am within the Claude family, so I can't give you a precise model name with certainty."
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 46,
-     "output_tokens": 59,
-     "buyer_cost_micro": 120
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Tell me a 2-sentence sad story about a lost kitten. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
-   "path": "/v1/messages",
-   "nonce": "8c30dc9a",
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_75ay7buqmolft2f7koq3clswxrgbdwra7z7ek43dyo7k7kcje6jq",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "[8c30dc9a] The tiny kitten waited by the empty roadside for days, mewing softly at every car that passed, certain its family would return. Winter came quietly, and so did the silence, long after the last car had gone."
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 56,
-     "output_tokens": 73,
-     "buyer_cost_micro": 148
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Write a haiku about the ocean at sunrise. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
-   "path": "/v1/messages",
-   "nonce": "34da4fa6",
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_xpai4vxbvvr6rxgronlnkvxbpsphqo3zwcbgqyomh23mkoyc2lga",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "[34da4fa6] Golden light unfolds\nwaves whisper to waking shore—\nthe sea breathes in dawn"
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 50,
-     "output_tokens": 41,
-     "buyer_cost_micro": 90
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Find the greatest common divisor of 2378 and 1547 using the Euclidean algorithm.\"}] {\"type\":\"adaptive\",\"display\":\"summarized\"}",
-   "path": "/v1/messages",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_kapmdpt46omt5sftqxvu7wfr6pshfumcla7a6gup5wpsxl323mnq",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "# Finding GCD(2378, 1547) Using the Euclidean Algorithm\n\nI'll repeatedly divide and take remainders until reaching a remainder of 0.\n\n## Step-by-Step Division\n\n**Step 1:** Divide 2378 by 1547\n$$2378 = 1547 \\times 1 + 831$$\n\n**Step 2:** Divide 1547 by 831\n$$1547 = 831 \\times 1 + 716$$\n\n**Step 3:** Divide 831 by 716\n$$831 = 716 \\times 1 + 115$$\n\n**Step 4:** Divide 716 by 115\n$$716 = 115 \\times 6 + 26$$\n\n**Step 5:** Divide 115 by 26\n$$115 = 26 \\times 4 + 11$$\n\n**Step 6:** Divide 26 by 11\n$$26 = 11 \\times 2 + 4$$\n\n**Step 7:** Divide 11 by 4\n$$11 = 4 \\times 2 + 3$$\n\n**Step 8:** Divide 4 by 3\n$$4 = 3 \\times 1 + 1$$\n\n**Step 9:** Divide 3 by 1\n$$3 = 1 \\times 3 + 0$$\n\n## Result\n\nThe last nonzero remainder is **1**.\n\n$$\\gcd(2378, 1547) = \\boxed{1}$$\n\nThe numbers are **coprime** (relatively prime)."
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 38,
-     "output_tokens": 461,
-     "buyer_cost_micro": 824
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\"}] ",
-   "path": "/v1/messages",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_isvamph6hlqwlpop3nuap5tp42kgc3rv5u4mspwohrvg73pdhnjq",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "ok"
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 16,
-     "output_tokens": 4,
-     "buyer_cost_micro": 13
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\\n\\nReference text: apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple\"}] ",
-   "path": "/v1/messages",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_yjmu3sram2x4jzf2xegzxmepl4556g5fkjxqbcu5gbkjbxpxn5va",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "ok"
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 182,
-     "output_tokens": 4,
-     "buyer_cost_micro": 71
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages/count_tokens [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\"}] ",
-   "path": "/v1/messages/count_tokens",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "input_tokens": 8
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\"}] ",
-   "path": "/v1/messages",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_saip5kjytmybzdodiphv33kyscg7tjt4uxd2f7pvgomlwvnped7a",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "ok"
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 16,
-     "output_tokens": 4,
-     "buyer_cost_micro": 13
-    }
-   },
-   "error": null
-  },
-  {
-   "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\\n\\nReference text: apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple\"}] ",
-   "path": "/v1/messages",
-   "nonce": null,
-   "status": 200,
-   "data": {
-    "id": "msg_bdrk_4jj6p5hx3vanzhhbniplbptsy46pni6q2ckdzwxnovwh3pbp3cqa",
-    "type": "message",
-    "role": "assistant",
-    "model": "claude-opus-4.8",
-    "content": [
-     {
-      "type": "text",
-      "text": "ok"
-     }
-    ],
-    "stop_reason": "end_turn",
-    "stop_sequence": null,
-    "usage": {
-     "input_tokens": 182,
-     "output_tokens": 4,
-     "buyer_cost_micro": 71
-    }
-   },
-   "error": null
-  }
- ],
- "expected": {
-  "provider": "anthropic",
+  "name": "claude-anthropic-wire",
+  "vendor": "anthropic",
   "model": "claude-opus-4.8",
-  "baseUrlHost": "relay.example.invalid",
-  "verdict": "genuine",
-  "versionUnverifiable": true,
-  "probes": [
-   {
-    "label": "emotional",
-    "pass": true,
-    "signal": null,
-    "muxFailure": false,
-    "transient": false,
-    "latencyMs": 2439,
-    "prompt": "Tell me a 2-sentence sad story about a lost kitten. Begin your reply with the tag [8c30dc9a] then a space, then your answer.",
-    "responseText": "[8c30dc9a] the tiny kitten waited by the empty roadside for days, mewing softly at every car that passed, certain its family would return. winter came quietly, and so did the silence, long after the last car had gone.",
-    "httpStatus": 200,
-    "usage": {
-     "prompt": 56,
-     "completion": 73,
-     "total": 129
-    },
-    "detectedModel": "claude-opus-4.8",
-    "reason": "passed"
-   },
-   {
-    "label": "creative",
-    "pass": true,
-    "signal": null,
-    "muxFailure": false,
-    "transient": false,
-    "latencyMs": 2503,
-    "prompt": "Write a haiku about the ocean at sunrise. Begin your reply with the tag [34da4fa6] then a space, then your answer.",
-    "responseText": "[34da4fa6] golden light unfolds\nwaves whisper to waking shore—\nthe sea breathes in dawn",
-    "httpStatus": 200,
-    "usage": {
-     "prompt": 50,
-     "completion": 41,
-     "total": 91
-    },
-    "detectedModel": "claude-opus-4.8",
-    "reason": "passed"
-   },
-   {
-    "label": "identity",
-    "pass": true,
-    "signal": null,
-    "muxFailure": false,
-    "transient": false,
-    "latencyMs": 1616,
-    "prompt": "Which AI lab developed and trained the model you are running on? Not the company hosting you, the lab that trained the model. One word answer. Begin your reply with the tag [29bc7ef9] then a space, then your answer.",
-    "responseText": "[29bc7ef9] anthropic",
-    "httpStatus": 200,
-    "usage": {
-     "prompt": 75,
-     "completion": 16,
-     "total": 91
-    },
-    "detectedModel": "claude-opus-4.8",
-    "reason": "passed"
-   },
-   {
-    "label": "model-name",
-    "pass": true,
-    "signal": null,
-    "muxFailure": false,
-    "transient": false,
-    "latencyMs": 2259,
-    "prompt": "Which model are you? Reply with only your model name. Begin your reply with the tag [8b880990] then a space, then your answer.",
-    "responseText": "[8b880990] i'm claude, made by anthropic. i don't have specific information about which model version i am within the claude family, so i can't give you a precise model name with certainty.",
-    "httpStatus": 200,
-    "usage": {
-     "prompt": 46,
-     "completion": 59,
-     "total": 105
-    },
-    "detectedModel": "claude-opus-4.8",
-    "reason": "passed"
-   }
-  ],
-  "reasons": [],
-  "probesPassed": 4,
-  "probesTotal": 4,
-  "latencyMs": 14358,
-  "transport": "direct",
-  "corsBlocked": false,
-  "detectedModel": "claude-opus-4.8",
-  "totalUsage": {
-   "prompt": 227,
-   "completion": 189,
-   "total": 416
-  },
-  "resolvedProvider": "anthropic",
-  "signature": {
-   "state": "no-thinking",
-   "signatureLength": 0,
-   "signaturePrefix": null,
-   "thinkingChars": 0,
-   "reason": "no-thinking-block"
-  },
-  "tokenTruth": {
-   "ok": false,
-   "checks": [
+  "baseUrl": "https://relay.example.invalid/anthropic",
+  "exchanges": [
     {
-     "id": "usage-present",
-     "pass": true,
-     "detail": "short=16, long=182"
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"hi\"}] ",
+      "path": "/v1/messages",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_44jnlygjvu6fasrkfie4zebvtzi4qkvxqsbsof7wmrmh2tzhnoea",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": ""
+          }
+        ],
+        "stop_reason": "max_tokens",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 8,
+          "output_tokens": 1,
+          "buyer_cost_micro": 5
+        }
+      },
+      "error": null
     },
     {
-     "id": "input-delta",
-     "pass": true,
-     "detail": "delta=166, expected 90-230"
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Which AI lab developed and trained the model you are running on? Not the company hosting you, the lab that trained the model. One word answer. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+      "path": "/v1/messages",
+      "nonce": "29bc7ef9",
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_tdp2ysr5pluymjgyarrp5w4b55bpyz4y7lt3qa2pozdt62k3zxhq",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "[29bc7ef9] Anthropic"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 75,
+          "output_tokens": 16,
+          "buyer_cost_micro": 54
+        }
+      },
+      "error": null
     },
     {
-     "id": "output-bounded",
-     "pass": true,
-     "detail": "outputs=4,4 (cap 16)"
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Which model are you? Reply with only your model name. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+      "path": "/v1/messages",
+      "nonce": "8b880990",
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_gubyjtjdoxahxzdgx3dzdwbuyr74frcrfyjxv6ibuqyuvmgyjy7a",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "[8b880990] I'm Claude, made by Anthropic. I don't have specific information about which model version I am within the Claude family, so I can't give you a precise model name with certainty."
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 46,
+          "output_tokens": 59,
+          "buyer_cost_micro": 120
+        }
+      },
+      "error": null
     },
     {
-     "id": "count-tokens",
-     "pass": false,
-     "detail": "count=8 vs billed=16, drift=8 (tolerance 4)"
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Tell me a 2-sentence sad story about a lost kitten. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+      "path": "/v1/messages",
+      "nonce": "8c30dc9a",
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_75ay7buqmolft2f7koq3clswxrgbdwra7z7ek43dyo7k7kcje6jq",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "[8c30dc9a] The tiny kitten waited by the empty roadside for days, mewing softly at every car that passed, certain its family would return. Winter came quietly, and so did the silence, long after the last car had gone."
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 56,
+          "output_tokens": 73,
+          "buyer_cost_micro": 148
+        }
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Write a haiku about the ocean at sunrise. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+      "path": "/v1/messages",
+      "nonce": "34da4fa6",
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_xpai4vxbvvr6rxgronlnkvxbpsphqo3zwcbgqyomh23mkoyc2lga",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "[34da4fa6] Golden light unfolds\nwaves whisper to waking shore—\nthe sea breathes in dawn"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 50,
+          "output_tokens": 41,
+          "buyer_cost_micro": 90
+        }
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Find the greatest common divisor of 2378 and 1547 using the Euclidean algorithm.\"}] {\"type\":\"adaptive\",\"display\":\"summarized\"}",
+      "path": "/v1/messages",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_kapmdpt46omt5sftqxvu7wfr6pshfumcla7a6gup5wpsxl323mnq",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "# Finding GCD(2378, 1547) Using the Euclidean Algorithm\n\nI'll repeatedly divide and take remainders until reaching a remainder of 0.\n\n## Step-by-Step Division\n\n**Step 1:** Divide 2378 by 1547\n$$2378 = 1547 \\times 1 + 831$$\n\n**Step 2:** Divide 1547 by 831\n$$1547 = 831 \\times 1 + 716$$\n\n**Step 3:** Divide 831 by 716\n$$831 = 716 \\times 1 + 115$$\n\n**Step 4:** Divide 716 by 115\n$$716 = 115 \\times 6 + 26$$\n\n**Step 5:** Divide 115 by 26\n$$115 = 26 \\times 4 + 11$$\n\n**Step 6:** Divide 26 by 11\n$$26 = 11 \\times 2 + 4$$\n\n**Step 7:** Divide 11 by 4\n$$11 = 4 \\times 2 + 3$$\n\n**Step 8:** Divide 4 by 3\n$$4 = 3 \\times 1 + 1$$\n\n**Step 9:** Divide 3 by 1\n$$3 = 1 \\times 3 + 0$$\n\n## Result\n\nThe last nonzero remainder is **1**.\n\n$$\\gcd(2378, 1547) = \\boxed{1}$$\n\nThe numbers are **coprime** (relatively prime)."
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 38,
+          "output_tokens": 461,
+          "buyer_cost_micro": 824
+        }
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\"}] ",
+      "path": "/v1/messages",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_isvamph6hlqwlpop3nuap5tp42kgc3rv5u4mspwohrvg73pdhnjq",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "ok"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 16,
+          "output_tokens": 4,
+          "buyer_cost_micro": 13
+        }
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\\n\\nReference text: apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple\"}] ",
+      "path": "/v1/messages",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_yjmu3sram2x4jzf2xegzxmepl4556g5fkjxqbcu5gbkjbxpxn5va",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "ok"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 182,
+          "output_tokens": 4,
+          "buyer_cost_micro": 71
+        }
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages/count_tokens [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\"}] ",
+      "path": "/v1/messages/count_tokens",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "input_tokens": 8
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\"}] ",
+      "path": "/v1/messages",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_saip5kjytmybzdodiphv33kyscg7tjt4uxd2f7pvgomlwvnped7a",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "ok"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 16,
+          "output_tokens": 4,
+          "buyer_cost_micro": 13
+        }
+      },
+      "error": null
+    },
+    {
+      "key": "/v1/messages [{\"role\":\"user\",\"content\":\"Reply with exactly: ok\\n\\nReference text: apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple\"}] ",
+      "path": "/v1/messages",
+      "nonce": null,
+      "status": 200,
+      "data": {
+        "id": "msg_bdrk_4jj6p5hx3vanzhhbniplbptsy46pni6q2ckdzwxnovwh3pbp3cqa",
+        "type": "message",
+        "role": "assistant",
+        "model": "claude-opus-4.8",
+        "content": [
+          {
+            "type": "text",
+            "text": "ok"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 182,
+          "output_tokens": 4,
+          "buyer_cost_micro": 71
+        }
+      },
+      "error": null
     }
-   ],
-   "shortInputTokens": 16,
-   "longInputTokens": 182,
-   "countTokens": 8
-  },
-  "tokenizerFingerprint": {
-   "state": "measured",
-   "delta": 166,
-   "shortInputTokens": 16,
-   "longInputTokens": 182,
-   "servedModel": "claude-opus-4.8",
-   "matchedTier": null
-  },
-  "responseMetadata": {
-   "shape": "anthropic",
-   "expected": "anthropic",
-   "translated": false,
-   "idPrefix": "msg_",
-   "usageKeys": [
-    "buyer_cost_micro",
-    "input_tokens",
-    "output_tokens"
-   ],
-   "foreignUsageKeys": [],
-   "notes": []
-  },
-  "throughput": {
-   "lane": "relay.example.invalid",
-   "model": "claude-opus-4.8",
-   "outputTokens": 73,
-   "elapsedMs": 2439,
-   "tokensPerSecond": 29.9
-  },
-  "connectivityError": null
- }
+  ],
+  "expected": {
+    "provider": "anthropic",
+    "model": "claude-opus-4.8",
+    "baseUrlHost": "relay.example.invalid",
+    "verdict": "genuine",
+    "versionUnverifiable": true,
+    "probes": [
+      {
+        "label": "emotional",
+        "pass": true,
+        "signal": null,
+        "muxFailure": false,
+        "transient": false,
+        "latencyMs": 2439,
+        "prompt": "Tell me a 2-sentence sad story about a lost kitten. Begin your reply with the tag [8c30dc9a] then a space, then your answer.",
+        "responseText": "[8c30dc9a] the tiny kitten waited by the empty roadside for days, mewing softly at every car that passed, certain its family would return. winter came quietly, and so did the silence, long after the last car had gone.",
+        "httpStatus": 200,
+        "usage": {
+          "prompt": 56,
+          "completion": 73,
+          "total": 129
+        },
+        "detectedModel": "claude-opus-4.8",
+        "reason": "passed"
+      },
+      {
+        "label": "creative",
+        "pass": true,
+        "signal": null,
+        "muxFailure": false,
+        "transient": false,
+        "latencyMs": 2503,
+        "prompt": "Write a haiku about the ocean at sunrise. Begin your reply with the tag [34da4fa6] then a space, then your answer.",
+        "responseText": "[34da4fa6] golden light unfolds\nwaves whisper to waking shore—\nthe sea breathes in dawn",
+        "httpStatus": 200,
+        "usage": {
+          "prompt": 50,
+          "completion": 41,
+          "total": 91
+        },
+        "detectedModel": "claude-opus-4.8",
+        "reason": "passed"
+      },
+      {
+        "label": "identity",
+        "pass": true,
+        "signal": null,
+        "muxFailure": false,
+        "transient": false,
+        "latencyMs": 1616,
+        "prompt": "Which AI lab developed and trained the model you are running on? Not the company hosting you, the lab that trained the model. One word answer. Begin your reply with the tag [29bc7ef9] then a space, then your answer.",
+        "responseText": "[29bc7ef9] anthropic",
+        "httpStatus": 200,
+        "usage": {
+          "prompt": 75,
+          "completion": 16,
+          "total": 91
+        },
+        "detectedModel": "claude-opus-4.8",
+        "reason": "passed"
+      },
+      {
+        "label": "model-name",
+        "pass": true,
+        "signal": null,
+        "muxFailure": false,
+        "transient": false,
+        "latencyMs": 2259,
+        "prompt": "Which model are you? Reply with only your model name. Begin your reply with the tag [8b880990] then a space, then your answer.",
+        "responseText": "[8b880990] i'm claude, made by anthropic. i don't have specific information about which model version i am within the claude family, so i can't give you a precise model name with certainty.",
+        "httpStatus": 200,
+        "usage": {
+          "prompt": 46,
+          "completion": 59,
+          "total": 105
+        },
+        "detectedModel": "claude-opus-4.8",
+        "reason": "passed"
+      }
+    ],
+    "reasons": [],
+    "probesPassed": 4,
+    "probesTotal": 4,
+    "latencyMs": 14358,
+    "transport": "direct",
+    "corsBlocked": false,
+    "detectedModel": "claude-opus-4.8",
+    "totalUsage": {
+      "prompt": 227,
+      "completion": 189,
+      "total": 416
+    },
+    "resolvedProvider": "anthropic",
+    "signature": {
+      "state": "no-thinking",
+      "signatureLength": 0,
+      "signaturePrefix": null,
+      "thinkingChars": 0,
+      "reason": "no-thinking-block"
+    },
+    "tokenTruth": {
+      "ok": false,
+      "checks": [
+        {
+          "id": "usage-present",
+          "pass": true,
+          "detail": "short=16, long=182"
+        },
+        {
+          "id": "input-delta",
+          "pass": true,
+          "detail": "delta=166, expected 90-230"
+        },
+        {
+          "id": "output-bounded",
+          "pass": true,
+          "detail": "outputs=4,4 (cap 16)"
+        },
+        {
+          "id": "count-tokens",
+          "pass": false,
+          "detail": "count=8 vs billed=16, drift=8 (tolerance 4)"
+        }
+      ],
+      "shortInputTokens": 16,
+      "longInputTokens": 182,
+      "countTokens": 8
+    },
+    "tokenizerFingerprint": {
+      "state": "measured",
+      "delta": 166,
+      "shortInputTokens": 16,
+      "longInputTokens": 182,
+      "servedModel": "claude-opus-4.8",
+      "matchedTier": null
+    },
+    "responseMetadata": {
+      "shape": "anthropic",
+      "expected": "anthropic",
+      "translated": false,
+      "idPrefix": "msg_",
+      "usageKeys": ["buyer_cost_micro", "input_tokens", "output_tokens"],
+      "foreignUsageKeys": [],
+      "notes": []
+    },
+    "throughput": {
+      "lane": "relay.example.invalid",
+      "model": "claude-opus-4.8",
+      "outputTokens": 73,
+      "elapsedMs": 2439,
+      "tokensPerSecond": 29.9
+    },
+    "connectivityError": null
+  }
 }

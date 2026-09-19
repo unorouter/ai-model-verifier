@@ -1,4 +1,4 @@
-import type { VendorAdapter } from "../vendors/types";
+import type { VendorIdentity } from "../vendors/types";
 /**
  * A probe is a request plus a grader for its own reply. Probes are data, not
  * rules: the ladder rules read across every probe's outcome (a quorum, a mux
@@ -8,7 +8,7 @@ export type ProbeDef<L extends string = string> = {
     label: L;
     maxTokens: number;
     prompt(nonce: string): string;
-    grade(text: string, wire: VendorAdapter): boolean;
+    grade(text: string, identity: VendorIdentity): boolean;
 };
 export declare const PROBES: readonly [{
     readonly label: "emotional";
@@ -24,12 +24,12 @@ export declare const PROBES: readonly [{
     readonly label: "identity";
     readonly maxTokens: 60;
     readonly prompt: (n: string) => string;
-    readonly grade: (text: string, wire: VendorAdapter) => boolean;
+    readonly grade: (text: string, identity: VendorIdentity) => boolean;
 }, {
     readonly label: "model-name";
     readonly maxTokens: 80;
     readonly prompt: (n: string) => string;
-    readonly grade: (text: string, wire: VendorAdapter) => boolean;
+    readonly grade: (text: string, identity: VendorIdentity) => boolean;
 }];
 export type ProbeLabel = (typeof PROBES)[number]["label"];
 export declare const PROBE_SIGNALS: readonly ["coding-tool", "scam", "foreign", "cloud-host", "cjk-leak", "blank"];

@@ -3,7 +3,9 @@ export function resolveChecks(checks) {
     const c = checks ?? {};
     return {
         signature: c.signature
-            ? { strict: typeof c.signature === "object" && c.signature.strict === true }
+            ? {
+                strict: typeof c.signature === "object" && c.signature.strict === true,
+            }
             : null,
         tokenTruth: c.tokenTruth === true,
         thinkingFloor: c.thinkingFloor

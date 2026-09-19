@@ -7,6 +7,7 @@ import type {
   BuiltRequest,
   ChatRequest,
   VendorAdapter,
+  VendorIdentity,
   WireCtx,
 } from "../vendors/types";
 
@@ -53,6 +54,13 @@ export type RunCtx<V extends string = string> = {
   requestedVendor: V;
   /** Wire the requests go over (after a handshake fallback, not the requested one). */
   wire: VendorAdapter<V>;
+  /**
+   * Vocabulary of the model's own vendor, not the wire's: Claude sold over an
+   * OpenAI-shaped relay still calls its maker "anthropic". Falls back to the
+   * wire when the model id names no vendor the tables know.
+   */
+  identity: VendorIdentity;
+  tiers: readonly string[] | null;
   mode: TransportMode;
   direct: boolean;
   baseUrl: string;

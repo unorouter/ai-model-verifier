@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1
+
+- The identity vocabulary and tier list come from the model's own vendor,
+  falling back to the wire only for a model the tables do not know. 2.0.0
+  read them from the wire, so a genuine Claude sold over an OpenAI-shaped relay
+  answered "anthropic" and was rejected as foreign.
+
 ## 2.0.0
 
 Architectural overhaul, no new detections. Every check from 1.4 still runs with

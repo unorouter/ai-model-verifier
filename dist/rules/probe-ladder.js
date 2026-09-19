@@ -18,7 +18,9 @@ const signalRule = (id, signal, prefix) => defineRule({
     applies: () => true,
     judge: async (ctx) => {
         const labels = labelsWith(await ctx.evidence("probes"), signal);
-        return labels ? { severity: "fail", reason: `${prefix}: ${labels}` } : null;
+        return labels
+            ? { severity: "fail", reason: `${prefix}: ${labels}` }
+            : null;
     },
 });
 export const codingToolRule = signalRule("coding-tool", "coding-tool", "coding-tool-refusal");
@@ -68,10 +70,10 @@ export const servedModelMismatchRule = defineRule({
     id: "served-model-mismatch",
     layer: "probe",
     needs: ["probes"],
-    applies: (ctx) => ctx.wire.tiers !== null,
+    applies: (ctx) => ctx.tiers !== null,
     judge: async (ctx) => {
         const probes = await ctx.evidence("probes");
-        const served = detectServedModelMismatch(ctx.model, probes.map((r) => r.detectedModel), ctx.wire.tiers ?? []);
+        const served = detectServedModelMismatch(ctx.model, probes.map((r) => r.detectedModel), ctx.tiers ?? []);
         return served
             ? {
                 severity: "fail",
@@ -138,10 +140,10 @@ export const tierSelfReportRule = defineRule({
     id: "tier-self-report",
     layer: "note",
     needs: ["probes"],
-    applies: (ctx) => ctx.wire.tiers !== null,
+    applies: (ctx) => ctx.tiers !== null,
     judge: async (ctx) => {
         const probes = await ctx.evidence("probes");
-        const claimed = detectTierMismatch(ctx.model, probes.find((r) => r.label === "model-name")?.text, ctx.wire.tiers ?? []);
+        const claimed = detectTierMismatch(ctx.model, probes.find((r) => r.label === "model-name")?.text, ctx.tiers ?? []);
         return claimed
             ? {
                 severity: "note",

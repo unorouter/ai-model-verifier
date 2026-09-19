@@ -1,4 +1,4 @@
-import { callWire, resolveChecks, } from "./engine/context";
+import { callWire, resolveChecks } from "./engine/context";
 import { EVIDENCE_ORDER, EvidenceStore } from "./engine/evidence";
 import { runHandshake } from "./engine/handshake";
 import { foldVerdict } from "./engine/verdict";
@@ -35,11 +35,16 @@ function buildCtx(registry, opts) {
             : directTransport);
     if (!transport)
         throw new TypeError("server mode needs a transport or a serverProxyUrl");
+    const home = facts.vendor
+        ? vendorFor(registry.vendors, facts.vendor)
+        : undefined;
     return {
         model: opts.model,
         facts,
         requestedVendor: opts.vendor,
         wire,
+        identity: (home ?? wire).identity,
+        tiers: (home ?? wire).tiers,
         mode: opts.mode,
         direct: opts.mode === "direct",
         baseUrl: opts.baseUrl,
@@ -103,7 +108,11 @@ function sumUsage(usages) {
             .filter((v) => v !== null);
         return vals.length > 0 ? vals.reduce((a, b) => a + b, 0) : null;
     };
-    return { prompt: add("prompt"), completion: add("completion"), total: add("total") };
+    return {
+        prompt: add("prompt"),
+        completion: add("completion"),
+        total: add("total"),
+    };
 }
 function connectivityResult(opts, error, corsBlocked, startedAt) {
     return {
@@ -133,7 +142,13 @@ export async function verifyWith(registry, opts) {
     const hs = await runHandshake(requested, registry.vendors);
     if (!hs.ok)
         return connectivityResult(opts, hs.reason, hs.corsBlocked, started);
-    const ctx = { ...requested, wire: hs.wire };
+    const home = requested.facts.vendor !== null;
+    const ctx = {
+        ...requested,
+        wire: hs.wire,
+        identity: home ? requested.identity : hs.wire.identity,
+        tiers: home ? requested.tiers : hs.wire.tiers,
+    };
     const rules = registry.rules.filter((r) => !r.check || ctx.checks[r.check]);
     const run = await runRuleSet(ctx, rules);
     const folded = foldVerdict(run.findings);

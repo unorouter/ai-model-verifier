@@ -362,3 +362,53 @@ describe("runRules", () => {
     ]);
   });
 });
+
+/** The same well behaved endpoint answering in OpenAI shape. */
+function openaiWire(opts: Parameters<typeof anthropicWire>[0]): TransportFn {
+  const inner = anthropicWire(opts);
+  return async (a) => {
+    const r = await inner(a);
+    const d = r.data as {
+      model?: string;
+      content?: { text: string }[];
+      usage?: { input_tokens: number; output_tokens: number };
+    } | null;
+    if (!d) return r;
+    return {
+      ...r,
+      data: {
+        id: "chatcmpl-1",
+        model: d.model,
+        choices: [{ message: { content: d.content?.[0]?.text ?? "" } }],
+        usage: {
+          prompt_tokens: d.usage?.input_tokens,
+          completion_tokens: d.usage?.output_tokens,
+        },
+      },
+    };
+  };
+}
+
+describe("identity follows the model, not the wire", () => {
+  test("Claude sold over the openai wire keeps Claude's vocabulary", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "claude-opus-4-6",
+      transport: openaiWire({}),
+    });
+    expect(r.resolvedVendor).toBe("openai");
+    expect(r.verdict).toBe("genuine");
+    expect(r.findings.filter((f) => f.severity !== "note")).toEqual([]);
+  });
+
+  test("an unknown model on the openai wire is judged by that wire", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "mystery-7b",
+      transport: openaiWire({}),
+    });
+    expect(r.reasons).toEqual(["foreign-identity: identity, model-name"]);
+  });
+});

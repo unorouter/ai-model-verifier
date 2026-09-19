@@ -20,7 +20,10 @@ async function collectFixedText(ctx) {
         maxTokens: COUNT_PROBE_MAX_TOKENS,
         messages: [{ role: "user", content: prompt }],
     });
-    const [short, long] = await Promise.all([ask(SHORT_PROMPT), ask(LONG_PROMPT)]);
+    const [short, long] = await Promise.all([
+        ask(SHORT_PROMPT),
+        ask(LONG_PROMPT),
+    ]);
     return { short, long };
 }
 async function collectCountTokens(ctx, store) {

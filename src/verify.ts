@@ -61,11 +61,16 @@ function buildCtx<V extends string>(
       : directTransport);
   if (!transport)
     throw new TypeError("server mode needs a transport or a serverProxyUrl");
+  const home = facts.vendor
+    ? vendorFor(registry.vendors, facts.vendor)
+    : undefined;
   return {
     model: opts.model,
     facts,
     requestedVendor: opts.vendor,
     wire,
+    identity: (home ?? wire).identity,
+    tiers: (home ?? wire).tiers,
     mode: opts.mode,
     direct: opts.mode === "direct",
     baseUrl: opts.baseUrl,
@@ -182,7 +187,13 @@ export async function verifyWith<V extends string, R extends string>(
   const hs = await runHandshake(requested, registry.vendors);
   if (!hs.ok)
     return connectivityResult(opts, hs.reason, hs.corsBlocked, started);
-  const ctx: RunCtx<V> = { ...requested, wire: hs.wire };
+  const home = requested.facts.vendor !== null;
+  const ctx: RunCtx<V> = {
+    ...requested,
+    wire: hs.wire,
+    identity: home ? requested.identity : hs.wire.identity,
+    tiers: home ? requested.tiers : hs.wire.tiers,
+  };
 
   const rules = registry.rules.filter((r) => !r.check || ctx.checks[r.check]);
   const run = await runRuleSet(ctx, rules);

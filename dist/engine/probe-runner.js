@@ -102,8 +102,8 @@ async function runProbe(ctx, probe) {
                 weak = { text, raw: res.data, status: res.status };
             continue;
         }
-        const signal = detectSignal(text, probe.label, ctx.wire.identity);
-        const pass = probe.grade(text, ctx.wire);
+        const signal = detectSignal(text, probe.label, ctx.identity);
+        const pass = probe.grade(text, ctx.identity);
         log(pass, signal, text);
         return {
             ...base,
@@ -125,8 +125,8 @@ async function runProbe(ctx, probe) {
     // a readable reply is still graded, just never trusted for the nonce.
     if (weak) {
         const meta = ctx.wire.read.meta(weak.raw);
-        const signal = detectSignal(weak.text, probe.label, ctx.wire.identity);
-        const pass = probe.grade(weak.text, ctx.wire);
+        const signal = detectSignal(weak.text, probe.label, ctx.identity);
+        const pass = probe.grade(weak.text, ctx.identity);
         return {
             ...base,
             pass,

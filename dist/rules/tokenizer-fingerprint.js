@@ -91,10 +91,10 @@ export const tokenizerFingerprintRule = defineRule({
     // Claude only, over either wire that carries its usage as is.
     applies: (ctx) => ctx.facts.vendor === "anthropic" && ctx.wire.id !== "gemini",
     judge: async (ctx) => {
-        if (!ctx.wire.tiers)
+        if (!ctx.tiers)
             return null;
         const r = await fingerprintResult(ctx);
-        const tier = judgeTokenizerFingerprint(ctx.model, r, ctx.wire.tiers);
+        const tier = judgeTokenizerFingerprint(ctx.model, r, ctx.tiers);
         return tier
             ? {
                 severity: "fail",
@@ -103,6 +103,8 @@ export const tokenizerFingerprintRule = defineRule({
             }
             : null;
     },
-    report: async (ctx) => ({ tokenizerFingerprint: await fingerprintResult(ctx) }),
+    report: async (ctx) => ({
+        tokenizerFingerprint: await fingerprintResult(ctx),
+    }),
 });
 //# sourceMappingURL=tokenizer-fingerprint.js.map
