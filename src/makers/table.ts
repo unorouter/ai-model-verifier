@@ -38,7 +38,9 @@ export const MAKERS = [
     home: ["google", "deepmind"],
     modelNames: ["gemini", "google", "gemma"],
     acceptsCloudHost: false,
-    tiers: null,
+    // Marketplaces sell flash under a pro label; the reply's model field and
+    // the self-report both name the tier.
+    tiers: ["pro", "flash"],
     cjkNative: false,
   },
   {

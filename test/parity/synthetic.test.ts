@@ -584,6 +584,26 @@ describe("makers", () => {
     expect(Math.min(...seen)).toBeGreaterThanOrEqual(2000);
   });
 
+  test("an open-weight thinker gets its room as a raised max_tokens", async () => {
+    const seen: Record<string, unknown>[] = [];
+    const inner = makerWire("Zhipu", "GLM-5.3");
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "glm-5.3",
+      transport: async (a) => {
+        const b = bodyOf(a);
+        if (!isHandshake(b)) seen.push(b);
+        return inner(a);
+      },
+    });
+    expect(r.verdict).toBe("genuine");
+    expect(seen.every((b) => b["max_completion_tokens"] === undefined)).toBe(true);
+    expect(
+      Math.min(...seen.map((b) => Number(b["max_tokens"]))),
+    ).toBeGreaterThanOrEqual(2000);
+  });
+
   test("a Palmyra answering under a Mistral label is foreign", async () => {
     const r = await verify({
       ...base,
@@ -592,6 +612,31 @@ describe("makers", () => {
       transport: makerWire("Mistral", "palmyra-instruct-32b-0719-v1"),
     });
     expect(r.reasons).toEqual(["foreign-identity: model-name"]);
+  });
+
+  test("a flash served under a Gemini pro label is a served-model mismatch", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "gemini-2.5-pro",
+      transport: openaiWire({
+        model: "gemini-2.5-flash",
+        answer: (p, n) =>
+          p.includes("AI lab")
+            ? `[${n}] google`
+            : p.includes("Which model")
+              ? `[${n}] gemini 2.5 flash`
+              : undefined,
+      }),
+    });
+    expect(r.reasons).toEqual([
+      "served-model-mismatch: requested gemini-2.5-pro, response model gemini-2.5-flash",
+    ]);
+    expect(
+      r.findings.some(
+        (f) => f.rule === "tier-self-report" && f.reason.includes("flash"),
+      ),
+    ).toBe(true);
   });
 
   test("catalog: wire and maker per model id", () => {

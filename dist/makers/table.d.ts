@@ -28,7 +28,7 @@ export declare const MAKERS: readonly [{
     readonly home: readonly ["google", "deepmind"];
     readonly modelNames: readonly ["gemini", "google", "gemma"];
     readonly acceptsCloudHost: false;
-    readonly tiers: null;
+    readonly tiers: readonly ["pro", "flash"];
     readonly cjkNative: false;
 }, {
     readonly id: "deepseek";

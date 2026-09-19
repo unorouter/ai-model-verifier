@@ -67,6 +67,24 @@ export const MODEL_FACTS = [
   // Gemini thinks before it answers over the OpenAI wire too, and a 60 token
   // cap left a few characters of visible reply on the order book sellers.
   { match: ["gemini-2-5*", "gemini-3*"], minOutputTokens: 2000 },
+  // Open-weight thinkers answer after a hidden reasoning pass on every relay
+  // that leaves it on; a 60 token cap returned a bracket and nothing else.
+  {
+    match: [
+      "glm-5*",
+      "kimi-k2-6*",
+      "kimi-k2-7*",
+      "kimi-k3*",
+      "deepseek-v4*",
+      "minimax-m2-5*",
+      "minimax-m2-7*",
+      "minimax-m3*",
+      "mimo-v2-5*",
+      "qwen3-8*",
+      "hy4*",
+    ],
+    minOutputTokens: 2000,
+  },
   {
     match: [
       "gpt-5*",

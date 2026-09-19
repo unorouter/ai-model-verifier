@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.2
+
+- The open-weight thinkers (GLM 5, Kimi k2.6 and up, DeepSeek v4, MiniMax
+  m2.5 and up, MiMo, Qwen 3.8, Hunyuan 4) get the same 2000 token room as
+  Gemini, sent as a raised `max_tokens` because their relays do not know
+  `max_completion_tokens`; OpenAI and Google keep `max_completion_tokens`.
+- Google gets the tier words `pro` and `flash`, so a flash served under a pro
+  label is a `served-model-mismatch` and a self-report note.
+
 ## 3.0.1
 
 - Gemini 2.5 and 3.x get reasoning room over the OpenAI wire

@@ -3,11 +3,15 @@ import { normalizeBaseUrl } from "./base-url";
 import { defineVendor, } from "./types";
 function chat(req, ctx) {
     const min = ctx.facts.minOutputTokens;
-    // Reasoning models refuse `max_tokens` and need room for hidden thought;
-    // everything else gets the field every OpenAI-shaped relay understands.
+    // Thinking models need room for hidden thought. OpenAI's own refuse
+    // `max_tokens` and Google's accept either, so those two get
+    // `max_completion_tokens`; the open-weight makers are sold through relays
+    // that only know `max_tokens`, which is raised instead.
     const limit = min === null
         ? { max_tokens: req.maxTokens }
-        : { max_completion_tokens: Math.max(req.maxTokens, min) };
+        : ctx.facts.maker === "openai" || ctx.facts.maker === "google"
+            ? { max_completion_tokens: Math.max(req.maxTokens, min) }
+            : { max_tokens: Math.max(req.maxTokens, min) };
     return {
         url: `${normalizeBaseUrl(ctx.baseUrl)}/v1/chat/completions`,
         headers: {
