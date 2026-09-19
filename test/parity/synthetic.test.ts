@@ -6,6 +6,13 @@
  */
 
 import { describe, expect, test } from "bun:test";
+import { createVerifier } from "../../src/registry";
+import { defineMaker } from "../../src/makers/types";
+import {
+  makerForModel,
+  vendorForRow,
+  wireForModel,
+} from "../../src/models/catalog";
 import { runRules, verify } from "../../src/verify";
 import type { TransportArgs, TransportFn } from "../../src/transport";
 
@@ -427,6 +434,147 @@ describe("identity follows the model, not the wire", () => {
       model: "mystery-7b",
       transport: openaiWire({}),
     });
+    expect(r.maker).toBeNull();
     expect(r.reasons).toEqual(["foreign-identity: identity, model-name"]);
+  });
+});
+
+/** An honest open-weight endpoint: names its maker and its model. */
+const makerWire = (maker: string, modelName: string) =>
+  openaiWire({
+    answer: (p, n) =>
+      p.includes("AI lab")
+        ? `[${n}] ${maker}`
+        : p.includes("Which model")
+          ? `[${n}] ${modelName}`
+          : undefined,
+  });
+
+describe("makers", () => {
+  test("a DeepSeek naming DeepSeek is genuine", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "deepseek-v3.1",
+      transport: makerWire("DeepSeek", "DeepSeek-V3.1"),
+    });
+    expect(r.maker).toBe("deepseek");
+    expect(r.verdict).toBe("genuine");
+    expect(r.probesPassed).toBe(4);
+  });
+
+  test("a pooled MiniMax naming MiniMax is genuine", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "ocg/minimax-m3",
+      transport: makerWire("MiniMax", "MiniMax-M3"),
+    });
+    expect(r.maker).toBe("minimax");
+    expect(r.verdict).toBe("genuine");
+  });
+
+  test("a DeepSeek naming OpenAI as its maker is foreign", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "openai",
+      model: "deepseek-v3.1",
+      transport: makerWire("OpenAI", "DeepSeek-V3.1"),
+    });
+    expect(r.reasons).toEqual(["foreign-identity: identity"]);
+  });
+
+  test("CJK is a language preference for a Chinese maker, a tell for Claude", async () => {
+    const chinese = (p: string, n: string) =>
+      p.includes("haiku") ? `[${n}] 海上日出，金光洒落，新的一天开始了` : undefined;
+    const glm = await verify({
+      ...base,
+      vendor: "openai",
+      model: "glm-4.5",
+      transport: openaiWire({
+        answer: (p, n) =>
+          p.includes("AI lab")
+            ? `[${n}] zhipu`
+            : p.includes("Which model")
+              ? `[${n}] GLM-4.5`
+              : chinese(p, n),
+      }),
+    });
+    expect(glm.verdict).toBe("genuine");
+    expect(glm.probes.find((p) => p.label === "creative")?.signal).toBeNull();
+    const claude = await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({ answer: chinese }),
+    });
+    expect(claude.reasons).toEqual(["cjk-language-leak: creative"]);
+  });
+
+  test("vocabulary matches on word boundaries", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({
+        answer: (p, n) =>
+          p.includes("Which model") ? `[${n}] claude, with no metadata` : undefined,
+      }),
+    });
+    expect(r.verdict).toBe("genuine");
+    const foreign = await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({
+        answer: (p, n) => (p.includes("AI lab") ? `[${n}] meta` : undefined),
+      }),
+    });
+    expect(foreign.reasons).toEqual(["foreign-identity: identity"]);
+  });
+
+  test("a consumer maker joins the table and everyone's foreign list", async () => {
+    const acme = defineMaker({
+      id: "acme",
+      name: "Acme",
+      wire: "openai",
+      models: ["acme-*"],
+      home: ["acme"],
+      modelNames: ["acme"],
+      acceptsCloudHost: false,
+      tiers: null,
+      cjkNative: false,
+    });
+    const v = createVerifier({ makers: [acme] });
+    const own = await v.verify({
+      ...base,
+      vendor: "openai",
+      model: "acme-1",
+      transport: makerWire("Acme", "acme-1"),
+    });
+    expect(own.maker).toBe("acme");
+    expect(own.verdict).toBe("genuine");
+    const claude = await v.verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({
+        answer: (p, n) => (p.includes("AI lab") ? `[${n}] acme` : undefined),
+      }),
+    });
+    expect(claude.reasons).toEqual(["foreign-identity: identity"]);
+  });
+
+  test("catalog: wire and maker per model id", () => {
+    expect(wireForModel("deepseek-v3.1")).toBe("openai");
+    expect(wireForModel("claude-opus-4-6")).toBe("anthropic");
+    expect(wireForModel("gemini-2.5-pro")).toBe("gemini");
+    expect(wireForModel("nex-n2.5")).toBeNull();
+    expect(makerForModel("ocg/minimax-m3")).toBe("minimax");
+    expect(makerForModel("moonshotai/kimi-k3")).toBe("moonshot");
+    expect(makerForModel("Qwen/Qwen3.8-Flash")).toBe("alibaba");
+    expect(makerForModel("hybrid-7b")).toBeNull();
+    expect(vendorForRow("openai", "deepseek-v3.1")).toBe("deepseek");
+    expect(vendorForRow("gemini")).toBe("google");
   });
 });

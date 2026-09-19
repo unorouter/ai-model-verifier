@@ -1,5 +1,6 @@
+import { MAKERS } from "../makers/table";
+import { makerForModel } from "../makers/resolve";
 import { VENDORS, vendorFor, type VendorId } from "../vendors/table";
-import { resolveModelFacts } from "./facts";
 
 /** Models the tester offers by default, per wire. */
 export const CURATED_MODELS: Record<VendorId, readonly string[]> = {
@@ -14,12 +15,19 @@ export const CURATED_MODELS: Record<VendorId, readonly string[]> = {
   gemini: ["gemini-3.1-pro-preview", "gemini-3.1-flash", "gemini-2.5-pro"],
 };
 
-export function vendorForModel(model: string): VendorId | null {
-  return resolveModelFacts(model).vendor;
+export { makerForModel };
+
+/** The wire a model's maker sells it on natively; null when the maker is unknown. */
+export function wireForModel(model: string): VendorId | null {
+  const maker = makerForModel(model);
+  return MAKERS.find((m) => m.id === maker)?.wire ?? null;
 }
 
-/** Display vendor for a row: the model's maker when known, else the wire's. */
+/** Display vendor for a row: the model's maker when known, else the wire's name. */
 export function vendorForRow(vendor: VendorId, model?: string): string {
-  const id = (model ? vendorForModel(model) : null) ?? vendor;
-  return vendorFor(VENDORS, id)?.vendorName ?? id;
+  return (
+    (model ? makerForModel(model) : null) ??
+    vendorFor(VENDORS, vendor)?.vendorName ??
+    vendor
+  );
 }

@@ -1,7 +1,7 @@
 {
   "name": "ai-model-verifier",
-  "version": "2.0.3",
-  "description": "Verify an AI API endpoint really serves the model it claims: a vendor adapter per wire, a rule table over shared evidence, and per model facts. Model substitution, Claude thinking signatures, token billing accuracy, envelope and throughput evidence.",
+  "version": "3.0.0",
+  "description": "Verify an AI API endpoint really serves the model it claims: a vendor adapter per wire, a maker table for who trained what, a rule table over shared evidence, and per model facts. Model substitution, Claude thinking signatures, token billing accuracy, envelope and throughput evidence.",
   "license": "AGPL-3.0-only",
   "type": "module",
   "repository": {
@@ -21,6 +21,8 @@
     "claude",
     "openai",
     "gemini",
+    "deepseek",
+    "qwen",
     "token-billing",
     "rule-engine",
     "adapter"
@@ -45,6 +47,10 @@
     "./models": {
       "types": "./dist/models/index.d.ts",
       "default": "./dist/models/index.js"
+    },
+    "./makers": {
+      "types": "./dist/makers/index.d.ts",
+      "default": "./dist/makers/index.js"
     },
     "./transport": {
       "types": "./dist/transport.d.ts",

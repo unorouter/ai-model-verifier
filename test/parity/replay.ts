@@ -24,6 +24,18 @@ export type Fixture = {
   baseUrl: string;
   exchanges: Exchange[];
   expected: unknown;
+  /** Where a later major deliberately judges the same exchanges differently. */
+  overrides?: {
+    note: string;
+    verdict?: string;
+    versionUnverifiable?: boolean;
+    reasons?: string[];
+    probesPassed?: number;
+    probes?: Record<
+      string,
+      { pass?: boolean; signal?: string | null; reason?: string | null }
+    >;
+  };
 };
 
 export const NONCE_RE = /\[([a-f0-9]{8})\]/;

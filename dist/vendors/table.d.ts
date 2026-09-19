@@ -25,14 +25,7 @@ export declare const VENDORS: readonly [{
         readonly thinkingBlock: (data: unknown) => import("./types").ThinkingBlockRead | null;
         readonly countedTokens: (data: unknown) => number | null;
     };
-    readonly identity: {
-        readonly home: readonly ["anthropic"];
-        readonly foreign: string[];
-        readonly homeModelNames: readonly ["claude", "anthropic"];
-        readonly cloudModelNames: readonly ["amazon q", "q developer", "kiro"];
-        readonly acceptsCloudHost: true;
-    };
-    readonly tiers: readonly ["opus", "sonnet", "haiku", "fable"];
+    readonly defaultMaker: "anthropic";
 }, {
     readonly id: "openai";
     readonly vendorName: "openai";
@@ -63,14 +56,7 @@ export declare const VENDORS: readonly [{
         readonly meta: (data: unknown) => import("./types").ProbeMeta;
         readonly reasoningUsage: (data: unknown) => import("./types").ReasoningUsage | null;
     };
-    readonly identity: {
-        readonly home: readonly ["openai"];
-        readonly foreign: string[];
-        readonly homeModelNames: readonly ["gpt", "openai", "o1", "o3", "o4"];
-        readonly cloudModelNames: readonly [];
-        readonly acceptsCloudHost: false;
-    };
-    readonly tiers: null;
+    readonly defaultMaker: "openai";
 }, {
     readonly id: "gemini";
     readonly vendorName: "google";
@@ -99,14 +85,7 @@ export declare const VENDORS: readonly [{
         readonly meta: (data: unknown) => import("./types").ProbeMeta;
         readonly reasoningUsage: (data: unknown) => import("./types").ReasoningUsage | null;
     };
-    readonly identity: {
-        readonly home: readonly ["google", "deepmind"];
-        readonly foreign: string[];
-        readonly homeModelNames: readonly ["gemini", "google"];
-        readonly cloudModelNames: readonly [];
-        readonly acceptsCloudHost: false;
-    };
-    readonly tiers: null;
+    readonly defaultMaker: "google";
 }];
 export type VendorId = (typeof VENDORS)[number]["id"];
 export declare function vendorFor<V extends string>(vendors: readonly VendorAdapter<V>[], id: string): VendorAdapter<V> | undefined;

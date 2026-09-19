@@ -7,6 +7,8 @@
  * so a narrow entry (opus-4-7 thinks adaptively) sits above the broad one
  * (every claude belongs to anthropic) and both apply.
  */
+import { MAKERS } from "../makers/table";
+import { makerForModel } from "../makers/resolve";
 /** Lowercase, `.` and `_` to `-`, any `vendor/` or `pool/` prefix stripped. */
 export const normalizeModelId = (model) => model.trim().toLowerCase().replace(/[._]/g, "-").split("/").pop() ?? "";
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -33,9 +35,8 @@ export const MODEL_FACTS = [
         ],
         thinking: "extended",
     },
-    { match: "*claude*", vendor: "anthropic", tokenizer: "claude-v1" },
+    { match: "*claude*", tokenizer: "claude-v1" },
     { match: "gemini-2-5-pro*", alwaysThinks: true },
-    { match: "*gemini*", vendor: "gemini" },
     {
         match: [
             "gpt-5*",
@@ -51,18 +52,17 @@ export const MODEL_FACTS = [
         ],
         minOutputTokens: 2000,
     },
-    { match: ["gpt-*", "o1*", "o3*", "o4*", "chatgpt*"], vendor: "openai" },
 ];
 export const defineModelFacts = (facts) => facts;
 const DEFAULTS = {
-    vendor: null,
+    maker: null,
     thinking: "none",
     tokenizer: null,
     alwaysThinks: false,
     minOutputTokens: null,
 };
 const FACT_KEYS = [
-    "vendor",
+    "maker",
     "thinking",
     "tokenizer",
     "alwaysThinks",
@@ -75,7 +75,7 @@ function take(out, entry, key, seen) {
     out[key] = v;
     seen.add(key);
 }
-export function resolveModelFacts(model, extra = []) {
+export function resolveModelFacts(model, extra = [], makers = MAKERS) {
     const id = normalizeModelId(model);
     const out = { ...DEFAULTS };
     const seen = new Set();
@@ -86,6 +86,8 @@ export function resolveModelFacts(model, extra = []) {
         for (const key of FACT_KEYS)
             take(out, entry, key, seen);
     }
+    if (!seen.has("maker"))
+        out.maker = makerForModel(id, makers);
     return out;
 }
 //# sourceMappingURL=facts.js.map

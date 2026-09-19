@@ -31,14 +31,7 @@ export declare const anthropicVendor: {
         readonly thinkingBlock: typeof thinkingBlock;
         readonly countedTokens: typeof countedTokens;
     };
-    readonly identity: {
-        readonly home: readonly ["anthropic"];
-        readonly foreign: string[];
-        readonly homeModelNames: readonly ["claude", "anthropic"];
-        readonly cloudModelNames: readonly ["amazon q", "q developer", "kiro"];
-        readonly acceptsCloudHost: true;
-    };
-    readonly tiers: readonly ["opus", "sonnet", "haiku", "fable"];
+    readonly defaultMaker: "anthropic";
 };
 export {};
 //# sourceMappingURL=anthropic.d.ts.map

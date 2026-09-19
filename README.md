@@ -15,6 +15,12 @@ engine runs in the browser, on a server, and inside our sync pipeline.
 
 - **Adapters.** One object per wire format (`anthropic`, `openai`, `gemini`)
   builds every request and reads every reply. Rules never see a URL.
+- **Makers.** Who trained a model is separate from how it is sold. A maker
+  table (Anthropic, OpenAI, Google, DeepSeek, Moonshot, Zhipu, MiniMax, Xiaomi,
+  Mistral, Alibaba, Meta, xAI, Tencent) carries the words a genuine model uses
+  for itself, its tiers and whether Chinese in a reply is a tell; the model id
+  picks the maker, the wire only shapes the request. A DeepSeek sold over an
+  OpenAI-shaped relay is judged as a DeepSeek.
 - **Rules over evidence.** Every detection is a rule that declares the
   evidence it needs (the four behavioural probes, a fixed-text pair, a thinking
   reply, a floor reply). Evidence is collected once per run and shared; the
@@ -70,13 +76,14 @@ for (const f of run.findings) console.log(f.rule, f.severity, f.reason);
 Extend without forking:
 
 ```ts
-import { createVerifier, defineRule, defineVendor, defineModelFacts } from "ai-model-verifier";
+import { createVerifier, defineMaker, defineRule, defineVendor, defineModelFacts } from "ai-model-verifier";
 
 const { verify } = createVerifier({
   vendors: [defineVendor({ id: "mywire", ... })],
+  makers: [defineMaker({ id: "acme", name: "Acme", wire: "openai", models: ["acme-*"], home: ["acme"], modelNames: ["acme"], acceptsCloudHost: false, tiers: null, cjkNative: false })],
   rules: [defineRule({ id: "my-rule", layer: "probe", needs: ["probes"], applies: () => true, judge: async (ctx) => ... })],
   omit: ["substituted"],
-  modelFacts: defineModelFacts([{ match: "my-model*", alwaysThinks: true }]),
+  modelFacts: defineModelFacts([{ match: "hy4-*", maker: "tencent" }, { match: "my-model*", alwaysThinks: true }]),
 });
 ```
 
@@ -87,10 +94,15 @@ reasoning tokens (`thinking-floor`, opt-in); a tokenizer fingerprint matching a
 cheaper tier under a caller-supplied calibration (`tokenizer-fingerprint`,
 opt-in; ships no table, see the rule's note); `coding-tool` refusals (Kiro or
 Amazon Q wearing a Claude badge); scam pages; CJK language leaks from a
-substituted Chinese model; response-mixing proxies (`mux`); a foreign vendor
-named as the maker; the reply's own `model` field naming another tier
+substituted Chinese model (skipped for makers that train on Chinese);
+response-mixing proxies (`mux`); another maker named as the maker, judged by the
+requested model's own maker rather than the wire; the reply's own `model` field naming another tier
 (`served-model-mismatch`) or another model (`substituted`); and a probe quorum
 that only fails on non-transient evidence.
+
+A model whose id names no maker is judged by the wire's default maker, and a
+model that only says "I am an AI assistant" fails the identity probe, which the
+quorum tolerates when the other three pass.
 
 Note rules report without judging: the Claude thinking signature, token
 accounting against the billed usage, a self-reported tier, the response

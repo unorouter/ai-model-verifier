@@ -44,7 +44,7 @@ export type TokenTruthResult = {
   reason?: string;
 };
 
-export const expectedInputDelta = (facts: ModelFacts) =>
+export const expectedInputDelta = (facts: ModelFacts<string>) =>
   facts.tokenizer === "claude-v2" ? DELTA_NEW : DELTA_OLD;
 
 async function tokenTruthResult(

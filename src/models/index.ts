@@ -11,6 +11,11 @@ export type {
   ThinkingMode,
   TokenizerGeneration,
 } from "./facts";
-export { CURATED_MODELS, vendorForModel, vendorForRow } from "./catalog";
+export {
+  CURATED_MODELS,
+  makerForModel,
+  vendorForRow,
+  wireForModel,
+} from "./catalog";
 export { detectSubstitution, modelsMatch } from "./substitution";
 export { detectServedModelMismatch, detectTierMismatch, tierOf } from "./tiers";

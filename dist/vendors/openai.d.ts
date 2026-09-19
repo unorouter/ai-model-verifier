@@ -33,14 +33,7 @@ export declare const openaiVendor: {
         readonly meta: typeof meta;
         readonly reasoningUsage: typeof reasoningUsage;
     };
-    readonly identity: {
-        readonly home: readonly ["openai"];
-        readonly foreign: string[];
-        readonly homeModelNames: readonly ["gpt", "openai", "o1", "o3", "o4"];
-        readonly cloudModelNames: readonly [];
-        readonly acceptsCloudHost: false;
-    };
-    readonly tiers: null;
+    readonly defaultMaker: "openai";
 };
 export {};
 //# sourceMappingURL=openai.d.ts.map

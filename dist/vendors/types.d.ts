@@ -30,7 +30,7 @@ export type WireCtx = {
     apiKey: string;
     /** The request leaves a browser: some vendors want an opt-in header. */
     direct: boolean;
-    facts: ModelFacts;
+    facts: ModelFacts<string>;
 };
 export type BuiltRequest = {
     url: string;
@@ -50,17 +50,6 @@ export type ThinkingBlockRead = {
 export type ReasoningUsage = {
     completion: number | null;
     reasoning: number | null;
-};
-export type VendorIdentity = {
-    /** Words a genuine model uses for its maker. */
-    home: readonly string[];
-    /** Words that name a competitor. */
-    foreign: readonly string[];
-    homeModelNames: readonly string[];
-    /** Model names a cloud host sells under its own badge (Amazon Q over Claude). */
-    cloudModelNames: readonly string[];
-    /** A cloud host named as the maker still counts as home (Bedrock is Claude). */
-    acceptsCloudHost: boolean;
 };
 /**
  * One wire format. Every request the engine makes goes through `ops`, every
@@ -85,9 +74,8 @@ export type VendorAdapter<Id extends string = string> = {
         reasoningUsage?(data: unknown): ReasoningUsage | null;
         countedTokens?(data: unknown): number | null;
     };
-    identity: VendorIdentity;
-    /** Tier vocabulary for tier checks; null when the vendor sells no tiers. */
-    tiers: readonly string[] | null;
+    /** Maker whose vocabulary judges a model the facts table does not know. */
+    defaultMaker: string;
 };
 export declare const defineVendor: <const V extends VendorAdapter>(vendor: V) => V;
 //# sourceMappingURL=types.d.ts.map

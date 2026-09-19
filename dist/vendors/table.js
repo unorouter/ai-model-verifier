@@ -8,6 +8,7 @@ export const VENDORS = [
 ];
 // A fallback wire that names no adapter is a typo; fail the build, not the run.
 void VENDORS;
+void VENDORS;
 export function vendorFor(vendors, id) {
     return vendors.find((v) => v.id === id);
 }

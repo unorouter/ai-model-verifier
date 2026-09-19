@@ -4,6 +4,8 @@ import { runHandshake } from "./engine/handshake";
 import { foldVerdict } from "./engine/verdict";
 import { hostOf } from "./internal/utils";
 import { normalizeModelId, resolveModelFacts, } from "./models/facts";
+import { MAKERS } from "./makers/table";
+import { resolveMaker } from "./makers/resolve";
 import { makeNonce } from "./probes/prompts";
 import { RULES } from "./rules/table";
 import { browserTransport, directTransport } from "./transport";
@@ -13,6 +15,7 @@ export const DEFAULT_REGISTRY = {
     vendors: VENDORS,
     rules: RULES,
     facts: [],
+    makers: MAKERS,
 };
 function buildCtx(registry, opts) {
     const wire = vendorFor(registry.vendors, opts.vendor);
@@ -26,7 +29,7 @@ function buildCtx(registry, opts) {
             alwaysThinks: true,
         })),
         ...registry.facts,
-    ]);
+    ], registry.makers);
     const transport = opts.transport ??
         (opts.mode === "server"
             ? opts.serverProxyUrl
@@ -35,16 +38,12 @@ function buildCtx(registry, opts) {
             : directTransport);
     if (!transport)
         throw new TypeError("server mode needs a transport or a serverProxyUrl");
-    const home = facts.vendor
-        ? vendorFor(registry.vendors, facts.vendor)
-        : undefined;
     return {
         model: opts.model,
         facts,
         requestedVendor: opts.vendor,
         wire,
-        identity: (home ?? wire).identity,
-        tiers: (home ?? wire).tiers,
+        maker: makerOf(registry, facts.maker, wire),
         mode: opts.mode,
         direct: opts.mode === "direct",
         baseUrl: opts.baseUrl,
@@ -56,6 +55,13 @@ function buildCtx(registry, opts) {
         ...(opts.onProbe ? { onProbe: opts.onProbe } : {}),
         checks: resolveChecks(opts.checks),
     };
+}
+/** The model's own maker, or the wire's default when the tables know no maker. */
+function makerOf(registry, maker, wire) {
+    const id = maker ?? wire.defaultMaker;
+    if (!maker && !registry.makers.some((m) => m.id === id))
+        throw new TypeError(`wire "${wire.id}" names unknown maker "${id}"`);
+    return resolveMaker(registry.makers, id);
 }
 /**
  * Collect what the applicable rules need, in canonical order, then judge them
@@ -114,9 +120,10 @@ function sumUsage(usages) {
         total: add("total"),
     };
 }
-function connectivityResult(opts, error, corsBlocked, startedAt) {
+function connectivityResult(opts, maker, error, corsBlocked, startedAt) {
     return {
         vendor: opts.vendor,
+        maker,
         model: opts.model,
         baseUrlHost: hostOf(opts.baseUrl),
         verdict: "unverified",
@@ -141,13 +148,11 @@ export async function verifyWith(registry, opts) {
     const requested = buildCtx(registry, opts);
     const hs = await runHandshake(requested, registry.vendors);
     if (!hs.ok)
-        return connectivityResult(opts, hs.reason, hs.corsBlocked, started);
-    const home = requested.facts.vendor !== null;
+        return connectivityResult(opts, requested.facts.maker, hs.reason, hs.corsBlocked, started);
     const ctx = {
         ...requested,
         wire: hs.wire,
-        identity: home ? requested.identity : hs.wire.identity,
-        tiers: home ? requested.tiers : hs.wire.tiers,
+        maker: makerOf(registry, requested.facts.maker, hs.wire),
     };
     const rules = registry.rules.filter((r) => !r.check || ctx.checks[r.check]);
     const run = await runRuleSet(ctx, rules);
@@ -156,6 +161,7 @@ export async function verifyWith(registry, opts) {
     return {
         ...run.reports,
         vendor: opts.vendor,
+        maker: requested.facts.maker,
         model: opts.model,
         baseUrlHost: hostOf(opts.baseUrl),
         verdict: folded.verdict,

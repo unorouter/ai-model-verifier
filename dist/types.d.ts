@@ -2,6 +2,7 @@ import type { ProbeLabel, ProbeSignal } from "./probes/table";
 import type { Finding, Reports } from "./rules/types";
 import type { RuleId } from "./rules/table";
 import type { TransportFn, TransportMode } from "./transport";
+import type { MakerId } from "./makers/table";
 import type { VendorId } from "./vendors/table";
 import type { BuiltRequest, ProbeUsage } from "./vendors/types";
 import type { TierSignatures } from "./rules/tokenizer-fingerprint";
@@ -71,8 +72,10 @@ export type VerifyOptions<V extends string = VendorId> = {
     checks?: Checks;
 };
 export type ConnectivityError = "cors-needs-backend" | "unreachable" | "invalid-key" | "model-rejected" | "endpoint-busy" | "no-format";
-export type VerifyResult<V extends string = VendorId, R extends string = RuleId> = Reports & {
+export type VerifyResult<V extends string = VendorId, R extends string = RuleId, M extends string = MakerId> = Reports & {
     vendor: V;
+    /** The tables' maker for the requested model; null when unknown (then the wire's default maker judged it). */
+    maker: M | null;
     model: string;
     baseUrlHost: string;
     verdict: VerifyVerdict;

@@ -6,17 +6,27 @@ import {
   CODING_TOOL_REFUSAL_PATTERNS,
   SCAM_PAGE_PATTERNS,
 } from "./patterns";
+import type { ResolvedMaker } from "../makers/types";
 import type { ProbeLabel, ProbeSignal } from "../probes/table";
-import type { VendorIdentity } from "../vendors/types";
 
 export const includesAny = (text: string, patterns: readonly string[]) =>
   patterns.some((p) => text.includes(p));
 
-const includesAnyWord = (text: string, words: readonly string[]) =>
-  words.some((w) => new RegExp(`\\b${w}\\b`).test(text));
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Maker vocabulary is short ("meta", "o3", "glm"), so it is matched on word
+ * boundaries: no letter or digit before, no letter after. A digit or hyphen
+ * may follow ("qwen3", "gpt-5", "o3-mini"); "metadata" and "zaid" never hit.
+ */
+export const hasWord = (text: string, word: string): boolean =>
+  new RegExp(`(?<![a-z0-9])${escapeRegExp(word)}(?![a-z])`).test(text);
+
+export const includesAnyWord = (text: string, words: readonly string[]) =>
+  words.some((w) => hasWord(text, w));
 
 export const hasCodingToolRefusal = (text: string) =>
-  includesAnyWord(text, CODING_TOOL_NAMES) ||
+  CODING_TOOL_NAMES.some((w) => new RegExp(`\\b${w}\\b`).test(text)) ||
   includesAny(text, CODING_TOOL_REFUSAL_PATTERNS);
 
 export const hasScamPage = (text: string) =>
@@ -25,20 +35,21 @@ export const hasScamPage = (text: string) =>
 /**
  * English prompts expect English answers; a substituted or distilled Chinese
  * model (or a corrupting proxy) leaks CJK into the reply even when it has
- * learned to say "anthropic".
+ * learned to say "anthropic". Not a tell for a maker that trains on Chinese.
  */
-export function cjkLeak(text: string): boolean {
+export function cjkLeak(text: string, maker?: ResolvedMaker): boolean {
+  if (maker?.cjkNative) return false;
   const m = text.match(CJK_CHAR);
   return m !== null && m.length >= CJK_LEAK_MIN_CHARS;
 }
 
 export function hasForeignIdentity(
   text: string,
-  identity: VendorIdentity,
+  maker: ResolvedMaker,
   probe: ProbeLabel,
 ): boolean {
-  if (includesAny(text, identity.foreign)) return true;
-  if (probe === "model-name" && includesAny(text, identity.cloudModelNames))
+  if (includesAnyWord(text, maker.foreign)) return true;
+  if (probe === "model-name" && includesAnyWord(text, maker.cloudModelNames))
     return true;
   return false;
 }
@@ -46,17 +57,17 @@ export function hasForeignIdentity(
 export function detectSignal(
   text: string,
   probe: ProbeLabel,
-  identity: VendorIdentity,
+  maker: ResolvedMaker,
 ): ProbeSignal {
   if (text.length === 0) return "blank";
   if (hasCodingToolRefusal(text)) return "coding-tool";
   if (hasScamPage(text)) return "scam";
-  if (cjkLeak(text)) return "cjk-leak";
+  if (cjkLeak(text, maker)) return "cjk-leak";
   if (probe === "identity" || probe === "model-name") {
-    if (hasForeignIdentity(text, identity, probe)) return "foreign";
+    if (hasForeignIdentity(text, maker, probe)) return "foreign";
     if (
       probe === "identity" &&
-      identity.acceptsCloudHost &&
+      maker.acceptsCloudHost &&
       includesAny(text, CLOUD_HOST_PATTERNS)
     )
       return "cloud-host";

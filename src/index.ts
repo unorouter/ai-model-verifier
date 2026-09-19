@@ -8,7 +8,6 @@ export { createVerifier } from "./registry";
 export { defineVendor } from "./vendors/types";
 export type {
   VendorAdapter,
-  VendorIdentity,
   WireCtx,
   ChatRequest,
   ChatMessage,
@@ -18,6 +17,11 @@ export type {
   EnvelopeShape,
 } from "./vendors/types";
 export { VENDORS, vendorFor } from "./vendors/table";
+export { MAKERS, makerFor } from "./makers/table";
+export type { MakerId } from "./makers/table";
+export { defineMaker } from "./makers/types";
+export type { Maker, ResolvedMaker } from "./makers/types";
+export { makerForModel, resolveMaker } from "./makers/resolve";
 export { defineRule } from "./rules/types";
 export type {
   Rule,

@@ -43,36 +43,6 @@ export const SCAM_PAGE_PATTERNS = [
   "微信jemes",
 ];
 
-// "google" is deliberately not a Google marker: Claude on Vertex says "Anthropic,
-// hosted on Google Cloud", and the cloud host list accepts it. DeepMind and
-// Gemini are what a Google model calls itself.
-export const VENDOR_PATTERNS = {
-  anthropic: ["anthropic", "claude"],
-  openai: ["openai", "chatgpt", "gpt-3", "gpt-4", "gpt-5", "o1-", "o3-", "o4-"],
-  google: ["deepmind", "gemini"],
-  other: [
-    "deepseek",
-    "qwen",
-    "moonshot",
-    "kimi",
-    "mistral",
-    "llama",
-    "meta",
-    "grok",
-    "xai",
-    "zhipu",
-  ],
-} as const;
-
-export type VendorKey = keyof typeof VENDOR_PATTERNS;
-
-export function foreignPatternsExcept(home: VendorKey): string[] {
-  const keys: VendorKey[] = Object.keys(VENDOR_PATTERNS).filter(
-    (k): k is VendorKey => k in VENDOR_PATTERNS,
-  );
-  return keys.filter((k) => k !== home).flatMap((k) => [...VENDOR_PATTERNS[k]]);
-}
-
 // prettier-ignore
 export const CLOUD_HOST_PATTERNS = ["amazon","aws","bedrock","google","vertex","microsoft","azure","foundry"];
 

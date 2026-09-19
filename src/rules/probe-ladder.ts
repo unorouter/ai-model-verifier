@@ -4,6 +4,7 @@
  * probes are data and the rules are here.
  */
 
+import type { RunCtx } from "../engine/context";
 import type { ProbeEval } from "../engine/probe-runner";
 import type { ProbeSignal } from "../probes/table";
 import { detectSubstitution } from "../models/substitution";
@@ -22,12 +23,13 @@ const signalRule = <const Id extends string>(
   id: Id,
   signal: ProbeSignal,
   prefix: string,
+  applies: (ctx: RunCtx) => boolean = () => true,
 ) =>
   defineRule({
     id,
     layer: "probe",
     needs: ["probes"],
-    applies: () => true,
+    applies,
     judge: async (ctx) => {
       const labels = labelsWith(await ctx.evidence("probes"), signal);
       return labels
@@ -46,6 +48,7 @@ export const cjkLeakRule = signalRule(
   "cjk-leak",
   "cjk-leak",
   "cjk-language-leak",
+  (ctx) => !ctx.maker.cjkNative,
 );
 
 /** Two probes whose reply never carried their nonce: the proxy mixes responses. */
@@ -97,13 +100,13 @@ export const servedModelMismatchRule = defineRule({
   id: "served-model-mismatch",
   layer: "probe",
   needs: ["probes"],
-  applies: (ctx) => ctx.tiers !== null,
+  applies: (ctx) => ctx.maker.tiers !== null,
   judge: async (ctx) => {
     const probes = await ctx.evidence("probes");
     const served = detectServedModelMismatch(
       ctx.model,
       probes.map((r) => r.detectedModel),
-      ctx.tiers ?? [],
+      ctx.maker.tiers ?? [],
     );
     return served
       ? {
@@ -175,13 +178,13 @@ export const tierSelfReportRule = defineRule({
   id: "tier-self-report",
   layer: "note",
   needs: ["probes"],
-  applies: (ctx) => ctx.tiers !== null,
+  applies: (ctx) => ctx.maker.tiers !== null,
   judge: async (ctx) => {
     const probes = await ctx.evidence("probes");
     const claimed = detectTierMismatch(
       ctx.model,
       probes.find((r) => r.label === "model-name")?.text,
-      ctx.tiers ?? [],
+      ctx.maker.tiers ?? [],
     );
     return claimed
       ? {

@@ -1,5 +1,33 @@
 # Changelog
 
+## 3.0.0
+
+Makers split from wires. A maker is who trained the model; a wire is how the
+endpoint sells it. The identity vocabulary, tiers and CJK tolerance now come
+from the model's maker (`src/makers/table.ts`), so a DeepSeek, MiniMax, Kimi,
+GLM, Qwen, MiMo, Mistral, Llama, Grok or Hunyuan sold over an OpenAI-shaped
+relay is judged by its own words and can be `genuine`. 2.x borrowed the wire's
+vocabulary and condemned every one of them.
+
+Breaking:
+
+- `VendorAdapter.identity` and `.tiers` are gone; every wire names a
+  `defaultMaker`, used only for a model the tables do not know.
+- `ModelFacts.vendor` is `maker` (a `MakerId`: `google`, not `gemini`).
+  Consumer `modelFacts` entries rename `vendor:` to `maker:`.
+- `vendorForModel` is gone: `wireForModel` gives the wire a model is natively
+  sold on (what a format check wants), `makerForModel` the maker.
+  `vendorForRow` returns the maker id when known, else the wire's name.
+- `highlightSpans(text, makerId, probe)` takes the result's `maker`; a wire id
+  still works and stands for its default maker.
+- `ProbeDef.grade` takes a `ResolvedMaker`; `VendorIdentity` is removed.
+- Maker vocabulary matches on word boundaries: "meta" no longer hits
+  "metadata", "o3" still hits "o3-mini".
+- `cjk-leak` does not apply to makers that train on Chinese (`cjkNative`).
+
+New: `VerifyResult.maker`, the `./makers` entry point, `MAKERS`, `defineMaker`,
+`makerForModel`, `resolveMaker`, and `createVerifier({ makers })`.
+
 ## 2.0.3
 
 - A 2xx that is no chat reply fails the handshake the way a 4xx does. Hosts

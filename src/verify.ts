@@ -9,6 +9,9 @@ import {
   resolveModelFacts,
   type FactsEntry,
 } from "./models/facts";
+import { MAKERS, type MakerId } from "./makers/table";
+import { resolveMaker } from "./makers/resolve";
+import type { Maker } from "./makers/types";
 import { makeNonce } from "./probes/prompts";
 import { RULES, type RuleId } from "./rules/table";
 import type { Finding, Reports, Rule, RuleCtx } from "./rules/types";
@@ -25,33 +28,43 @@ import type { ProbeUsage, VendorAdapter } from "./vendors/types";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
-export type Registry<V extends string = VendorId, R extends string = RuleId> = {
+export type Registry<
+  V extends string = VendorId,
+  R extends string = RuleId,
+  M extends string = MakerId,
+> = {
   vendors: readonly VendorAdapter<V>[];
   rules: readonly Rule<R>[];
-  facts: readonly FactsEntry[];
+  facts: readonly FactsEntry<M>[];
+  makers: readonly Maker<M>[];
 };
 
 export const DEFAULT_REGISTRY: Registry = {
   vendors: VENDORS,
   rules: RULES,
   facts: [],
+  makers: MAKERS,
 };
 
-function buildCtx<V extends string>(
-  registry: Registry<V, string>,
+function buildCtx<V extends string, M extends string>(
+  registry: Registry<V, string, M>,
   opts: VerifyOptions<V>,
-): RunCtx<V> {
+): RunCtx<V, M> {
   const wire = vendorFor(registry.vendors, opts.vendor);
   if (!wire) throw new TypeError(`unknown vendor "${opts.vendor}"`);
   const floor = opts.checks?.thinkingFloor;
   const floorModels = typeof floor === "object" ? (floor.models ?? []) : [];
-  const facts = resolveModelFacts(opts.model, [
-    ...floorModels.map((p) => ({
-      match: `${normalizeModelId(p)}*`,
-      alwaysThinks: true,
-    })),
-    ...registry.facts,
-  ]);
+  const facts = resolveModelFacts<M>(
+    opts.model,
+    [
+      ...floorModels.map((p) => ({
+        match: `${normalizeModelId(p)}*`,
+        alwaysThinks: true,
+      })),
+      ...registry.facts,
+    ],
+    registry.makers,
+  );
   const transport =
     opts.transport ??
     (opts.mode === "server"
@@ -61,16 +74,12 @@ function buildCtx<V extends string>(
       : directTransport);
   if (!transport)
     throw new TypeError("server mode needs a transport or a serverProxyUrl");
-  const home = facts.vendor
-    ? vendorFor(registry.vendors, facts.vendor)
-    : undefined;
   return {
     model: opts.model,
     facts,
     requestedVendor: opts.vendor,
     wire,
-    identity: (home ?? wire).identity,
-    tiers: (home ?? wire).tiers,
+    maker: makerOf(registry, facts.maker, wire),
     mode: opts.mode,
     direct: opts.mode === "direct",
     baseUrl: opts.baseUrl,
@@ -82,6 +91,18 @@ function buildCtx<V extends string>(
     ...(opts.onProbe ? { onProbe: opts.onProbe } : {}),
     checks: resolveChecks(opts.checks),
   };
+}
+
+/** The model's own maker, or the wire's default when the tables know no maker. */
+function makerOf<M extends string>(
+  registry: Registry<string, string, M>,
+  maker: M | null,
+  wire: VendorAdapter,
+) {
+  const id = maker ?? wire.defaultMaker;
+  if (!maker && !registry.makers.some((m) => m.id === id))
+    throw new TypeError(`wire "${wire.id}" names unknown maker "${id}"`);
+  return resolveMaker(registry.makers, id as M);
 }
 
 type RuleSetRun<R extends string> = {
@@ -150,14 +171,16 @@ function sumUsage(usages: (ProbeUsage | null)[]): ProbeUsage | null {
   };
 }
 
-function connectivityResult<V extends string, R extends string>(
+function connectivityResult<V extends string, R extends string, M extends string>(
   opts: VerifyOptions<V>,
+  maker: M | null,
   error: ConnectivityError,
   corsBlocked: boolean,
   startedAt: number,
-): VerifyResult<V, R> {
+): VerifyResult<V, R, M> {
   return {
     vendor: opts.vendor,
+    maker,
     model: opts.model,
     baseUrlHost: hostOf(opts.baseUrl),
     verdict: "unverified",
@@ -178,21 +201,29 @@ function connectivityResult<V extends string, R extends string>(
 }
 
 /** Handshake, probes, every enabled rule, verdict. */
-export async function verifyWith<V extends string, R extends string>(
-  registry: Registry<V, R>,
+export async function verifyWith<
+  V extends string,
+  R extends string,
+  M extends string = MakerId,
+>(
+  registry: Registry<V, R, M>,
   opts: VerifyOptions<V>,
-): Promise<VerifyResult<V, R>> {
+): Promise<VerifyResult<V, R, M>> {
   const started = performance.now();
   const requested = buildCtx(registry, opts);
   const hs = await runHandshake(requested, registry.vendors);
   if (!hs.ok)
-    return connectivityResult(opts, hs.reason, hs.corsBlocked, started);
-  const home = requested.facts.vendor !== null;
-  const ctx: RunCtx<V> = {
+    return connectivityResult(
+      opts,
+      requested.facts.maker,
+      hs.reason,
+      hs.corsBlocked,
+      started,
+    );
+  const ctx: RunCtx<V, M> = {
     ...requested,
     wire: hs.wire,
-    identity: home ? requested.identity : hs.wire.identity,
-    tiers: home ? requested.tiers : hs.wire.tiers,
+    maker: makerOf(registry, requested.facts.maker, hs.wire),
   };
 
   const rules = registry.rules.filter((r) => !r.check || ctx.checks[r.check]);
@@ -203,6 +234,7 @@ export async function verifyWith<V extends string, R extends string>(
   return {
     ...run.reports,
     vendor: opts.vendor,
+    maker: requested.facts.maker,
     model: opts.model,
     baseUrlHost: hostOf(opts.baseUrl),
     verdict: folded.verdict,
@@ -227,8 +259,12 @@ export async function verifyWith<V extends string, R extends string>(
  * no verdict, only the evidence those rules ask for. A rule named here runs
  * whether or not its `checks` switch is on; `checks` still carries options.
  */
-export async function runRulesWith<V extends string, R extends string>(
-  registry: Registry<V, R>,
+export async function runRulesWith<
+  V extends string,
+  R extends string,
+  M extends string = MakerId,
+>(
+  registry: Registry<V, R, M>,
   opts: VerifyOptions<V> & { only: readonly R[] },
 ): Promise<RuleRun<R>> {
   const ctx = buildCtx(registry, opts);

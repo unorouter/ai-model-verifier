@@ -31,14 +31,7 @@ export declare const geminiVendor: {
         readonly meta: typeof meta;
         readonly reasoningUsage: typeof reasoningUsage;
     };
-    readonly identity: {
-        readonly home: readonly ["google", "deepmind"];
-        readonly foreign: string[];
-        readonly homeModelNames: readonly ["gemini", "google"];
-        readonly cloudModelNames: readonly [];
-        readonly acceptsCloudHost: false;
-    };
-    readonly tiers: null;
+    readonly defaultMaker: "google";
 };
 export {};
 //# sourceMappingURL=gemini.d.ts.map

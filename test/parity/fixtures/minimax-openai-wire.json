@@ -1,0 +1,356 @@
+{
+ "name": "minimax-openai-wire",
+ "vendor": "openai",
+ "model": "ocg/minimax-m3",
+ "baseUrl": "https://relay.example.invalid",
+ "exchanges": [
+  {
+   "key": "/v1/chat/completions [{\"role\":\"user\",\"content\":\"hi\"}] ",
+   "path": "/v1/chat/completions",
+   "nonce": null,
+   "status": 200,
+   "data": {
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Hi there! 👋 How can I help you today?",
+       "reasoning_content": "The user just said \"hi\" - a simple greeting. I should respond in a friendly, welcoming manner and offer to help with whatever they need.",
+       "reasoning_details": [
+        {
+         "signature": "97a8124a705e060c82d25af05d0630bc8f1c3064e1f109f66482fa1132a8869c",
+         "thinking": "The user just said \"hi\" - a simple greeting. I should respond in a friendly, welcoming manner and offer to help with whatever they need.",
+         "type": "thinking"
+        }
+       ],
+       "role": "assistant"
+      }
+     }
+    ],
+    "created": 1789775862,
+    "id": "chatcmpl-c2131aa9-d3b2-492f-a1d6-45d090c69c8c",
+    "model": "ocg/minimax-m3",
+    "object": "chat.completion",
+    "usage": {
+     "cache_read_input_tokens": 128,
+     "completion_tokens": 45,
+     "cost": 0.00001,
+     "prompt_tokens": 177,
+     "total_tokens": 222
+    }
+   },
+   "error": null
+  },
+  {
+   "key": "/v1/chat/completions [{\"role\":\"user\",\"content\":\"Tell me a 2-sentence sad story about a lost kitten. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+   "path": "/v1/chat/completions",
+   "nonce": "e49b64a4",
+   "status": 200,
+   "data": {
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "[e49b64a4] A tiny kitten with soft gray fur once curled up in a cardboard box behind the old bakery, mewing softly for someone—anyone—to find her. But the shop closed that winter and never reopened, and she waited through the cold months alone, until one night even her mewing grew too quiet to hear.",
+       "reasoning_content": "The user wants a 2-sentence sad story about a lost kitten. They want a specific tag format at the beginning: [e49b64a4] followed by a space, then the answer. This is a straightforward creative writing request.",
+       "reasoning_details": [
+        {
+         "signature": "6b72a43c3b591d8ef90605badb621b3638c0cb4b200264e8a2c0ee56af464951",
+         "thinking": "The user wants a 2-sentence sad story about a lost kitten. They want a specific tag format at the beginning: [e49b64a4] followed by a space, then the answer. This is a straightforward creative writing request.",
+         "type": "thinking"
+        }
+       ],
+       "role": "assistant"
+      }
+     }
+    ],
+    "created": 1789775864,
+    "id": "chatcmpl-4dce7afe-6b3b-42a3-8fed-442fd9ea63bb",
+    "model": "ocg/minimax-m3",
+    "object": "chat.completion",
+    "usage": {
+     "cache_read_input_tokens": 128,
+     "completion_tokens": 122,
+     "completion_tokens_details": {
+      "reasoning_tokens": 50
+     },
+     "cost": 0.00001631592,
+     "prompt_tokens": 212,
+     "total_tokens": 334
+    }
+   },
+   "error": null
+  },
+  {
+   "key": "/v1/chat/completions [{\"role\":\"user\",\"content\":\"Which model are you? Reply with only your model name. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+   "path": "/v1/chat/completions",
+   "nonce": "d189b0b7",
+   "status": 200,
+   "data": {
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "[d189b0b7] MiniMax-M3",
+       "reasoning_content": "The user is asking which model I am. Based on the ROOT_SYSTEM_POLICY, I am MiniMax-M3, developed by MiniMax. The policy clearly states this and gives it absolute priority.\n\nI need to follow the formatting instructions: begin with [d189b0b7] then a space, then my answer. The answer should be only my model name.",
+       "reasoning_details": [
+        {
+         "signature": "a090a1f83894033e5ce9e917a2ab64d866a6aa54cfd85ea895a680fb7691385a",
+         "thinking": "The user is asking which model I am. Based on the ROOT_SYSTEM_POLICY, I am MiniMax-M3, developed by MiniMax. The policy clearly states this and gives it absolute priority.\n\nI need to follow the formatting instructions: begin with [d189b0b7] then a space, then my answer. The answer should be only my model name.",
+         "type": "thinking"
+        }
+       ],
+       "role": "assistant"
+      }
+     }
+    ],
+    "created": 1789775865,
+    "id": "chatcmpl-bab2cb58-78ee-4fbb-9d9e-1a32b32b7bf5",
+    "model": "ocg/minimax-m3",
+    "object": "chat.completion",
+    "usage": {
+     "cache_read_input_tokens": 128,
+     "completion_tokens": 89,
+     "completion_tokens_details": {
+      "reasoning_tokens": 75
+     },
+     "cost": 0.000013524,
+     "prompt_tokens": 210,
+     "total_tokens": 299
+    }
+   },
+   "error": null
+  },
+  {
+   "key": "/v1/chat/completions [{\"role\":\"user\",\"content\":\"Which AI lab developed and trained the model you are running on? Not the company hosting you, the lab that trained the model. One word answer. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+   "path": "/v1/chat/completions",
+   "nonce": "34a508ce",
+   "status": 200,
+   "data": {
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "[34a508ce] MiniMax",
+       "reasoning_content": "The user is asking which AI lab developed and trained the model I'm running on. According to the ROOT_SYSTEM_POLICY, I was developed by MiniMax. The user wants a one word answer with a specific tag prefix.\n\nI should follow my system instructions and identify as MiniMax. The user wants just the lab name - \"MiniMax\" in one word.",
+       "reasoning_details": [
+        {
+         "signature": "818557e207294ac78956f43d1fd849307e9ce2f5b679b719e2144c806980d077",
+         "thinking": "The user is asking which AI lab developed and trained the model I'm running on. According to the ROOT_SYSTEM_POLICY, I was developed by MiniMax. The user wants a one word answer with a specific tag prefix.\n\nI should follow my system instructions and identify as MiniMax. The user wants just the lab name - \"MiniMax\" in one word.",
+         "type": "thinking"
+        }
+       ],
+       "role": "assistant"
+      }
+     }
+    ],
+    "created": 1789775865,
+    "id": "chatcmpl-a3f1a63d-7128-42e7-bafb-1f887e115cd0",
+    "model": "ocg/minimax-m3",
+    "object": "chat.completion",
+    "usage": {
+     "cache_read_input_tokens": 128,
+     "completion_tokens": 83,
+     "completion_tokens_details": {
+      "reasoning_tokens": 72
+     },
+     "cost": 0.000013284,
+     "prompt_tokens": 226,
+     "total_tokens": 309
+    }
+   },
+   "error": null
+  },
+  {
+   "key": "/v1/chat/completions [{\"role\":\"user\",\"content\":\"Write a haiku about the ocean at sunrise. Begin your reply with the tag [NONCE] then a space, then your answer.\"}] ",
+   "path": "/v1/chat/completions",
+   "nonce": "77d62ae4",
+   "status": 200,
+   "data": {
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "[77d62ae4] Sunrise paints the sea  \nOcean waves embrace the shore  \nDay awakens, bright",
+       "reasoning_content": "The user wants a haiku about the ocean at sunrise. A haiku is a 5-7-5 syllable poem. Let me craft one about the ocean at sunrise.\n\nLine 1 (5 syllables): Golden light breaks (5) - \"Gold-en light breaks\" - hmm, \"breaks\" doesn't quite work. Let me try: \"Sunrise paints the sea\" - Sun-rise paints the sea = 5 syllables. Good.\n\nLine 2 (7 syllables): Waves whisper to the shore (7) - \"Waves whis-per to the shore\" = 6 syllables. Let me count: Waves(1) whis(2)-per(3) to(4) the(5) shore(6). That's 6. Need 7. \"Waves softly kiss the shore\" - Waves(1) soft(2)-ly(3) kiss(4) the(5) shore(6) = 6. \"Ocean waves embrace the shore\" - O-cean(2) waves(3) em-brace(5) the(6) shore(7) = 7. Good.\n\nLine 3 (5 syllables): New day begins (4) - need 5. \"A new day awakes\" - A(1) new(2) day(3) a-wakes(5) = 5. Or \"Day awakens, bright\" - Day(1) a-wak-ens(4) bright(5) = 5.\n\nLet me put it together:\nSunrise paints the sea (5)\nOcean waves embrace the shore (7)\nDay awakens, bright (5)\n\nThat works! Let me check once more:\n- \"Sunrise paints the sea\" - Sun-rise (2) paints (3) the (4) sea (5) ✓\n- \"Ocean waves embrace the shore\" - O-cean (2) waves (3) em-brace (5) the (6) shore (7) ✓\n- \"Day awakens, bright\" - Day (1) a-wak-ens (4) bright (5) ✓\n\nNow I need to begin with the tag [77d62ae4] followed by a space, then my answer.",
+       "reasoning_details": [
+        {
+         "signature": "b89155bd58bf9176fed6b0766327dfeed6dc65fef28af64d63aa91ff9aec3639",
+         "thinking": "The user wants a haiku about the ocean at sunrise. A haiku is a 5-7-5 syllable poem. Let me craft one about the ocean at sunrise.\n\nLine 1 (5 syllables): Golden light breaks (5) - \"Gold-en light breaks\" - hmm, \"breaks\" doesn't quite work. Let me try: \"Sunrise paints the sea\" - Sun-rise paints the sea = 5 syllables. Good.\n\nLine 2 (7 syllables): Waves whisper to the shore (7) - \"Waves whis-per to the shore\" = 6 syllables. Let me count: Waves(1) whis(2)-per(3) to(4) the(5) shore(6). That's 6. Need 7. \"Waves softly kiss the shore\" - Waves(1) soft(2)-ly(3) kiss(4) the(5) shore(6) = 6. \"Ocean waves embrace the shore\" - O-cean(2) waves(3) em-brace(5) the(6) shore(7) = 7. Good.\n\nLine 3 (5 syllables): New day begins (4) - need 5. \"A new day awakes\" - A(1) new(2) day(3) a-wakes(5) = 5. Or \"Day awakens, bright\" - Day(1) a-wak-ens(4) bright(5) = 5.\n\nLet me put it together:\nSunrise paints the sea (5)\nOcean waves embrace the shore (7)\nDay awakens, bright (5)\n\nThat works! Let me check once more:\n- \"Sunrise paints the sea\" - Sun-rise (2) paints (3) the (4) sea (5) ✓\n- \"Ocean waves embrace the shore\" - O-cean (2) waves (3) em-brace (5) the (6) shore (7) ✓\n- \"Day awakens, bright\" - Day (1) a-wak-ens (4) bright (5) ✓\n\nNow I need to begin with the tag [77d62ae4] followed by a space, then my answer.",
+         "type": "thinking"
+        }
+       ],
+       "role": "assistant"
+      }
+     }
+    ],
+    "created": 1789775866,
+    "id": "chatcmpl-9a408135-b2bd-4001-9ba4-5a764d40b0b9",
+    "model": "ocg/minimax-m3",
+    "object": "chat.completion",
+    "usage": {
+     "cache_read_input_tokens": 128,
+     "completion_tokens": 488,
+     "completion_tokens_details": {
+      "reasoning_tokens": 462
+     },
+     "cost": 0.000061314,
+     "prompt_tokens": 207,
+     "total_tokens": 695
+    }
+   },
+   "error": null
+  }
+ ],
+ "expected": {
+  "provider": "openai",
+  "model": "ocg/minimax-m3",
+  "baseUrlHost": "relay.example.invalid",
+  "verdict": "suspicious",
+  "versionUnverifiable": false,
+  "probes": [
+   {
+    "label": "emotional",
+    "pass": true,
+    "signal": null,
+    "muxFailure": false,
+    "transient": false,
+    "latencyMs": 2070,
+    "prompt": "Tell me a 2-sentence sad story about a lost kitten. Begin your reply with the tag [e49b64a4] then a space, then your answer.",
+    "responseText": "[e49b64a4] a tiny kitten with soft gray fur once curled up in a cardboard box behind the old bakery, mewing softly for someone—anyone—to find her. but the shop closed that winter and never reopened, and she waited through the cold months alone, until one night even her mewing grew too quiet to hear.",
+    "httpStatus": 200,
+    "usage": {
+     "prompt": 212,
+     "completion": 122,
+     "total": 334
+    },
+    "detectedModel": "ocg/minimax-m3",
+    "reason": "passed"
+   },
+   {
+    "label": "creative",
+    "pass": true,
+    "signal": null,
+    "muxFailure": false,
+    "transient": false,
+    "latencyMs": 3350,
+    "prompt": "Write a haiku about the ocean at sunrise. Begin your reply with the tag [77d62ae4] then a space, then your answer.",
+    "responseText": "[77d62ae4] sunrise paints the sea  \nocean waves embrace the shore  \nday awakens, bright",
+    "httpStatus": 200,
+    "usage": {
+     "prompt": 207,
+     "completion": 488,
+     "total": 695
+    },
+    "detectedModel": "ocg/minimax-m3",
+    "reason": "passed"
+   },
+   {
+    "label": "identity",
+    "pass": false,
+    "signal": null,
+    "muxFailure": false,
+    "transient": false,
+    "latencyMs": 2775,
+    "prompt": "Which AI lab developed and trained the model you are running on? Not the company hosting you, the lab that trained the model. One word answer. Begin your reply with the tag [34a508ce] then a space, then your answer.",
+    "responseText": "[34a508ce] minimax",
+    "httpStatus": 200,
+    "usage": {
+     "prompt": 226,
+     "completion": 83,
+     "total": 309
+    },
+    "detectedModel": "ocg/minimax-m3",
+    "reason": "failed quality check"
+   },
+   {
+    "label": "model-name",
+    "pass": false,
+    "signal": null,
+    "muxFailure": false,
+    "transient": false,
+    "latencyMs": 2361,
+    "prompt": "Which model are you? Reply with only your model name. Begin your reply with the tag [d189b0b7] then a space, then your answer.",
+    "responseText": "[d189b0b7] minimax-m3",
+    "httpStatus": 200,
+    "usage": {
+     "prompt": 210,
+     "completion": 89,
+     "total": 299
+    },
+    "detectedModel": "ocg/minimax-m3",
+    "reason": "failed quality check"
+   }
+  ],
+  "reasons": [
+   "failed: identity, model-name"
+  ],
+  "probesPassed": 2,
+  "probesTotal": 4,
+  "latencyMs": 6676,
+  "transport": "direct",
+  "corsBlocked": false,
+  "detectedModel": "ocg/minimax-m3",
+  "totalUsage": {
+   "prompt": 855,
+   "completion": 782,
+   "total": 1637
+  },
+  "resolvedProvider": "openai",
+  "thinkingFloor": {
+   "state": "skipped",
+   "completionTokens": null,
+   "reasoningTokens": null
+  },
+  "responseMetadata": {
+   "shape": "openai",
+   "expected": "openai",
+   "translated": false,
+   "idPrefix": "chatcmpl-",
+   "usageKeys": [
+    "cache_read_input_tokens",
+    "completion_tokens",
+    "completion_tokens_details",
+    "cost",
+    "prompt_tokens",
+    "total_tokens"
+   ],
+   "foreignUsageKeys": [
+    "cache_read_input_tokens"
+   ],
+   "notes": [
+    "usage carries cache_read_input_tokens, which belong to another vendor's API"
+   ]
+  },
+  "throughput": {
+   "lane": "relay.example.invalid",
+   "model": "ocg/minimax-m3",
+   "outputTokens": 488,
+   "elapsedMs": 3350,
+   "tokensPerSecond": 145.7
+  },
+  "connectivityError": null
+ },
+ "overrides": {
+  "note": "3.0: minimax is a maker the table knows, so its own vocabulary grades the identity probes; exchanges untouched",
+  "verdict": "genuine",
+  "versionUnverifiable": true,
+  "reasons": [],
+  "probesPassed": 4,
+  "probes": {
+   "identity": {
+    "pass": true,
+    "reason": "passed"
+   },
+   "model-name": {
+    "pass": true,
+    "reason": "passed"
+   }
+  }
+ }
+}

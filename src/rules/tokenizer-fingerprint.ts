@@ -127,12 +127,11 @@ export const tokenizerFingerprintRule = defineRule({
   needs: ["fixedText"],
   check: "tokenizerFingerprint",
   // Claude only, over either wire that carries its usage as is.
-  applies: (ctx) =>
-    ctx.facts.vendor === "anthropic" && ctx.wire.id !== "gemini",
+  applies: (ctx) => ctx.maker.id === "anthropic" && ctx.wire.id !== "gemini",
   judge: async (ctx) => {
-    if (!ctx.tiers) return null;
+    if (!ctx.maker.tiers) return null;
     const r = await fingerprintResult(ctx);
-    const tier = judgeTokenizerFingerprint(ctx.model, r, ctx.tiers);
+    const tier = judgeTokenizerFingerprint(ctx.model, r, ctx.maker.tiers);
     return tier
       ? {
           severity: "fail",

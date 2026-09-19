@@ -54,7 +54,20 @@ const fixtures = readdirSync(dir)
 describe("parity with 1.4.1 recordings", () => {
   for (const fixture of fixtures) {
     test(fixture.name, async () => {
-      const old = fixture.expected as OldResult;
+      const recorded = fixture.expected as OldResult;
+      const o = fixture.overrides;
+      const old: OldResult = {
+        ...recorded,
+        ...(o?.verdict !== undefined ? { verdict: o.verdict } : {}),
+        ...(o?.versionUnverifiable !== undefined
+          ? { versionUnverifiable: o.versionUnverifiable }
+          : {}),
+        ...(o?.reasons !== undefined ? { reasons: o.reasons } : {}),
+        ...(o?.probesPassed !== undefined
+          ? { probesPassed: o.probesPassed }
+          : {}),
+        probes: recorded.probes.map((p) => ({ ...p, ...o?.probes?.[p.label] })),
+      };
       const result = await verify({
         vendor: fixture.vendor as VendorId,
         baseUrl: fixture.baseUrl,
@@ -103,7 +116,7 @@ describe("parity with 1.4.1 recordings", () => {
       if (!oldReason.startsWith("tier-mismatch:")) {
         expect(result.verdict).toBe(old.verdict);
         expect(result.versionUnverifiable).toBe(old.versionUnverifiable);
-        if (STABLE_REASONS.some((p) => oldReason.startsWith(p)))
+        if (o?.reasons || STABLE_REASONS.some((p) => oldReason.startsWith(p)))
           expect(result.reasons).toEqual(old.reasons);
       }
 

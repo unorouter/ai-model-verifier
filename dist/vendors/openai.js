@@ -1,5 +1,4 @@
 import { intOf, rec } from "../internal/utils";
-import { foreignPatternsExcept } from "../identity/patterns";
 import { normalizeBaseUrl } from "./base-url";
 import { defineVendor, } from "./types";
 function chat(req, ctx) {
@@ -65,13 +64,6 @@ export const openaiVendor = defineVendor({
     fallbackWires: [],
     ops: { chat },
     read: { text, meta, reasoningUsage },
-    identity: {
-        home: ["openai"],
-        foreign: foreignPatternsExcept("openai"),
-        homeModelNames: ["gpt", "openai", "o1", "o3", "o4"],
-        cloudModelNames: [],
-        acceptsCloudHost: false,
-    },
-    tiers: null,
+    defaultMaker: "openai",
 });
 //# sourceMappingURL=openai.js.map

@@ -1,5 +1,6 @@
+import { MAKERS } from "../makers/table";
+import { makerForModel } from "../makers/resolve";
 import { VENDORS, vendorFor } from "../vendors/table";
-import { resolveModelFacts } from "./facts";
 /** Models the tester offers by default, per wire. */
 export const CURATED_MODELS = {
     anthropic: [
@@ -12,12 +13,16 @@ export const CURATED_MODELS = {
     openai: ["gpt-5.5", "gpt-5.4", "gpt-5.1", "o3", "o4-mini"],
     gemini: ["gemini-3.1-pro-preview", "gemini-3.1-flash", "gemini-2.5-pro"],
 };
-export function vendorForModel(model) {
-    return resolveModelFacts(model).vendor;
+export { makerForModel };
+/** The wire a model's maker sells it on natively; null when the maker is unknown. */
+export function wireForModel(model) {
+    const maker = makerForModel(model);
+    return MAKERS.find((m) => m.id === maker)?.wire ?? null;
 }
-/** Display vendor for a row: the model's maker when known, else the wire's. */
+/** Display vendor for a row: the model's maker when known, else the wire's name. */
 export function vendorForRow(vendor, model) {
-    const id = (model ? vendorForModel(model) : null) ?? vendor;
-    return vendorFor(VENDORS, id)?.vendorName ?? id;
+    return ((model ? makerForModel(model) : null) ??
+        vendorFor(VENDORS, vendor)?.vendorName ??
+        vendor);
 }
 //# sourceMappingURL=catalog.js.map

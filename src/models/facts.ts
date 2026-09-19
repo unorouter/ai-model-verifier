@@ -8,14 +8,16 @@
  * (every claude belongs to anthropic) and both apply.
  */
 
-import type { VendorId } from "../vendors/table";
+import { MAKERS, type MakerId } from "../makers/table";
+import { makerForModel } from "../makers/resolve";
+import type { Maker } from "../makers/types";
 
 export type ThinkingMode = "adaptive" | "extended" | "none";
 export type TokenizerGeneration = "claude-v1" | "claude-v2";
 
-export type ModelFacts = {
-  /** Vendor that trained it; null when the id names nothing the table knows. */
-  vendor: VendorId | null;
+export type ModelFacts<M extends string = MakerId> = {
+  /** Who trained it; null when the id names no maker the tables know. */
+  maker: M | null;
   thinking: ThinkingMode;
   tokenizer: TokenizerGeneration | null;
   /** Cannot switch reasoning off (a reply with no thought tokens is a cheaper tier). */
@@ -24,10 +26,10 @@ export type ModelFacts = {
   minOutputTokens: number | null;
 };
 
-export type FactsEntry = {
+export type FactsEntry<M extends string = MakerId> = {
   /** Glob(s) over the normalised id: `*` is the only wildcard, no `*` means exact. */
   match: string | readonly string[];
-} & Partial<ModelFacts>;
+} & Partial<ModelFacts<M>>;
 
 /** Lowercase, `.` and `_` to `-`, any `vendor/` or `pool/` prefix stripped. */
 export const normalizeModelId = (model: string): string =>
@@ -60,9 +62,8 @@ export const MODEL_FACTS = [
     ],
     thinking: "extended",
   },
-  { match: "*claude*", vendor: "anthropic", tokenizer: "claude-v1" },
+  { match: "*claude*", tokenizer: "claude-v1" },
   { match: "gemini-2-5-pro*", alwaysThinks: true },
-  { match: "*gemini*", vendor: "gemini" },
   {
     match: [
       "gpt-5*",
@@ -78,15 +79,14 @@ export const MODEL_FACTS = [
     ],
     minOutputTokens: 2000,
   },
-  { match: ["gpt-*", "o1*", "o3*", "o4*", "chatgpt*"], vendor: "openai" },
 ] as const satisfies readonly FactsEntry[];
 
 export const defineModelFacts = <const F extends readonly FactsEntry[]>(
   facts: F,
 ): F => facts;
 
-const DEFAULTS: ModelFacts = {
-  vendor: null,
+const DEFAULTS: ModelFacts<string> = {
+  maker: null,
   thinking: "none",
   tokenizer: null,
   alwaysThinks: false,
@@ -94,18 +94,18 @@ const DEFAULTS: ModelFacts = {
 };
 
 const FACT_KEYS = [
-  "vendor",
+  "maker",
   "thinking",
   "tokenizer",
   "alwaysThinks",
   "minOutputTokens",
 ] as const satisfies readonly (keyof ModelFacts)[];
 
-function take<K extends keyof ModelFacts>(
-  out: ModelFacts,
-  entry: Partial<ModelFacts>,
+function take<K extends keyof ModelFacts<string>>(
+  out: ModelFacts<string>,
+  entry: Partial<ModelFacts<string>>,
   key: K,
-  seen: Set<keyof ModelFacts>,
+  seen: Set<keyof ModelFacts<string>>,
 ): void {
   const v = entry[key];
   if (seen.has(key) || v === undefined) return;
@@ -113,18 +113,30 @@ function take<K extends keyof ModelFacts>(
   seen.add(key);
 }
 
+/** Layered first match per field: consumer entries, the table, then the maker globs. */
 export function resolveModelFacts(
   model: string,
-  extra: readonly FactsEntry[] = [],
-): ModelFacts {
+  extra?: readonly FactsEntry[],
+): ModelFacts;
+export function resolveModelFacts<M extends string>(
+  model: string,
+  extra: readonly FactsEntry<M>[],
+  makers: readonly Maker<M>[],
+): ModelFacts<M>;
+export function resolveModelFacts(
+  model: string,
+  extra: readonly FactsEntry<string>[] = [],
+  makers: readonly Maker<string>[] = MAKERS,
+): ModelFacts<string> {
   const id = normalizeModelId(model);
-  const out: ModelFacts = { ...DEFAULTS };
-  const seen = new Set<keyof ModelFacts>();
+  const out: ModelFacts<string> = { ...DEFAULTS };
+  const seen = new Set<keyof ModelFacts<string>>();
   for (const entry of [...extra, ...MODEL_FACTS]) {
     const patterns =
       typeof entry.match === "string" ? [entry.match] : entry.match;
     if (!patterns.some((p) => globMatches(id, p))) continue;
     for (const key of FACT_KEYS) take(out, entry, key, seen);
   }
+  if (!seen.has("maker")) out.maker = makerForModel(id, makers);
   return out;
 }

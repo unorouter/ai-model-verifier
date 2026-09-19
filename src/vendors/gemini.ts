@@ -1,5 +1,4 @@
 import { intOf, rec } from "../internal/utils";
-import { foreignPatternsExcept } from "../identity/patterns";
 import { normalizeBaseUrl } from "./base-url";
 import {
   defineVendor,
@@ -87,12 +86,5 @@ export const geminiVendor = defineVendor({
   fallbackWires: ["openai"],
   ops: { chat },
   read: { text, meta, reasoningUsage },
-  identity: {
-    home: ["google", "deepmind"],
-    foreign: foreignPatternsExcept("google"),
-    homeModelNames: ["gemini", "google"],
-    cloudModelNames: [],
-    acceptsCloudHost: false,
-  },
-  tiers: null,
+  defaultMaker: "google",
 });

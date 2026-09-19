@@ -1,5 +1,4 @@
 import { intOf, rec } from "../internal/utils";
-import { foreignPatternsExcept } from "../identity/patterns";
 import { normalizeBaseUrl } from "./base-url";
 import { defineVendor, } from "./types";
 // Anthropic refuses a browser preflight unless the caller opts in with this
@@ -100,15 +99,6 @@ export const anthropicVendor = defineVendor({
     fallbackWires: ["openai"],
     ops: { chat, countTokens },
     read: { text, meta, thinkingBlock, countedTokens },
-    identity: {
-        home: ["anthropic"],
-        foreign: foreignPatternsExcept("anthropic"),
-        homeModelNames: ["claude", "anthropic"],
-        cloudModelNames: ["amazon q", "q developer", "kiro"],
-        acceptsCloudHost: true,
-    },
-    // `fable` is load-bearing: without it tierOf() returns null for
-    // claude-fable-5 and a relay serving opus under a fable label is never checked.
-    tiers: ["opus", "sonnet", "haiku", "fable"],
+    defaultMaker: "anthropic",
 });
 //# sourceMappingURL=anthropic.js.map

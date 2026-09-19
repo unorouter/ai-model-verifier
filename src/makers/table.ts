@@ -1,0 +1,184 @@
+import type { VendorId } from "../vendors/table";
+import type { Maker } from "./types";
+
+// Every word is matched on word boundaries (a digit or hyphen may follow, a
+// letter may not), so "meta" never hits "metadata" and "o3" still hits "o3-mini".
+// "google" is a cloud host, not a maker word for anyone else's foreign list.
+export const MAKERS = [
+  {
+    id: "anthropic",
+    name: "Anthropic",
+    wire: "anthropic",
+    models: ["*claude*"],
+    home: ["anthropic"],
+    modelNames: ["claude", "anthropic"],
+    cloudModelNames: ["amazon q", "q developer", "kiro"],
+    acceptsCloudHost: true,
+    // `fable` is load-bearing: without it tierOf() returns null for
+    // claude-fable-5 and a relay serving opus under a fable label is never checked.
+    tiers: ["opus", "sonnet", "haiku", "fable"],
+    cjkNative: false,
+  },
+  {
+    id: "openai",
+    name: "OpenAI",
+    wire: "openai",
+    models: ["gpt-*", "chatgpt*", "o1*", "o3*", "o4*"],
+    home: ["openai"],
+    modelNames: ["gpt", "chatgpt", "openai", "o1", "o3", "o4"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: false,
+  },
+  {
+    id: "google",
+    name: "Google",
+    wire: "gemini",
+    models: ["*gemini*", "gemma*"],
+    home: ["google", "deepmind"],
+    modelNames: ["gemini", "google", "gemma"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: false,
+  },
+  {
+    id: "deepseek",
+    name: "DeepSeek",
+    wire: "openai",
+    models: ["deepseek*"],
+    home: ["deepseek", "deepseek-ai", "深度求索"],
+    modelNames: ["deepseek"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+  {
+    id: "moonshot",
+    name: "Moonshot AI",
+    wire: "openai",
+    models: ["kimi*", "moonshot*"],
+    home: ["moonshot", "moonshotai", "月之暗面"],
+    modelNames: ["kimi"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+  {
+    id: "zhipu",
+    name: "Zhipu AI",
+    wire: "openai",
+    models: ["glm*", "chatglm*"],
+    home: ["zhipu", "zhipuai", "z.ai", "智谱"],
+    modelNames: ["glm", "chatglm"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+  {
+    id: "minimax",
+    name: "MiniMax",
+    wire: "openai",
+    models: ["minimax*", "abab*"],
+    home: ["minimax", "minimaxai", "稀宇"],
+    modelNames: ["minimax", "abab"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+  {
+    id: "xiaomi",
+    name: "Xiaomi",
+    wire: "openai",
+    models: ["mimo*"],
+    home: ["xiaomi", "小米"],
+    modelNames: ["mimo"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+  {
+    id: "mistral",
+    name: "Mistral AI",
+    wire: "openai",
+    models: [
+      "mistral*",
+      "mixtral*",
+      "codestral*",
+      "magistral*",
+      "devstral*",
+      "ministral*",
+      "pixtral*",
+    ],
+    home: ["mistral", "mistralai"],
+    modelNames: [
+      "mistral",
+      "mixtral",
+      "codestral",
+      "magistral",
+      "devstral",
+      "ministral",
+      "pixtral",
+    ],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: false,
+  },
+  {
+    id: "alibaba",
+    name: "Alibaba",
+    wire: "openai",
+    models: ["qwen*", "qwq*", "qvq*"],
+    home: ["alibaba", "qwen", "tongyi", "阿里", "通义"],
+    modelNames: ["qwen", "qwq", "qvq"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+  {
+    id: "meta",
+    name: "Meta",
+    wire: "openai",
+    models: ["*llama*"],
+    home: ["meta", "facebook"],
+    modelNames: ["llama"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: false,
+  },
+  {
+    id: "xai",
+    name: "xAI",
+    wire: "openai",
+    models: ["grok*"],
+    home: ["xai", "x.ai"],
+    modelNames: ["grok"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: false,
+  },
+  {
+    id: "tencent",
+    name: "Tencent",
+    wire: "openai",
+    // No `hy*` glob: it would claim hybrid-* and hyper-* ids; a consumer pins
+    // hy4-preview through modelFacts.
+    models: ["hunyuan*"],
+    home: ["tencent", "hunyuan", "腾讯", "混元"],
+    modelNames: ["hunyuan", "hy"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+  },
+] as const satisfies readonly Maker[];
+
+export type MakerId = (typeof MAKERS)[number]["id"];
+
+// A native wire that names no adapter is a typo; fail the build, not the run.
+void (MAKERS satisfies readonly { wire: VendorId }[]);
+
+export function makerFor<M extends string>(
+  makers: readonly Maker<M>[],
+  id: string,
+): Maker<M> | undefined {
+  return makers.find((m) => m.id === id);
+}

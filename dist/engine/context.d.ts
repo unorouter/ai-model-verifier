@@ -2,7 +2,8 @@ import type { ModelFacts } from "../models/facts";
 import type { TierSignatures } from "../rules/tokenizer-fingerprint";
 import type { TransportFn, TransportMode, TransportResult } from "../transport";
 import type { Checks, ProbeAttempt } from "../types";
-import type { BuiltRequest, ChatRequest, VendorAdapter, VendorIdentity, WireCtx } from "../vendors/types";
+import type { ResolvedMaker } from "../makers/types";
+import type { BuiltRequest, ChatRequest, VendorAdapter, WireCtx } from "../vendors/types";
 export type ResolvedChecks = {
     signature: {
         strict: boolean;
@@ -17,19 +18,18 @@ export type ResolvedChecks = {
 };
 export declare function resolveChecks(checks: Checks | undefined): ResolvedChecks;
 /** Everything a rule may read about the run. */
-export type RunCtx<V extends string = string> = {
+export type RunCtx<V extends string = string, M extends string = string> = {
     model: string;
-    facts: ModelFacts;
+    facts: ModelFacts<M>;
     requestedVendor: V;
     /** Wire the requests go over (after a handshake fallback, not the requested one). */
     wire: VendorAdapter<V>;
     /**
-     * Vocabulary of the model's own vendor, not the wire's: Claude sold over an
-     * OpenAI-shaped relay still calls its maker "anthropic". Falls back to the
-     * wire when the model id names no vendor the tables know.
+     * The model's own maker, not the wire's: Claude sold over an OpenAI-shaped
+     * relay still calls its maker "anthropic". Falls back to the wire's default
+     * maker when the model id names no maker the tables know.
      */
-    identity: VendorIdentity;
-    tiers: readonly string[] | null;
+    maker: ResolvedMaker<M>;
     mode: TransportMode;
     direct: boolean;
     baseUrl: string;

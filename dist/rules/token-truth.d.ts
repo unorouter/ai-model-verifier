@@ -26,7 +26,7 @@ export type TokenTruthResult = {
     countTokens: number | null;
     reason?: string;
 };
-export declare const expectedInputDelta: (facts: ModelFacts) => {
+export declare const expectedInputDelta: (facts: ModelFacts<string>) => {
     min: number;
     max: number;
 };

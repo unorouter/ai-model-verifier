@@ -11,11 +11,11 @@ const labelsWith = (probes, sig) => probes
     .filter((r) => r.signal === sig)
     .map((r) => r.label)
     .join(", ");
-const signalRule = (id, signal, prefix) => defineRule({
+const signalRule = (id, signal, prefix, applies = () => true) => defineRule({
     id,
     layer: "probe",
     needs: ["probes"],
-    applies: () => true,
+    applies,
     judge: async (ctx) => {
         const labels = labelsWith(await ctx.evidence("probes"), signal);
         return labels
@@ -25,7 +25,7 @@ const signalRule = (id, signal, prefix) => defineRule({
 });
 export const codingToolRule = signalRule("coding-tool", "coding-tool", "coding-tool-refusal");
 export const scamRule = signalRule("scam", "scam", "scam-page");
-export const cjkLeakRule = signalRule("cjk-leak", "cjk-leak", "cjk-language-leak");
+export const cjkLeakRule = signalRule("cjk-leak", "cjk-leak", "cjk-language-leak", (ctx) => !ctx.maker.cjkNative);
 /** Two probes whose reply never carried their nonce: the proxy mixes responses. */
 export const muxRule = defineRule({
     id: "mux",
@@ -70,10 +70,10 @@ export const servedModelMismatchRule = defineRule({
     id: "served-model-mismatch",
     layer: "probe",
     needs: ["probes"],
-    applies: (ctx) => ctx.tiers !== null,
+    applies: (ctx) => ctx.maker.tiers !== null,
     judge: async (ctx) => {
         const probes = await ctx.evidence("probes");
-        const served = detectServedModelMismatch(ctx.model, probes.map((r) => r.detectedModel), ctx.tiers ?? []);
+        const served = detectServedModelMismatch(ctx.model, probes.map((r) => r.detectedModel), ctx.maker.tiers ?? []);
         return served
             ? {
                 severity: "fail",
@@ -140,10 +140,10 @@ export const tierSelfReportRule = defineRule({
     id: "tier-self-report",
     layer: "note",
     needs: ["probes"],
-    applies: (ctx) => ctx.tiers !== null,
+    applies: (ctx) => ctx.maker.tiers !== null,
     judge: async (ctx) => {
         const probes = await ctx.evidence("probes");
-        const claimed = detectTierMismatch(ctx.model, probes.find((r) => r.label === "model-name")?.text, ctx.tiers ?? []);
+        const claimed = detectTierMismatch(ctx.model, probes.find((r) => r.label === "model-name")?.text, ctx.maker.tiers ?? []);
         return claimed
             ? {
                 severity: "note",
