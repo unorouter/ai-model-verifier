@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2
+
+- "google" alone no longer marks a foreign maker: Claude on Vertex answers
+  "Anthropic, hosted on Google Cloud", which the cloud host list accepts. A
+  Google model still names DeepMind or Gemini.
+
 ## 2.0.1
 
 - The identity vocabulary and tier list come from the model's own vendor,

@@ -390,6 +390,24 @@ function openaiWire(opts: Parameters<typeof anthropicWire>[0]): TransportFn {
 }
 
 describe("identity follows the model, not the wire", () => {
+  test("Claude naming its cloud host is home, not foreign", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({
+        answer: (p, n) =>
+          p.includes("AI lab")
+            ? `[${n}] anthropic, hosted on google cloud vertex`
+            : undefined,
+      }),
+    });
+    expect(r.verdict).toBe("genuine");
+    expect(r.probes.find((p) => p.label === "identity")?.signal).toBe(
+      "cloud-host",
+    );
+  });
+
   test("Claude sold over the openai wire keeps Claude's vocabulary", async () => {
     const r = await verify({
       ...base,

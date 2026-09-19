@@ -40,10 +40,13 @@ export const SCAM_PAGE_PATTERNS = [
     "盗取token",
     "微信jemes",
 ];
+// "google" is deliberately not a Google marker: Claude on Vertex says "Anthropic,
+// hosted on Google Cloud", and the cloud host list accepts it. DeepMind and
+// Gemini are what a Google model calls itself.
 export const VENDOR_PATTERNS = {
     anthropic: ["anthropic", "claude"],
     openai: ["openai", "chatgpt", "gpt-3", "gpt-4", "gpt-5", "o1-", "o3-", "o4-"],
-    google: ["google", "deepmind", "gemini"],
+    google: ["deepmind", "gemini"],
     other: [
         "deepseek",
         "qwen",
