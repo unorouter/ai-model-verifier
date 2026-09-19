@@ -39,7 +39,7 @@ export declare const MODEL_FACTS: readonly [{
     readonly match: "*claude*";
     readonly tokenizer: "claude-v1";
 }, {
-    readonly match: "gemini-2-5-pro*";
+    readonly match: readonly ["gemini-2-5-pro*", "gemini-3-pro*", "gemini-3-1-pro*"];
     readonly alwaysThinks: true;
 }, {
     readonly match: readonly ["gemini-2-5*", "gemini-3*"];

@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+- Gemini 3 Pro and 3.1 Pro always think, like 2.5 Pro: the `thinking-floor`
+  rule now judges them, so a pro label answering "ok" with no hidden tokens
+  is `no-thinking`. Two such lanes were found by hand tonight; one answered
+  "42" to a sum after 32 seconds.
+
 ## 3.0.2
 
 - The open-weight thinkers (GLM 5, Kimi k2.6 and up, DeepSeek v4, MiniMax

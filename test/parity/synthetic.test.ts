@@ -639,6 +639,27 @@ describe("makers", () => {
     ).toBe(true);
   });
 
+  test("a gemini-3 pro answering with no hidden tokens fails the thinking floor", async () => {
+    const r = await runRules({
+      ...base,
+      vendor: "openai",
+      model: "gemini-3-pro-preview",
+      transport: async () => ({
+        status: 200,
+        data: {
+          model: "gemini-3-pro-preview",
+          choices: [{ message: { content: "ok" } }],
+          usage: { prompt_tokens: 5, completion_tokens: 1 },
+        },
+        error: null,
+        corsBlocked: false,
+      }),
+      only: ["thinking-floor"],
+    });
+    expect(r.findings.map((f) => f.rule)).toEqual(["thinking-floor"]);
+    expect(r.reports.thinkingFloor?.state).toBe("no-thinking");
+  });
+
   test("catalog: wire and maker per model id", () => {
     expect(wireForModel("deepseek-v3.1")).toBe("openai");
     expect(wireForModel("claude-opus-4-6")).toBe("anthropic");

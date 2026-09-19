@@ -36,7 +36,9 @@ export const MODEL_FACTS = [
         thinking: "extended",
     },
     { match: "*claude*", tokenizer: "claude-v1" },
-    { match: "gemini-2-5-pro*", alwaysThinks: true },
+    // The pro tiers cannot switch thinking off; a pro that answers "ok" with no
+    // hidden tokens is a flash (or worse) behind the label.
+    { match: ["gemini-2-5-pro*", "gemini-3-pro*", "gemini-3-1-pro*"], alwaysThinks: true },
     // Gemini thinks before it answers over the OpenAI wire too, and a 60 token
     // cap left a few characters of visible reply on the order book sellers.
     { match: ["gemini-2-5*", "gemini-3*"], minOutputTokens: 2000 },
