@@ -12,6 +12,7 @@ import {
 } from "./probe-ladder";
 import { envelopeRule } from "./response-metadata";
 import { signatureRule } from "./thinking-signature";
+import { surveyRule } from "./survey";
 import { thinkingFloorRule } from "./thinking-floor";
 import { throughputRule } from "./throughput";
 import { tokenTruthRule } from "./token-truth";
@@ -39,6 +40,7 @@ export const RULES = [
   tokenTruthRule,
   envelopeRule,
   throughputRule,
+  surveyRule,
 ] as const satisfies readonly Rule[];
 
 type RuleEntry = (typeof RULES)[number];

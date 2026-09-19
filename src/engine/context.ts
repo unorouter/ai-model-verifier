@@ -16,6 +16,7 @@ export type ResolvedChecks = {
   tokenTruth: boolean;
   thinkingFloor: { minCompletionTokens: number | null } | null;
   tokenizerFingerprint: { signatures: TierSignatures | undefined } | null;
+  survey: boolean;
 };
 
 export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
@@ -44,6 +45,7 @@ export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
               : undefined,
         }
       : null,
+    survey: c.survey === true,
   };
 }
 

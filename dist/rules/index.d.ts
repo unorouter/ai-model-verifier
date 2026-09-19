@@ -11,5 +11,6 @@ export type { TokenTruthCheck, TokenTruthResult } from "./token-truth";
 export { readResponseMetadata } from "./response-metadata";
 export type { ResponseMetadata } from "./response-metadata";
 export { compareThroughput, sampleThroughput } from "./throughput";
+export type { SurveyOutcome } from "../engine/survey-runner";
 export type { ThroughputComparison, ThroughputSample } from "./throughput";
 //# sourceMappingURL=index.d.ts.map

@@ -13,5 +13,6 @@ export { defineRule } from "./rules/types";
 export { RULES, DETECTION_RULES, DETECTION_EXCEPTIONS, RULE_FOR_SIGNAL, } from "./rules/table";
 export { defineModelFacts, resolveModelFacts } from "./models/facts";
 export { PROBES, PROBE_SIGNALS } from "./probes/table";
+export { SURVEY } from "./probes/survey";
 export { directTransport, browserTransport } from "./transport";
 //# sourceMappingURL=index.js.map

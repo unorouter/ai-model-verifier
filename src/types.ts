@@ -1,4 +1,5 @@
 import type { ProbeLabel, ProbeSignal } from "./probes/table";
+import type { SurveyLabel } from "./probes/survey";
 import type { Finding, Reports } from "./rules/types";
 import type { RuleId } from "./rules/table";
 import type { TransportFn, TransportMode } from "./transport";
@@ -11,6 +12,7 @@ export type {
   ProbeUsage,
   ProbeLabel,
   ProbeSignal,
+  SurveyLabel,
   TransportMode,
   VendorId,
   RuleId,
@@ -33,9 +35,9 @@ export type ProbeOutcome = {
   reason: string | null;
 };
 
-/** One request of a probe, including the nonce retries; for a caller's own log. */
+/** One request of a probe or survey question, including the nonce retries; for a caller's own log. */
 export type ProbeAttempt = {
-  label: ProbeLabel;
+  label: ProbeLabel | SurveyLabel;
   attempt: number;
   pass: boolean;
   signal: ProbeSignal;
@@ -57,6 +59,8 @@ export type Checks = {
     boolean | { models?: readonly string[]; minCompletionTokens?: number };
   /** Input-token delta for a fixed text; `signatures` is a per-endpoint calibration. */
   tokenizerFingerprint?: boolean | { signatures?: TierSignatures };
+  /** Ask the survey questions and report the answers; never a verdict. */
+  survey?: boolean;
 };
 
 export type VerifyOptions<V extends string = VendorId> = {

@@ -22,6 +22,7 @@ export function resolveChecks(checks) {
                     : undefined,
             }
             : null,
+        survey: c.survey === true,
     };
 }
 export const wireCtx = (ctx) => ({

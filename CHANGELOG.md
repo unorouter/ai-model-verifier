@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.2.0
+
+- Survey questions (`survey` rule, note layer, `checks.survey` under `verify`
+  or named in `only` under `runRules`): six questions asked beside the ladder
+  and reported as answered, never judged. Training cutoff, context window, a
+  verbatim replay of any prior instructions (a relay's injected system prompt),
+  a sum with a fact check and the hidden token count it cost, a JSON object
+  naming maker and model with a parse check, and a one sentence self
+  description. `reports.survey` carries text, nonce echo, usage, reasoning
+  usage, latency, `detectedModel` and `correct`. `SURVEY` is exported;
+  `ProbeAttempt.label` now also names a survey question.
+
 ## 3.1.0
 
 - Gemini 3 Pro and 3.1 Pro always think, like 2.5 Pro: the `thinking-floor`

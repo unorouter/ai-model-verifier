@@ -1,6 +1,7 @@
 import type { TransportResult } from "../transport";
 import { type RunCtx } from "./context";
 import { type ProbeEval } from "./probe-runner";
+import { type SurveyOutcome } from "./survey-runner";
 export type FixedTextEvidence = {
     short: TransportResult;
     long: TransportResult;
@@ -17,6 +18,8 @@ export type ThinkingReplyEvidence = {
  */
 export type EvidenceBag = {
     probes: ProbeEval[];
+    /** The survey answers, recorded as they came. */
+    survey: SurveyOutcome[];
     fixedText: FixedTextEvidence;
     /** null when the wire has no count endpoint or the short reply had no usage. */
     countTokens: TransportResult | null;
@@ -27,9 +30,10 @@ export type EvidenceBag = {
 };
 export type EvidenceKey = keyof EvidenceBag;
 /** Collection order when several keys are needed: probes first, then the extras. */
-export declare const EVIDENCE_ORDER: readonly ["probes", "thinkingReply", "fixedText", "countTokens", "floorReply"];
+export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "thinkingReply", "fixedText", "countTokens", "floorReply"];
 export declare class EvidenceStore {
     private readonly probes;
+    private readonly survey;
     private readonly fixedText;
     private readonly countTokens;
     private readonly thinkingReply;

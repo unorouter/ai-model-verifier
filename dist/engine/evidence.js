@@ -1,6 +1,7 @@
 import { COUNT_PROBE_MAX_TOKENS, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, } from "../probes/prompts";
 import { callWire, chat, wireCtx } from "./context";
 import { collectProbes } from "./probe-runner";
+import { collectSurvey } from "./survey-runner";
 const THINKING_BUDGET_TOKENS = 2000;
 /** Thinking plus answer; too small and an adaptive model skips thinking to fit. */
 const SIGNATURE_MAX_TOKENS = 16000;
@@ -9,6 +10,7 @@ const FLOOR_MAX_TOKENS = 2048;
 /** Collection order when several keys are needed: probes first, then the extras. */
 export const EVIDENCE_ORDER = [
     "probes",
+    "survey",
     "thinkingReply",
     "fixedText",
     "countTokens",
@@ -79,12 +81,14 @@ const memo = (fn) => {
 };
 export class EvidenceStore {
     probes;
+    survey;
     fixedText;
     countTokens;
     thinkingReply;
     floorReply;
     constructor(ctx) {
         this.probes = memo(() => collectProbes(ctx));
+        this.survey = memo(() => collectSurvey(ctx));
         this.fixedText = memo(() => collectFixedText(ctx));
         this.countTokens = memo(() => collectCountTokens(ctx, this));
         this.thinkingReply = memo(() => collectThinkingReply(ctx));
@@ -94,6 +98,8 @@ export class EvidenceStore {
         switch (key) {
             case "probes":
                 return this.probes();
+            case "survey":
+                return this.survey();
             case "fixedText":
                 return this.fixedText();
             case "countTokens":

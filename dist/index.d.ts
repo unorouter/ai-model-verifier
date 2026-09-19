@@ -18,6 +18,9 @@ export type { EvidenceBag, EvidenceKey } from "./engine/evidence";
 export { defineModelFacts, resolveModelFacts } from "./models/facts";
 export type { ModelFacts, FactsEntry } from "./models/facts";
 export { PROBES, PROBE_SIGNALS } from "./probes/table";
+export { SURVEY } from "./probes/survey";
+export type { SurveyDef } from "./probes/survey";
+export type { SurveyOutcome } from "./engine/survey-runner";
 export type { TransportFn, TransportArgs, TransportResult } from "./transport";
 export { directTransport, browserTransport } from "./transport";
 //# sourceMappingURL=index.d.ts.map

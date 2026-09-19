@@ -15,6 +15,7 @@ export type ResolvedChecks = {
     tokenizerFingerprint: {
         signatures: TierSignatures | undefined;
     } | null;
+    survey: boolean;
 };
 export declare function resolveChecks(checks: Checks | undefined): ResolvedChecks;
 /** Everything a rule may read about the run. */

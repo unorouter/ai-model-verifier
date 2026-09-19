@@ -673,3 +673,74 @@ describe("makers", () => {
     expect(vendorForRow("gemini")).toBe("google");
   });
 });
+
+describe("survey", () => {
+  test("answers are reported as they came, with a fact check and no finding", async () => {
+    const asked: string[] = [];
+    const run = await runRules({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({
+        answer: (p, n) => {
+          if (p.includes("cutoff")) return `[${n}] march 2026`;
+          if (p.includes("context window")) return `[${n}] 200000`;
+          if (p.includes("word for word")) return `[${n}] none`;
+          if (p.includes("47 times 83")) return `[${n}] 3882`;
+          if (p.includes("JSON")) return `[${n}] {"maker": "anthropic", "model": "claude"}`;
+          if (p.includes("one sentence")) return `[${n}] i am claude, trained by anthropic, answering through a relay`;
+          return undefined;
+        },
+      }),
+      onProbe: (a) => asked.push(a.label),
+      only: ["survey"],
+    });
+    expect(run.findings).toEqual([]);
+    expect(run.probes).toEqual([]);
+    const byLabel = Object.fromEntries(
+      (run.reports.survey ?? []).map((s) => [s.label, s]),
+    );
+    expect(Object.keys(byLabel).sort()).toEqual([
+      "arithmetic",
+      "context-window",
+      "cutoff",
+      "json",
+      "self",
+      "system-prompt",
+    ]);
+    expect(byLabel["cutoff"]?.answer).toBe("march 2026");
+    expect(byLabel["cutoff"]?.nonced).toBe(true);
+    expect(byLabel["cutoff"]?.correct).toBeNull();
+    expect(byLabel["arithmetic"]?.correct).toBe(true);
+    expect(byLabel["json"]?.correct).toBe(true);
+    expect(byLabel["system-prompt"]?.answer).toBe("none");
+    expect(asked.length).toBe(6);
+  });
+
+  test("verify asks no survey question unless the check is on", async () => {
+    const prompts: string[] = [];
+    const inner = anthropicWire({});
+    const transport: TransportFn = async (a) => {
+      prompts.push(promptOf(bodyOf(a)));
+      return inner(a);
+    };
+    await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport,
+    });
+    expect(prompts.some((p) => p.includes("cutoff"))).toBe(false);
+    prompts.length = 0;
+    const r = await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport,
+      checks: { survey: true },
+    });
+    expect(prompts.some((p) => p.includes("cutoff"))).toBe(true);
+    expect(r.verdict).toBe("genuine");
+    expect(r.survey?.length).toBe(6);
+  });
+});

@@ -24,10 +24,10 @@ export declare function verifyWith<V extends string, R extends string, M extends
 export declare function runRulesWith<V extends string, R extends string, M extends string = MakerId>(registry: Registry<V, R, M>, opts: VerifyOptions<V> & {
     only: readonly R[];
 }): Promise<RuleRun<R>>;
-export declare const verify: (opts: VerifyOptions) => Promise<VerifyResult<"anthropic" | "gemini" | "openai", "cjk-leak" | "coding-tool" | "envelope" | "foreign" | "mux" | "quorum" | "scam" | "served-model-mismatch" | "signature" | "substituted" | "thinking-floor" | "throughput" | "tier-self-report" | "token-truth" | "tokenizer-fingerprint", "alibaba" | "anthropic" | "deepseek" | "google" | "meta" | "minimax" | "mistral" | "moonshot" | "openai" | "tencent" | "writer" | "xai" | "xiaomi" | "zhipu">>;
+export declare const verify: (opts: VerifyOptions) => Promise<VerifyResult<"anthropic" | "gemini" | "openai", "cjk-leak" | "coding-tool" | "envelope" | "foreign" | "mux" | "quorum" | "scam" | "served-model-mismatch" | "signature" | "substituted" | "survey" | "thinking-floor" | "throughput" | "tier-self-report" | "token-truth" | "tokenizer-fingerprint", "alibaba" | "anthropic" | "deepseek" | "google" | "meta" | "minimax" | "mistral" | "moonshot" | "openai" | "tencent" | "writer" | "xai" | "xiaomi" | "zhipu">>;
 export declare const runRules: (opts: VerifyOptions & {
     only: readonly RuleId[];
-}) => Promise<RuleRun<"cjk-leak" | "coding-tool" | "envelope" | "foreign" | "mux" | "quorum" | "scam" | "served-model-mismatch" | "signature" | "substituted" | "thinking-floor" | "throughput" | "tier-self-report" | "token-truth" | "tokenizer-fingerprint">>;
+}) => Promise<RuleRun<"cjk-leak" | "coding-tool" | "envelope" | "foreign" | "mux" | "quorum" | "scam" | "served-model-mismatch" | "signature" | "substituted" | "survey" | "thinking-floor" | "throughput" | "tier-self-report" | "token-truth" | "tokenizer-fingerprint">>;
 /** One raw request through the run's transport and body extras, for callers with their own probes. */
 export { callWire };
 //# sourceMappingURL=verify.d.ts.map

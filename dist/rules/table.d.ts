@@ -4,7 +4,7 @@ import type { Rule } from "./types";
  * verdict. Evidence rules sit above the probe ladder because they read facts a
  * coached reply cannot fake; note rules only report.
  */
-export declare const RULES: readonly [Rule<"thinking-floor", "floorReply", "evidence">, Rule<"tokenizer-fingerprint", "fixedText", "evidence">, Rule<"coding-tool", "probes", "probe">, Rule<"scam", "probes", "probe">, Rule<"cjk-leak", "probes", "probe">, Rule<"mux", "probes", "probe">, Rule<"foreign", "probes", "probe">, Rule<"served-model-mismatch", "probes", "probe">, Rule<"substituted", "probes", "probe">, Rule<"quorum", "probes", "probe">, Rule<"tier-self-report", "probes", "note">, Rule<"signature", "thinkingReply", "note">, Rule<"token-truth", "countTokens" | "fixedText", "note">, Rule<"envelope", "probes", "note">, Rule<"throughput", "probes", "note">];
+export declare const RULES: readonly [Rule<"thinking-floor", "floorReply", "evidence">, Rule<"tokenizer-fingerprint", "fixedText", "evidence">, Rule<"coding-tool", "probes", "probe">, Rule<"scam", "probes", "probe">, Rule<"cjk-leak", "probes", "probe">, Rule<"mux", "probes", "probe">, Rule<"foreign", "probes", "probe">, Rule<"served-model-mismatch", "probes", "probe">, Rule<"substituted", "probes", "probe">, Rule<"quorum", "probes", "probe">, Rule<"tier-self-report", "probes", "note">, Rule<"signature", "thinkingReply", "note">, Rule<"token-truth", "countTokens" | "fixedText", "note">, Rule<"envelope", "probes", "note">, Rule<"throughput", "probes", "note">, Rule<"survey", "survey", "note">];
 type RuleEntry = (typeof RULES)[number];
 export type RuleId = RuleEntry["id"];
 /** Rules that can decide a verdict; a UI naming every rule keys off this. */

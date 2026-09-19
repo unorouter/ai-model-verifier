@@ -106,7 +106,17 @@ quorum tolerates when the other three pass.
 
 Note rules report without judging: the Claude thinking signature, token
 accounting against the billed usage, a self-reported tier, the response
-envelope (which vendor's shape and id minted the reply) and throughput.
+envelope (which vendor's shape and id minted the reply), throughput and the
+survey.
+
+The survey (`survey`, opt-in via `checks.survey` or `only`) asks six questions
+for the record and reports every answer with its usage, hidden token count and
+latency: training cutoff, context window, a verbatim replay of any prior
+instructions (a relay's injected system prompt shows here), a sum (with a fact
+check, and the thinking it cost), a JSON object naming maker and model (with a
+parse check) and a one sentence self description. Nothing in it decides a
+verdict; over many lanes and weeks it is the record to read a model's usual
+answers from before any rule gets authority over that maker.
 
 ## Tests
 

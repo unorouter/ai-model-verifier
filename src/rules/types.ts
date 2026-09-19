@@ -1,5 +1,6 @@
 import type { ResolvedChecks, RunCtx } from "../engine/context";
 import type { EvidenceBag, EvidenceKey } from "../engine/evidence";
+import type { SurveyOutcome } from "../engine/survey-runner";
 import type { ResponseMetadata } from "./response-metadata";
 import type { SignatureResult } from "./thinking-signature";
 import type { ThinkingFloorResult } from "./thinking-floor";
@@ -41,6 +42,7 @@ export type Reports = {
   tokenizerFingerprint?: TokenizerFingerprintResult;
   responseMetadata?: ResponseMetadata;
   throughput?: ThroughputSample | null;
+  survey?: SurveyOutcome[];
 };
 
 export type CheckKey = keyof ResolvedChecks;

@@ -8,6 +8,7 @@ import {
 import type { TransportResult } from "../transport";
 import { callWire, chat, wireCtx, type RunCtx } from "./context";
 import { collectProbes, type ProbeEval } from "./probe-runner";
+import { collectSurvey, type SurveyOutcome } from "./survey-runner";
 
 const THINKING_BUDGET_TOKENS = 2000;
 /** Thinking plus answer; too small and an adaptive model skips thinking to fit. */
@@ -33,6 +34,8 @@ export type ThinkingReplyEvidence = {
  */
 export type EvidenceBag = {
   probes: ProbeEval[];
+  /** The survey answers, recorded as they came. */
+  survey: SurveyOutcome[];
   fixedText: FixedTextEvidence;
   /** null when the wire has no count endpoint or the short reply had no usage. */
   countTokens: TransportResult | null;
@@ -47,6 +50,7 @@ export type EvidenceKey = keyof EvidenceBag;
 /** Collection order when several keys are needed: probes first, then the extras. */
 export const EVIDENCE_ORDER = [
   "probes",
+  "survey",
   "thinkingReply",
   "fixedText",
   "countTokens",
@@ -131,6 +135,7 @@ const memo = <T>(fn: () => Promise<T>) => {
 
 export class EvidenceStore {
   private readonly probes: () => Promise<ProbeEval[]>;
+  private readonly survey: () => Promise<SurveyOutcome[]>;
   private readonly fixedText: () => Promise<FixedTextEvidence>;
   private readonly countTokens: () => Promise<TransportResult | null>;
   private readonly thinkingReply: () => Promise<ThinkingReplyEvidence>;
@@ -138,6 +143,7 @@ export class EvidenceStore {
 
   constructor(ctx: RunCtx) {
     this.probes = memo(() => collectProbes(ctx));
+    this.survey = memo(() => collectSurvey(ctx));
     this.fixedText = memo(() => collectFixedText(ctx));
     this.countTokens = memo(() => collectCountTokens(ctx, this));
     this.thinkingReply = memo(() => collectThinkingReply(ctx));
@@ -149,6 +155,8 @@ export class EvidenceStore {
     switch (key) {
       case "probes":
         return this.probes();
+      case "survey":
+        return this.survey();
       case "fixedText":
         return this.fixedText();
       case "countTokens":
