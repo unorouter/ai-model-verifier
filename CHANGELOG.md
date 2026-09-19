@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.3.0
+
+- Twenty eight more makers (Cohere, ByteDance, Baidu, StepFun, NVIDIA, IBM,
+  Liquid, Kwaipilot, Meituan, inclusionAI, Shanghai AI Lab, OpenBMB,
+  SenseTime, rednote, Perplexity, Microsoft, Amazon, AI21, Nous, Poolside,
+  Swiss AI, Inception, Arcee, Nex AGI, Sarvam, SCB 10X, Moondream, JetBrains,
+  Aion, Venice) and wider globs for the existing ones, so relay spellings
+  (`coding-glm-5.3-free`, `e2ee-qwen3-6-35b-a3b`, `morph-kimik3`,
+  `xiaomi-mimo-v2-5`, `tencent/hy4-preview`, `openai-gpt-oss-120b`,
+  `kiro-auto`, `antigravity-*`, `nano-banana-*`) resolve. Measured over the
+  1,421 model ids of three marketplaces, a gateway and a verdict cache: 1,203
+  resolve, and what is left is media models and one-off finetunes.
+- Character classes never worked in a glob (`*` is the only wildcard); the
+  table no longer uses them.
+
 ## 3.2.0
 
 - Survey questions (`survey` rule, note layer, `checks.survey` under `verify`

@@ -664,7 +664,12 @@ describe("makers", () => {
     expect(wireForModel("deepseek-v3.1")).toBe("openai");
     expect(wireForModel("claude-opus-4-6")).toBe("anthropic");
     expect(wireForModel("gemini-2.5-pro")).toBe("gemini");
-    expect(wireForModel("nex-n2.5")).toBeNull();
+    expect(wireForModel("nex-n2.5")).toBe("openai");
+    expect(wireForModel("mystery-7b")).toBeNull();
+    expect(makerForModel("tencent/hy4-preview")).toBe("tencent");
+    expect(makerForModel("coding-glm-5.3-free")).toBe("zhipu");
+    expect(makerForModel("xiaomi-mimo-v2-5")).toBe("xiaomi");
+    expect(makerForModel("CohereLabs/command-a-plus-05-2026-fp8")).toBe("cohere");
     expect(makerForModel("ocg/minimax-m3")).toBe("minimax");
     expect(makerForModel("moonshotai/kimi-k3")).toBe("moonshot");
     expect(makerForModel("Qwen/Qwen3.8-Flash")).toBe("alibaba");
