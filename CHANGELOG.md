@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.3
+
+- A 2xx that is no chat reply fails the handshake the way a 4xx does. Hosts
+  that answer every path with 200 (webhook.site, httpbin, an app's HTML
+  fallback) now end as `no-format` instead of being probed and scored
+  suspicious.
+- A probe answered with an error body at 200 counts as no answer, like a
+  non-2xx: a run whose probes only got error bodies is `unverified`, not
+  `suspicious`.
+
 ## 2.0.2
 
 - "google" alone no longer marks a foreign maker: Claude on Vertex answers

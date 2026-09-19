@@ -1,4 +1,5 @@
 import { isTransientError } from "../identity/signals";
+import { envelopeShapeOf } from "../vendors/shape";
 import { vendorFor } from "../vendors/table";
 import { callWire, wireCtx } from "./context";
 const HANDSHAKE_PROMPT = "hi";
@@ -51,7 +52,12 @@ async function tryWire(ctx, wire) {
         return { outcome: "cors", status: null, corsBlocked: true };
     if (res.status === null)
         return { outcome: "transient", status: null, corsBlocked: false };
-    const outcome = classifyStatus(res.status);
+    // A 2xx that is no chat reply (an error body, or a host like webhook.site
+    // that answers every path with 200) proves no format, the same as a 4xx.
+    const status = classifyStatus(res.status);
+    const outcome = status === "ok" && envelopeShapeOf(res.data) === "unknown"
+        ? "format"
+        : status;
     return {
         outcome: outcome !== "ok" && rejectsModel(res.data) ? "model" : outcome,
         status: res.status,

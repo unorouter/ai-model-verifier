@@ -82,11 +82,13 @@ async function runProbe(ctx, probe) {
         }
         const text = ctx.wire.read.text(res.data);
         const meta = ctx.wire.read.meta(res.data);
+        // An error body at 200 is no answer either.
         if (text === null) {
             log(false, null, null, "upstream error envelope");
             return {
                 ...base,
                 pass: false,
+                transient: true,
                 latencyMs: elapsed(),
                 prompt: lastPrompt,
                 httpStatus: res.status,

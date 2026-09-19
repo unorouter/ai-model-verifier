@@ -11,24 +11,9 @@
  * worth being able to ask.
  */
 import { richestProbe } from "../engine/probe-runner";
+import { rec } from "../internal/utils";
+import { ANTHROPIC_USAGE, envelopeShapeOf, GEMINI_USAGE, OPENAI_USAGE, } from "../vendors/shape";
 import { defineRule } from "./types";
-const ANTHROPIC_USAGE = new Set([
-    "input_tokens",
-    "output_tokens",
-    "cache_read_input_tokens",
-    "cache_creation_input_tokens",
-]);
-const OPENAI_USAGE = new Set([
-    "prompt_tokens",
-    "completion_tokens",
-    "total_tokens",
-]);
-const GEMINI_USAGE = new Set([
-    "promptTokenCount",
-    "candidatesTokenCount",
-    "totalTokenCount",
-    "thoughtsTokenCount",
-]);
 function idPrefixOf(id) {
     if (typeof id !== "string" || id.length === 0)
         return null;
@@ -39,23 +24,10 @@ function idPrefixOf(id) {
     const cut = id.search(/[-_]/);
     return cut > 0 ? id.slice(0, cut + 1) : "(none)";
 }
-function shapeOf(data, usageKeys) {
-    if (data["candidates"] !== undefined ||
-        usageKeys.some((k) => GEMINI_USAGE.has(k)))
-        return "gemini";
-    if (data["choices"] !== undefined ||
-        usageKeys.some((k) => OPENAI_USAGE.has(k)))
-        return "openai";
-    if (data["content"] !== undefined ||
-        usageKeys.some((k) => ANTHROPIC_USAGE.has(k)))
-        return "anthropic";
-    return "unknown";
-}
 export function readResponseMetadata(data, expected) {
-    const obj = (data ?? {});
-    const usage = (obj["usage"] ?? {});
-    const usageKeys = Object.keys(usage).sort();
-    const shape = shapeOf(obj, usageKeys);
+    const obj = rec(data) ?? {};
+    const usageKeys = Object.keys(rec(obj["usage"]) ?? {}).sort();
+    const shape = envelopeShapeOf(data);
     const idPrefix = idPrefixOf(obj["id"]);
     const notes = [];
     // Usage keys belonging to a vendor other than the shape we are reading.
