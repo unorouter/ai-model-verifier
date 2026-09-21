@@ -27,6 +27,8 @@ export const PROBES = [
                 return false;
             if (includesAnyWord(text, maker.home))
                 return true;
+            if (includesAnyWord(text, maker.selfConfusions))
+                return true;
             return maker.acceptsCloudHost && includesAny(text, CLOUD_HOST_PATTERNS);
         },
     },
@@ -39,7 +41,8 @@ export const PROBES = [
                 return false;
             if (hasForeignIdentity(text, maker, "model-name"))
                 return false;
-            if (!includesAnyWord(text, maker.modelNames))
+            if (!includesAnyWord(text, maker.modelNames) &&
+                !includesAnyWord(text, maker.selfConfusions))
                 return false;
             const stripped = text.replace(/^\s*\[[a-z0-9]{4,8}\]\s*/i, "").trim();
             return !FAKE_RESPONSE_SIGNATURES.includes(stripped);

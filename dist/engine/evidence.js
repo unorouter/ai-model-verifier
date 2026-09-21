@@ -1,7 +1,8 @@
-import { COUNT_PROBE_MAX_TOKENS, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, } from "../probes/prompts";
+import { COUNT_PROBE_MAX_TOKENS, DIVERSE_PROMPT, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, } from "../probes/prompts";
 import { callWire, chat, wireCtx } from "./context";
 import { collectProbes } from "./probe-runner";
 import { collectSurvey } from "./survey-runner";
+import { collectAnswerFingerprint, } from "./answer-fingerprint-runner";
 const THINKING_BUDGET_TOKENS = 2000;
 /** Thinking plus answer; too small and an adaptive model skips thinking to fit. */
 const SIGNATURE_MAX_TOKENS = 16000;
@@ -11,6 +12,7 @@ const FLOOR_MAX_TOKENS = 2048;
 export const EVIDENCE_ORDER = [
     "probes",
     "survey",
+    "answerFingerprint",
     "thinkingReply",
     "fixedText",
     "countTokens",
@@ -22,11 +24,12 @@ async function collectFixedText(ctx) {
         maxTokens: COUNT_PROBE_MAX_TOKENS,
         messages: [{ role: "user", content: prompt }],
     });
-    const [short, long] = await Promise.all([
+    const [short, long, diverse] = await Promise.all([
         ask(SHORT_PROMPT),
         ask(LONG_PROMPT),
+        ask(DIVERSE_PROMPT),
     ]);
-    return { short, long };
+    return { short, long, diverse };
 }
 async function collectCountTokens(ctx, store) {
     const count = ctx.wire.ops.countTokens;
@@ -82,6 +85,7 @@ const memo = (fn) => {
 export class EvidenceStore {
     probes;
     survey;
+    answerFingerprint;
     fixedText;
     countTokens;
     thinkingReply;
@@ -89,6 +93,7 @@ export class EvidenceStore {
     constructor(ctx) {
         this.probes = memo(() => collectProbes(ctx));
         this.survey = memo(() => collectSurvey(ctx));
+        this.answerFingerprint = memo(() => collectAnswerFingerprint(ctx));
         this.fixedText = memo(() => collectFixedText(ctx));
         this.countTokens = memo(() => collectCountTokens(ctx, this));
         this.thinkingReply = memo(() => collectThinkingReply(ctx));
@@ -100,6 +105,8 @@ export class EvidenceStore {
                 return this.probes();
             case "survey":
                 return this.survey();
+            case "answerFingerprint":
+                return this.answerFingerprint();
             case "fixedText":
                 return this.fixedText();
             case "countTokens":

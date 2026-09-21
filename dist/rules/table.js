@@ -2,6 +2,9 @@ import { cjkLeakRule, codingToolRule, foreignRule, muxRule, quorumRule, scamRule
 import { envelopeRule } from "./response-metadata";
 import { signatureRule } from "./thinking-signature";
 import { surveyRule } from "./survey";
+import { answerFingerprintRule } from "./answer-fingerprint";
+import { thinkLeakRule } from "./think-leak";
+import { wrapperLeakRule } from "./wrapper-leak";
 import { thinkingFloorRule } from "./thinking-floor";
 import { throughputRule } from "./throughput";
 import { tokenTruthRule } from "./token-truth";
@@ -27,7 +30,10 @@ export const RULES = [
     tokenTruthRule,
     envelopeRule,
     throughputRule,
+    thinkLeakRule,
+    wrapperLeakRule,
     surveyRule,
+    answerFingerprintRule,
 ];
 export const DETECTION_RULES = RULES.filter((r) => r.layer !== "note").map((r) => r.id);
 export const DETECTION_EXCEPTIONS = [

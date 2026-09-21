@@ -9,6 +9,12 @@ export declare const CODING_TOOL_NAMES: string[];
 export declare const SCAM_PAGE_PATTERNS: string[];
 export declare const CLOUD_HOST_PATTERNS: string[];
 export declare const FAKE_RESPONSE_SIGNATURES: string[];
+/**
+ * Fragments of an injected system prompt a lane replays when asked to repeat
+ * its instructions: the reseller wraps an IDE or agent session around the
+ * model. A fact about the lane, never about the model.
+ */
+export declare const WRAPPER_SIGNATURES: string[];
 export declare const CJK_CHAR: RegExp;
 /** A couple of incidental glyphs (a quoted loanword) are tolerated. */
 export declare const CJK_LEAK_MIN_CHARS = 4;

@@ -15,19 +15,9 @@ export type SurveyDef<L extends string = string> = {
   correct?(answer: string): boolean;
 };
 
+// Cutoff and context window were asked until 3.4.0 and dropped: on one
+// backend known to be real they gave twelve different cutoffs in 34 runs.
 export const SURVEY = [
-  {
-    label: "cutoff",
-    maxTokens: 40,
-    prompt: (n: string) =>
-      `What is your training data cutoff? Reply with the month and year only. ${nonceTag(n)}`,
-  },
-  {
-    label: "context-window",
-    maxTokens: 40,
-    prompt: (n: string) =>
-      `How many tokens fit in your context window? Reply with the number only. ${nonceTag(n)}`,
-  },
   {
     label: "system-prompt",
     maxTokens: 400,

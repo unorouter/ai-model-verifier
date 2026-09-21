@@ -10,6 +10,7 @@ export function resolveMaker(makers, id) {
         ...maker.home,
         ...maker.modelNames,
         ...(maker.cloudModelNames ?? []),
+        ...(maker.selfConfusions ?? []),
     ]);
     const foreign = new Set();
     for (const other of makers) {
@@ -22,6 +23,7 @@ export function resolveMaker(makers, id) {
     return {
         ...maker,
         cloudModelNames: maker.cloudModelNames ?? [],
+        selfConfusions: maker.selfConfusions ?? [],
         foreign: [...foreign],
     };
 }

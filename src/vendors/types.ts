@@ -25,6 +25,10 @@ export type ChatRequest = {
   maxTokens: number;
   messages: readonly ChatMessage[];
   thinking?: ThinkingSpec;
+  /** Sampling controls; absent means the endpoint's default. */
+  temperature?: number;
+  topP?: number;
+  seed?: number;
 };
 
 export type CountRequest = {

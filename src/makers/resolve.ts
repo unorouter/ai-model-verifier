@@ -14,6 +14,7 @@ export function resolveMaker<M extends string>(
     ...maker.home,
     ...maker.modelNames,
     ...(maker.cloudModelNames ?? []),
+    ...(maker.selfConfusions ?? []),
   ]);
   const foreign = new Set<string>();
   for (const other of makers) {
@@ -24,6 +25,7 @@ export function resolveMaker<M extends string>(
   return {
     ...maker,
     cloudModelNames: maker.cloudModelNames ?? [],
+    selfConfusions: maker.selfConfusions ?? [],
     foreign: [...foreign],
   };
 }

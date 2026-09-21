@@ -48,6 +48,23 @@ export const CLOUD_HOST_PATTERNS = ["amazon","aws","bedrock","google","vertex","
 
 export const FAKE_RESPONSE_SIGNATURES = ["claude sonnet (4.0)"];
 
+/**
+ * Fragments of an injected system prompt a lane replays when asked to repeat
+ * its instructions: the reseller wraps an IDE or agent session around the
+ * model. A fact about the lane, never about the model.
+ */
+export const WRAPPER_SIGNATURES = [
+  "antigravity",
+  "accessed via an api",
+  "mcp tools",
+  "qoder",
+  "cnb",
+  "kiro",
+  "windsurf",
+  "cursor",
+  "formatting notes for this conversation",
+];
+
 export const CJK_CHAR = /[぀-ヿ㐀-䶿一-鿿豈-﫿가-힯]/g;
 
 /** A couple of incidental glyphs (a quoted loanword) are tolerated. */

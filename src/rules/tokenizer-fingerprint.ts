@@ -32,6 +32,8 @@ export type TokenizerFingerprintResult = {
   state: TokenizerFingerprintState;
   /** long minus short input tokens; the fingerprint itself. */
   delta: number | null;
+  /** diverse minus short: the script-mixed text, which separates vocabularies. */
+  diverseDelta: number | null;
   shortInputTokens: number | null;
   longInputTokens: number | null;
   /** `model` echoed on the short reply, when the endpoint reported one. */
@@ -85,6 +87,7 @@ async function fingerprintResult(
   const ft = await ctx.evidence("fixedText");
   const empty = {
     delta: null,
+    diverseDelta: null,
     shortInputTokens: null,
     longInputTokens: null,
     servedModel: null,
@@ -108,9 +111,15 @@ async function fingerprintResult(
       reason: "no-usage-reported",
     };
   const delta = long - short;
+  // The diverse reply is best effort: a relay may refuse the mixed script.
+  const diverse =
+    ft.diverse.status !== null && ft.diverse.status < 400
+      ? (ctx.wire.read.meta(ft.diverse.data).usage?.prompt ?? null)
+      : null;
   return {
     state: "measured",
     delta,
+    diverseDelta: diverse === null ? null : diverse - short,
     shortInputTokens: short,
     longInputTokens: long,
     servedModel: shortMeta.detectedModel,
@@ -126,10 +135,11 @@ export const tokenizerFingerprintRule = defineRule({
   layer: "evidence",
   needs: ["fixedText"],
   check: "tokenizerFingerprint",
-  // Claude only, over either wire that carries its usage as is.
-  applies: (ctx) => ctx.maker.id === "anthropic" && ctx.wire.id !== "gemini",
+  // Every maker measures (the deltas are the record); only Claude's tiers
+  // are judged, and only over a wire that carries usage as is.
+  applies: (ctx) => ctx.wire.id !== "gemini",
   judge: async (ctx) => {
-    if (!ctx.maker.tiers) return null;
+    if (ctx.maker.id !== "anthropic" || !ctx.maker.tiers) return null;
     const r = await fingerprintResult(ctx);
     const tier = judgeTokenizerFingerprint(ctx.model, r, ctx.maker.tiers);
     return tier

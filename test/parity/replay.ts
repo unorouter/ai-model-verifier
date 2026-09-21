@@ -59,13 +59,29 @@ export function fixtureKey(path: string, body: unknown): string {
   return `${path} ${conversation} ${thinking}`;
 }
 
+/**
+ * Requests a later build makes that 1.4.1 never did (the diverse tokenizer
+ * text, the fixed text on non-Claude makers) have no recording and come back
+ * as a transport error, the way a refusing relay would; anything else
+ * unrecorded is a harness bug and throws.
+ */
+const UNRECORDED_OK = ["Reference text: 深度学习", "Reply with exactly: ok"];
+
 export function replayTransport(fixture: Fixture): TransportFn {
   const used = new Set<Exchange>();
   return async (args) => {
     const key = fixtureKey(pathUnder(args.url, fixture.baseUrl), args.reqBody);
     const hits = fixture.exchanges.filter((e) => e.key === key);
-    if (hits.length === 0)
+    if (hits.length === 0) {
+      if (UNRECORDED_OK.some((s) => key.includes(s)))
+        return {
+          status: null,
+          data: null,
+          error: "no recording",
+          corsBlocked: false,
+        };
       throw new Error(`no recording for ${key.slice(0, 160)}`);
+    }
     const ex = hits.find((e) => !used.has(e)) ?? hits[hits.length - 1]!;
     used.add(ex);
     const nonce = nonceOf(args.reqBody);

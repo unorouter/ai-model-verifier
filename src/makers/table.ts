@@ -69,6 +69,10 @@ export const MAKERS = [
     acceptsCloudHost: false,
     tiers: null,
     cjkNative: true,
+    // Measured on Cloudflare's own deepseek route as well as on every
+    // marketplace: V4 answers "openai", "chatgpt" or "gpt-4o" about half the
+    // time and "anthropic" now and then. Its training data, not a swap.
+    selfConfusions: ["openai", "gpt", "chatgpt", "anthropic", "claude"],
   },
   {
     id: "moonshot",

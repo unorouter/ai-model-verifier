@@ -5,4 +5,5 @@ export { DEFAULT_TIER_SIGNATURES, fingerprintDrifted, judgeTokenizerFingerprint,
 export { expectedInputDelta } from "./token-truth";
 export { readResponseMetadata } from "./response-metadata";
 export { compareThroughput, sampleThroughput } from "./throughput";
+export { compareFingerprints, compareToProfiles, fingerprintClusters, jensenShannon, mergeFingerprints, DEFAULT_MATCH_BITS, DEFAULT_MISMATCH_BITS, DEFAULT_MIN_CELL_SAMPLES, } from "./answer-fingerprint";
 //# sourceMappingURL=index.js.map

@@ -26,6 +26,14 @@ export const LONG_PROMPT = `${SHORT_PROMPT}\n\nReference text:${" apple".repeat(
 export const COUNT_PROBE_MAX_TOKENS = 16;
 
 /**
+ * A run of text that every vocabulary splits differently: the apple run is one
+ * token per word on every BPE and only tells Claude generations apart, this
+ * one mixes scripts, digits, code punctuation and emoji. Fixed like the pair
+ * above: a recorded delta is only comparable on the same bytes.
+ */
+export const DIVERSE_PROMPT = `${SHORT_PROMPT}\n\nReference text: 深度学习模型在2026年9月的推理成本下降了37.5%。The quick brown fox jumps over the lazy dog; naïve café résumé. fn main() { let x: Vec<u32> = (0..42).map(|i| i * i).collect(); println!("{:?}", x); } SELECT COUNT(*) FROM logs WHERE created_at > 1758412800 AND model_name LIKE 'deepseek-%'; 🚀🧠🍎🌊 ΑΒΓΔ αβγδ Привет мир こんにちは世界 안녕하세요 مرحبا بالعالم 0x7f3a9c 3.14159265 1e-9 https://example.invalid/path?q=a%20b&x=1`;
+
+/**
  * Multi-step GCD: hard enough that adaptive models decide to think, and
  * deliberately not the 1071/462 pair from Anthropic's own docs, which a relay
  * could special-case.

@@ -1,5 +1,32 @@
 # Changelog
 
+## 3.4.0
+
+- Answer fingerprint (`answer-fingerprint`, note layer, `checks.answerFingerprint`
+  or `only`): eight one-word questions at temperature 1, `repeats` per cell,
+  reported as answer counts. Pure helpers `mergeFingerprints`, `jensenShannon`,
+  `compareFingerprints`, `compareToProfiles` and `fingerprintClusters` let a
+  caller accumulate runs and compare a lane against accepted profiles with the
+  thresholds of arXiv 2607.10252 (0.25 match, 0.35 mismatch bits, 10 valid
+  answers per cell). `FINGERPRINT_CELLS`, `classifyAnswer`, `stripThink`
+  exported. All 24 calls run sequentially.
+- `ChatRequest` gains `temperature`, `topP` and `seed`; the OpenAI and Gemini
+  adapters send them, Anthropic sends temperature only and never next to
+  thinking.
+- `Maker.selfConfusions`: names a model gives itself that are not a swap.
+  DeepSeek carries `openai, gpt, chatgpt, anthropic, claude`, measured on the
+  routes DeepSeek operates; those words are neither foreign nor a failed
+  identity probe for it, and a competitor's name still is.
+- Note rules `think-leak` (reasoning inside the content) and `wrapper-leak`
+  (the survey's instruction replay names a known IDE or agent wrapper,
+  `WRAPPER_SIGNATURES`).
+- The tokenizer fingerprint measures every maker over the OpenAI and Anthropic
+  wires (verdict still Claude-only) and reports `diverseDelta`, the billed
+  tokens of a new script-mixed `DIVERSE_PROMPT`; the fixed text now costs three
+  calls.
+- Survey: `cutoff` and `context-window` dropped (noise on a known backend).
+- `ProbeAttempt.label` also names a fingerprint cell.
+
 ## 3.3.0
 
 - Twenty eight more makers (Cohere, ByteDance, Baidu, StepFun, NVIDIA, IBM,

@@ -26,6 +26,8 @@ export type TokenizerFingerprintResult = {
     state: TokenizerFingerprintState;
     /** long minus short input tokens; the fingerprint itself. */
     delta: number | null;
+    /** diverse minus short: the script-mixed text, which separates vocabularies. */
+    diverseDelta: number | null;
     shortInputTokens: number | null;
     longInputTokens: number | null;
     /** `model` echoed on the short reply, when the endpoint reported one. */

@@ -38,6 +38,11 @@ function chat(req: ChatRequest, ctx: WireCtx) {
       })),
       generationConfig: {
         maxOutputTokens: Math.max(req.maxTokens, MIN_OUTPUT_TOKENS),
+        ...(req.temperature !== undefined
+          ? { temperature: req.temperature }
+          : {}),
+        ...(req.topP !== undefined ? { topP: req.topP } : {}),
+        ...(req.seed !== undefined ? { seed: req.seed } : {}),
       },
     },
   };

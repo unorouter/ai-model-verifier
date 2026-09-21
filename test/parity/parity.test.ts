@@ -124,12 +124,19 @@ describe("parity with 1.4.1 recordings", () => {
       expect(result.tokenTruth?.ok).toBe(old.tokenTruth?.ok);
       expect(result.tokenTruth?.checks).toEqual(old.tokenTruth?.checks);
       expect(result.thinkingFloor?.state).toBe(old.thinkingFloor?.state);
-      expect(result.tokenizerFingerprint?.state).toBe(
-        old.tokenizerFingerprint?.state,
-      );
-      expect(result.tokenizerFingerprint?.delta).toBe(
-        old.tokenizerFingerprint?.delta,
-      );
+      // 3.4 measures the tokenizer on every maker; a recording made when only
+      // Claude was measured has no fixed text for the others, so the rule
+      // reports unmeasured there.
+      if (old.tokenizerFingerprint) {
+        expect(result.tokenizerFingerprint?.state).toBe(
+          old.tokenizerFingerprint.state,
+        );
+        expect(result.tokenizerFingerprint?.delta).toBe(
+          old.tokenizerFingerprint.delta,
+        );
+      } else {
+        expect(result.tokenizerFingerprint?.state).toBe("unmeasured");
+      }
       expect(result.responseMetadata?.notes).toEqual(
         old.responseMetadata?.notes,
       );

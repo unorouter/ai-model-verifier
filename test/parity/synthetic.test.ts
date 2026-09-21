@@ -14,6 +14,16 @@ import {
   wireForModel,
 } from "../../src/models/catalog";
 import { runRules, verify } from "../../src/verify";
+import {
+  classifyAnswer,
+  FINGERPRINT_CELLS,
+} from "../../src/probes/answer-fingerprint";
+import {
+  compareFingerprints,
+  compareToProfiles,
+  jensenShannon,
+  mergeFingerprints,
+} from "../../src/rules/answer-fingerprint";
 import type { TransportArgs, TransportFn } from "../../src/transport";
 
 type Body = Record<string, unknown>;
@@ -306,7 +316,8 @@ describe("evidence rules", () => {
       transport,
       checks: { tokenTruth: true, tokenizerFingerprint: true },
     });
-    expect(fixed).toBe(2);
+    // short, long and the diverse text, each once for both rules.
+    expect(fixed).toBe(3);
     expect(r.tokenTruth?.ok).toBe(true);
     expect(r.tokenizerFingerprint?.state).toBe("measured");
   });
@@ -328,7 +339,7 @@ describe("runRules", () => {
       bodyExtras: { provider: ["bedrock"] },
       only: ["tokenizer-fingerprint"],
     });
-    expect(seen.length).toBe(2);
+    expect(seen.length).toBe(3);
     expect(
       seen.every((b) => JSON.stringify(b["provider"]) === '["bedrock"]'),
     ).toBe(true);
@@ -474,14 +485,30 @@ describe("makers", () => {
     expect(r.verdict).toBe("genuine");
   });
 
-  test("a DeepSeek naming OpenAI as its maker is foreign", async () => {
-    const r = await verify({
+  test("a DeepSeek naming OpenAI is its own confusion, a GLM naming Anthropic is foreign", async () => {
+    const ds = await verify({
       ...base,
       vendor: "openai",
       model: "deepseek-v3.1",
       transport: makerWire("OpenAI", "DeepSeek-V3.1"),
     });
-    expect(r.reasons).toEqual(["foreign-identity: identity"]);
+    expect(ds.verdict).toBe("genuine");
+    expect(ds.probes.find((p) => p.label === "identity")?.pass).toBe(true);
+    const glm = await verify({
+      ...base,
+      vendor: "openai",
+      model: "glm-4.5",
+      transport: makerWire("Anthropic", "GLM-4.5"),
+    });
+    expect(glm.reasons).toEqual(["foreign-identity: identity"]);
+    // A DeepSeek naming a Chinese competitor is still foreign.
+    const swapped = await verify({
+      ...base,
+      vendor: "openai",
+      model: "deepseek-v3.1",
+      transport: makerWire("Moonshot", "Kimi"),
+    });
+    expect(swapped.reasons).toEqual(["foreign-identity: identity, model-name"]);
   });
 
   test("CJK is a language preference for a Chinese maker, a tell for Claude", async () => {
@@ -688,8 +715,6 @@ describe("survey", () => {
       model: "claude-opus-4-6",
       transport: anthropicWire({
         answer: (p, n) => {
-          if (p.includes("cutoff")) return `[${n}] march 2026`;
-          if (p.includes("context window")) return `[${n}] 200000`;
           if (p.includes("word for word")) return `[${n}] none`;
           if (p.includes("47 times 83")) return `[${n}] 3882`;
           if (p.includes("JSON")) return `[${n}] {"maker": "anthropic", "model": "claude"}`;
@@ -707,19 +732,16 @@ describe("survey", () => {
     );
     expect(Object.keys(byLabel).sort()).toEqual([
       "arithmetic",
-      "context-window",
-      "cutoff",
       "json",
       "self",
       "system-prompt",
     ]);
-    expect(byLabel["cutoff"]?.answer).toBe("march 2026");
-    expect(byLabel["cutoff"]?.nonced).toBe(true);
-    expect(byLabel["cutoff"]?.correct).toBeNull();
+    expect(byLabel["self"]?.nonced).toBe(true);
+    expect(byLabel["self"]?.correct).toBeNull();
     expect(byLabel["arithmetic"]?.correct).toBe(true);
     expect(byLabel["json"]?.correct).toBe(true);
     expect(byLabel["system-prompt"]?.answer).toBe("none");
-    expect(asked.length).toBe(6);
+    expect(asked.length).toBe(4);
   });
 
   test("verify asks no survey question unless the check is on", async () => {
@@ -735,7 +757,7 @@ describe("survey", () => {
       model: "claude-opus-4-6",
       transport,
     });
-    expect(prompts.some((p) => p.includes("cutoff"))).toBe(false);
+    expect(prompts.some((p) => p.includes("word for word"))).toBe(false);
     prompts.length = 0;
     const r = await verify({
       ...base,
@@ -744,8 +766,133 @@ describe("survey", () => {
       transport,
       checks: { survey: true },
     });
-    expect(prompts.some((p) => p.includes("cutoff"))).toBe(true);
+    expect(prompts.some((p) => p.includes("word for word"))).toBe(true);
     expect(r.verdict).toBe("genuine");
-    expect(r.survey?.length).toBe(6);
+    expect(r.survey?.length).toBe(4);
+  });
+
+  test("wrapper-leak notes a replayed IDE system prompt, think-leak a reasoning tag", async () => {
+    const r = await verify({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport: anthropicWire({
+        answer: (p, n) => {
+          if (p.includes("word for word"))
+            return `[${n}] <identity> you are antigravity, a powerful agentic ai coding assistant`;
+          if (p.includes("haiku"))
+            return `[${n}] <think>a haiku about dawn</think> golden light rising / waves whisper to the shore / a new day begins`;
+          return undefined;
+        },
+      }),
+      checks: { survey: true },
+    });
+    expect(r.verdict).toBe("genuine");
+    const notes = r.findings.filter((f) => f.severity === "note").map((f) => f.rule);
+    expect(notes).toContain("wrapper-leak");
+    expect(notes).toContain("think-leak");
+    expect(r.findings.find((f) => f.rule === "wrapper-leak")?.reason).toBe("wrapper-leak: antigravity");
+  });
+});
+
+describe("answer fingerprint", () => {
+  const answers: Record<string, string[]> = {
+    number: ["7", "42", "seven", "Sure, 17."],
+    colour: ["Blue", "gray", "blue", "Green"],
+    letter: ["Q", "the letter r", "q", "Z"],
+    city: ["Paris", "Tokyo.", "paris", "London"],
+    coin: ["Heads", "tails", "Heads!", "heads"],
+    animal: ["Cat", "dog", "cat", "Elephant"],
+    favourite: ["7", "seven", "3", "7"],
+    fruit: ["Apple", "banana", "apple", "mango"],
+  };
+  const cellOf = (p: string) =>
+    p.includes("1 to 100") ? "number" : p.includes("colour") ? "colour" : p.includes("letter") ? "letter" : p.includes("city") ? "city" : p.includes("coin") ? "coin" : p.includes("animal") ? "animal" : p.includes("1 to 10") ? "favourite" : p.includes("fruit") ? "fruit" : null;
+
+  test("normalises answers per cell and strips a leaked think block", () => {
+    const cell = (label: string) => FINGERPRINT_CELLS.find((c) => c.label === label)!;
+    expect(classifyAnswer("Sure, 17.", cell("number"))).toEqual({ answer: "17", cls: "valid" });
+    expect(classifyAnswer("seven", cell("number"))).toEqual({ answer: "7", cls: "valid" });
+    expect(classifyAnswer("gray", cell("colour"))).toEqual({ answer: "grey", cls: "valid" });
+    expect(classifyAnswer("<think>hmm</think> Tails", cell("coin"))).toEqual({ answer: "tails", cls: "valid" });
+    expect(classifyAnswer("the letter r", cell("letter"))).toEqual({ answer: "r", cls: "valid" });
+    expect(classifyAnswer("I cannot pick a random number.", cell("number")).cls).toBe("refusal");
+    expect(classifyAnswer("banana", cell("number")).cls).toBe("invalid");
+    expect(classifyAnswer("", cell("city")).cls).toBe("empty");
+  });
+
+  test("divergence is 0 on identical histograms and 1 on disjoint ones", () => {
+    expect(jensenShannon({ a: 5, b: 5 }, { a: 50, b: 50 })).toBeCloseTo(0, 6);
+    expect(jensenShannon({ a: 10 }, { b: 10 })).toBeCloseTo(1, 6);
+    const sample = { cells: { number: { answers: { "7": 12 }, valid: 12, refusal: 0, invalid: 0, empty: 0, errors: 0 } }, calls: 12, temperature: 1, detectedModel: null, latencyMs: 0 };
+    const same = mergeFingerprints(sample, sample);
+    expect(same.cells["number"]?.valid).toBe(24);
+    expect(compareFingerprints(sample, same).verdict).toBe("insufficient");
+    const wide = { ...sample, cells: Object.fromEntries(["number", "colour", "letter", "city"].map((l) => [l, sample.cells["number"]!])) };
+    expect(compareFingerprints(wide, wide).verdict).toBe("match");
+    const other = { ...wide, cells: Object.fromEntries(Object.keys(wide.cells).map((l) => [l, { ...wide.cells[l]!, answers: { "9": 12 } }])) };
+    expect(compareFingerprints(wide, other).verdict).toBe("mismatch");
+    expect(compareToProfiles(wide, [{ name: "official", sample: other }, { name: "host", sample: wide }]).verdict).toBe("known");
+    expect(compareToProfiles(wide, [{ name: "official", sample: other }]).verdict).toBe("novel");
+  });
+
+  test("runRules asks every cell `repeats` times, sequentially, and reports counts without a finding", async () => {
+    const calls: string[] = [];
+    let inFlight = 0;
+    let overlap = false;
+    const inner = anthropicWire({
+      answer: (p) => {
+        const c = cellOf(p);
+        if (!c) return undefined;
+        const list = answers[c]!;
+        return list[calls.filter((x) => x === c).length % list.length];
+      },
+    });
+    const transport: TransportFn = async (a) => {
+      const c = cellOf(promptOf(bodyOf(a)));
+      if (c) {
+        inFlight++;
+        if (inFlight > 1) overlap = true;
+        calls.push(c);
+        const r = await inner(a);
+        inFlight--;
+        return r;
+      }
+      return inner(a);
+    };
+    const run = await runRules({
+      ...base,
+      vendor: "anthropic",
+      model: "claude-opus-4-6",
+      transport,
+      only: ["answer-fingerprint"],
+      checks: { answerFingerprint: { repeats: 3 } },
+    });
+    expect(run.findings).toEqual([]);
+    expect(calls.length).toBe(24);
+    expect(overlap).toBe(false);
+    const fp = run.reports.answerFingerprint!;
+    expect(fp.calls).toBe(24);
+    // Replies 2, 3 and 4 of each list: "42", "seven", "Sure, 17.".
+    expect(fp.cells["number"]?.answers).toEqual({ "42": 1, "7": 1, "17": 1 });
+    expect(fp.cells["number"]?.valid).toBe(3);
+    expect(fp.cells["colour"]?.answers).toEqual({ grey: 1, blue: 1, green: 1 });
+    expect(fp.cells["colour"]?.valid).toBe(3);
+    const body = fp.raw?.[0];
+    expect(body?.cell).toBe("number");
+  });
+
+  test("verify sends temperature 1 for the battery only when the check is on", async () => {
+    const temps: unknown[] = [];
+    const inner = anthropicWire({});
+    const transport: TransportFn = async (a) => {
+      if (cellOf(promptOf(bodyOf(a)))) temps.push(bodyOf(a)["temperature"]);
+      return inner(a);
+    };
+    await verify({ ...base, vendor: "anthropic", model: "claude-opus-4-6", transport });
+    expect(temps.length).toBe(0);
+    await verify({ ...base, vendor: "anthropic", model: "claude-opus-4-6", transport, checks: { answerFingerprint: true } });
+    expect(temps.length).toBe(24);
+    expect(temps.every((t) => t === 1)).toBe(true);
   });
 });

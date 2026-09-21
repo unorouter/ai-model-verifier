@@ -1,6 +1,7 @@
 import type { ResolvedChecks, RunCtx } from "../engine/context";
 import type { EvidenceBag, EvidenceKey } from "../engine/evidence";
 import type { SurveyOutcome } from "../engine/survey-runner";
+import type { FingerprintSample } from "../engine/answer-fingerprint-runner";
 import type { ResponseMetadata } from "./response-metadata";
 import type { SignatureResult } from "./thinking-signature";
 import type { ThinkingFloorResult } from "./thinking-floor";
@@ -38,6 +39,7 @@ export type Reports = {
     responseMetadata?: ResponseMetadata;
     throughput?: ThroughputSample | null;
     survey?: SurveyOutcome[];
+    answerFingerprint?: FingerprintSample;
 };
 export type CheckKey = keyof ResolvedChecks;
 /** A rule sees the run and only the evidence it declared in `needs`. */

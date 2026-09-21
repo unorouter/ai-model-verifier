@@ -24,6 +24,13 @@ export type Maker<Id extends string = string> = {
   tiers: readonly string[] | null;
   /** Trains primarily on Chinese text: CJK in a reply is a language preference, not a substitution tell. */
   cjkNative: boolean;
+  /**
+   * Names the model habitually gives for itself that are not evidence of a
+   * swap, measured on a route the maker operates (DeepSeek says "openai" or
+   * "chatgpt" on its own routes). Never foreign for this maker, still foreign
+   * for every other.
+   */
+  selfConfusions?: readonly string[];
 };
 
 /** A maker plus the vocabulary derived from every other maker in the registry. */
@@ -31,6 +38,7 @@ export type ResolvedMaker<Id extends string = string> = Maker<Id> & {
   /** Words that name a competitor. */
   foreign: readonly string[];
   cloudModelNames: readonly string[];
+  selfConfusions: readonly string[];
 };
 
 export const defineMaker = <const M extends Maker>(maker: M): M => maker;

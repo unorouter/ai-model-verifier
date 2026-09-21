@@ -1,5 +1,6 @@
 import {
   COUNT_PROBE_MAX_TOKENS,
+  DIVERSE_PROMPT,
   FLOOR_PROMPT,
   LONG_PROMPT,
   SHORT_PROMPT,
@@ -9,6 +10,10 @@ import type { TransportResult } from "../transport";
 import { callWire, chat, wireCtx, type RunCtx } from "./context";
 import { collectProbes, type ProbeEval } from "./probe-runner";
 import { collectSurvey, type SurveyOutcome } from "./survey-runner";
+import {
+  collectAnswerFingerprint,
+  type FingerprintSample,
+} from "./answer-fingerprint-runner";
 
 const THINKING_BUDGET_TOKENS = 2000;
 /** Thinking plus answer; too small and an adaptive model skips thinking to fit. */
@@ -19,6 +24,8 @@ const FLOOR_MAX_TOKENS = 2048;
 export type FixedTextEvidence = {
   short: TransportResult;
   long: TransportResult;
+  /** The script-mixed text every vocabulary splits differently. */
+  diverse: TransportResult;
 };
 
 export type ThinkingReplyEvidence = {
@@ -36,6 +43,8 @@ export type EvidenceBag = {
   probes: ProbeEval[];
   /** The survey answers, recorded as they came. */
   survey: SurveyOutcome[];
+  /** One-word answer counts at temperature 1, for a caller to accumulate. */
+  answerFingerprint: FingerprintSample;
   fixedText: FixedTextEvidence;
   /** null when the wire has no count endpoint or the short reply had no usage. */
   countTokens: TransportResult | null;
@@ -51,6 +60,7 @@ export type EvidenceKey = keyof EvidenceBag;
 export const EVIDENCE_ORDER = [
   "probes",
   "survey",
+  "answerFingerprint",
   "thinkingReply",
   "fixedText",
   "countTokens",
@@ -65,11 +75,12 @@ async function collectFixedText(ctx: RunCtx): Promise<FixedTextEvidence> {
       maxTokens: COUNT_PROBE_MAX_TOKENS,
       messages: [{ role: "user", content: prompt }],
     });
-  const [short, long] = await Promise.all([
+  const [short, long, diverse] = await Promise.all([
     ask(SHORT_PROMPT),
     ask(LONG_PROMPT),
+    ask(DIVERSE_PROMPT),
   ]);
-  return { short, long };
+  return { short, long, diverse };
 }
 
 async function collectCountTokens(
@@ -136,6 +147,7 @@ const memo = <T>(fn: () => Promise<T>) => {
 export class EvidenceStore {
   private readonly probes: () => Promise<ProbeEval[]>;
   private readonly survey: () => Promise<SurveyOutcome[]>;
+  private readonly answerFingerprint: () => Promise<FingerprintSample>;
   private readonly fixedText: () => Promise<FixedTextEvidence>;
   private readonly countTokens: () => Promise<TransportResult | null>;
   private readonly thinkingReply: () => Promise<ThinkingReplyEvidence>;
@@ -144,6 +156,7 @@ export class EvidenceStore {
   constructor(ctx: RunCtx) {
     this.probes = memo(() => collectProbes(ctx));
     this.survey = memo(() => collectSurvey(ctx));
+    this.answerFingerprint = memo(() => collectAnswerFingerprint(ctx));
     this.fixedText = memo(() => collectFixedText(ctx));
     this.countTokens = memo(() => collectCountTokens(ctx, this));
     this.thinkingReply = memo(() => collectThinkingReply(ctx));
@@ -157,6 +170,8 @@ export class EvidenceStore {
         return this.probes();
       case "survey":
         return this.survey();
+      case "answerFingerprint":
+        return this.answerFingerprint();
       case "fixedText":
         return this.fixedText();
       case "countTokens":

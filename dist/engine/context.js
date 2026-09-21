@@ -1,4 +1,5 @@
 import { isRecord } from "../internal/utils";
+export const DEFAULT_FINGERPRINT_REPEATS = 3;
 export function resolveChecks(checks) {
     const c = checks ?? {};
     return {
@@ -23,6 +24,13 @@ export function resolveChecks(checks) {
             }
             : null,
         survey: c.survey === true,
+        answerFingerprint: c.answerFingerprint
+            ? {
+                repeats: typeof c.answerFingerprint === "object"
+                    ? (c.answerFingerprint.repeats ?? DEFAULT_FINGERPRINT_REPEATS)
+                    : DEFAULT_FINGERPRINT_REPEATS,
+            }
+            : null,
     };
 }
 export const wireCtx = (ctx) => ({

@@ -31,4 +31,24 @@ export { readResponseMetadata } from "./response-metadata";
 export type { ResponseMetadata } from "./response-metadata";
 export { compareThroughput, sampleThroughput } from "./throughput";
 export type { SurveyOutcome } from "../engine/survey-runner";
+export type {
+  FingerprintSample,
+  FingerprintCellSample,
+} from "../engine/answer-fingerprint-runner";
+export {
+  compareFingerprints,
+  compareToProfiles,
+  fingerprintClusters,
+  jensenShannon,
+  mergeFingerprints,
+  DEFAULT_MATCH_BITS,
+  DEFAULT_MISMATCH_BITS,
+  DEFAULT_MIN_CELL_SAMPLES,
+} from "./answer-fingerprint";
+export type {
+  CompareOptions,
+  CompareResult,
+  CompareVerdict,
+  ProfileVerdict,
+} from "./answer-fingerprint";
 export type { ThroughputComparison, ThroughputSample } from "./throughput";

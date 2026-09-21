@@ -13,14 +13,6 @@ export type SurveyDef<L extends string = string> = {
     correct?(answer: string): boolean;
 };
 export declare const SURVEY: readonly [{
-    readonly label: "cutoff";
-    readonly maxTokens: 40;
-    readonly prompt: (n: string) => string;
-}, {
-    readonly label: "context-window";
-    readonly maxTokens: 40;
-    readonly prompt: (n: string) => string;
-}, {
     readonly label: "system-prompt";
     readonly maxTokens: 400;
     readonly prompt: (n: string) => string;

@@ -53,6 +53,10 @@ function chat(req: ChatRequest, ctx: WireCtx) {
     max_tokens: req.maxTokens,
     messages: req.messages,
   };
+  // The API rejects temperature next to thinking; there is no seed.
+  if (req.temperature !== undefined && !req.thinking)
+    body["temperature"] = req.temperature;
+  if (req.topP !== undefined && !req.thinking) body["top_p"] = req.topP;
   if (req.thinking) {
     body["thinking"] =
       req.thinking.kind === "extended"

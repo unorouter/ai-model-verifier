@@ -1,5 +1,6 @@
 import type { ProbeLabel, ProbeSignal } from "./probes/table";
 import type { SurveyLabel } from "./probes/survey";
+import type { FingerprintLabel } from "./probes/answer-fingerprint";
 import type { Finding, Reports } from "./rules/types";
 import type { RuleId } from "./rules/table";
 import type { TransportFn, TransportMode } from "./transport";
@@ -13,6 +14,7 @@ export type {
   ProbeLabel,
   ProbeSignal,
   SurveyLabel,
+  FingerprintLabel,
   TransportMode,
   VendorId,
   RuleId,
@@ -35,9 +37,9 @@ export type ProbeOutcome = {
   reason: string | null;
 };
 
-/** One request of a probe or survey question, including the nonce retries; for a caller's own log. */
+/** One request of a probe, survey question or fingerprint cell, including the nonce retries; for a caller's own log. */
 export type ProbeAttempt = {
-  label: ProbeLabel | SurveyLabel;
+  label: ProbeLabel | SurveyLabel | `answer-fingerprint:${FingerprintLabel}`;
   attempt: number;
   pass: boolean;
   signal: ProbeSignal;
@@ -61,6 +63,8 @@ export type Checks = {
   tokenizerFingerprint?: boolean | { signatures?: TierSignatures };
   /** Ask the survey questions and report the answers; never a verdict. */
   survey?: boolean;
+  /** The one-word answer battery at temperature 1, `repeats` per cell (default 3); never a verdict. */
+  answerFingerprint?: boolean | { repeats?: number };
 };
 
 export type VerifyOptions<V extends string = VendorId> = {

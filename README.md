@@ -109,12 +109,39 @@ accounting against the billed usage, a self-reported tier, the response
 envelope (which vendor's shape and id minted the reply), throughput and the
 survey.
 
-The survey (`survey`, opt-in via `checks.survey` or `only`) asks six questions
+The answer fingerprint (`answer-fingerprint`, opt-in via `checks.answerFingerprint` or `only`)
+asks eight one-word questions at temperature 1 (a random number, a colour, a letter, a city, a
+coin flip, an animal, a favourite number, a fruit), `repeats` times each (default 3, 24 calls of
+32 output tokens), and reports the answer counts per cell. One run says nothing; the answer
+distribution of a model is specific to it once a cell holds 10 or more valid answers (the
+method of arXiv 2607.10252), so a caller merges runs over days with `mergeFingerprints` and
+compares a lane against the profiles it trusts with `compareFingerprints` (Jensen-Shannon
+divergence in bits: match at or under 0.25, mismatch above 0.35) or `compareToProfiles` (a set of
+accepted profiles: the maker's own route, each known host). The prompts carry no nonce on
+purpose: the bytes must be identical across lanes. It separates families and mixed pools; it
+does not name a version or a quantisation level, and nothing in the literature does black-box.
+
+Two more note rules read what the lane leaks about itself: `think-leak` (reasoning returned
+inside the content, which also poisons the identity probes) and `wrapper-leak` (the survey's
+replay of prior instructions matches a known IDE or agent wrapper).
+
+A maker may carry `selfConfusions`, names the model habitually gives for itself that are not
+evidence of a swap: DeepSeek answers "openai" or "chatgpt" about half the time on the routes
+DeepSeek operates. Those words are never foreign for that maker and pass its identity probes,
+while a competitor's name (a DeepSeek saying "kimi") stays foreign. A self confusion is added
+only after it has been measured on a route the maker operates.
+
+The tokenizer fingerprint now measures every maker (its verdict stays Claude-only) and adds
+`diverseDelta`, the billed input tokens of a script-mixed text that every vocabulary splits
+differently, so two lanes of one model on different tokenizers show it in one number.
+
+The survey (`survey`, opt-in via `checks.survey` or `only`) asks four questions
 for the record and reports every answer with its usage, hidden token count and
-latency: training cutoff, context window, a verbatim replay of any prior
-instructions (a relay's injected system prompt shows here), a sum (with a fact
-check, and the thinking it cost), a JSON object naming maker and model (with a
-parse check) and a one sentence self description. Nothing in it decides a
+latency: a verbatim replay of any prior instructions (a relay's injected system
+prompt shows here), a sum (with a fact check, and the thinking it cost), a JSON
+object naming maker and model (with a parse check) and a one sentence self
+description. Training cutoff and context window were asked until 3.4.0 and
+dropped: one backend known to be real gave twelve different cutoffs in 34 runs. Nothing in it decides a
 verdict; over many lanes and weeks it is the record to read a model's usual
 answers from before any rule gets authority over that maker.
 

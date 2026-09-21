@@ -40,6 +40,7 @@ export declare const MAKERS: readonly [{
     readonly acceptsCloudHost: false;
     readonly tiers: null;
     readonly cjkNative: true;
+    readonly selfConfusions: readonly ["openai", "gpt", "chatgpt", "anthropic", "claude"];
 }, {
     readonly id: "moonshot";
     readonly name: "Moonshot AI";

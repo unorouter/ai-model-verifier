@@ -14,5 +14,7 @@ export { RULES, DETECTION_RULES, DETECTION_EXCEPTIONS, RULE_FOR_SIGNAL, } from "
 export { defineModelFacts, resolveModelFacts } from "./models/facts";
 export { PROBES, PROBE_SIGNALS } from "./probes/table";
 export { SURVEY } from "./probes/survey";
+export { FINGERPRINT_CELLS, classifyAnswer, stripThink, } from "./probes/answer-fingerprint";
+export { compareFingerprints, compareToProfiles, fingerprintClusters, jensenShannon, mergeFingerprints, } from "./rules/answer-fingerprint";
 export { directTransport, browserTransport } from "./transport";
 //# sourceMappingURL=index.js.map

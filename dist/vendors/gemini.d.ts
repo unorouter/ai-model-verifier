@@ -12,6 +12,9 @@ declare function chat(req: ChatRequest, ctx: WireCtx): {
         }[];
         generationConfig: {
             maxOutputTokens: number;
+            temperature?: number | undefined;
+            topP?: number | undefined;
+            seed?: number | undefined;
         };
     };
 };

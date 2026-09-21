@@ -17,7 +17,10 @@ export type ResolvedChecks = {
   thinkingFloor: { minCompletionTokens: number | null } | null;
   tokenizerFingerprint: { signatures: TierSignatures | undefined } | null;
   survey: boolean;
+  answerFingerprint: { repeats: number } | null;
 };
+
+export const DEFAULT_FINGERPRINT_REPEATS = 3;
 
 export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
   const c = checks ?? {};
@@ -46,6 +49,14 @@ export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
         }
       : null,
     survey: c.survey === true,
+    answerFingerprint: c.answerFingerprint
+      ? {
+          repeats:
+            typeof c.answerFingerprint === "object"
+              ? (c.answerFingerprint.repeats ?? DEFAULT_FINGERPRINT_REPEATS)
+              : DEFAULT_FINGERPRINT_REPEATS,
+        }
+      : null,
   };
 }
 

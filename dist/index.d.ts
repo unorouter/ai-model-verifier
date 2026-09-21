@@ -21,6 +21,11 @@ export { PROBES, PROBE_SIGNALS } from "./probes/table";
 export { SURVEY } from "./probes/survey";
 export type { SurveyDef } from "./probes/survey";
 export type { SurveyOutcome } from "./engine/survey-runner";
+export { FINGERPRINT_CELLS, classifyAnswer, stripThink, } from "./probes/answer-fingerprint";
+export type { FingerprintCell, FingerprintLabel, AnswerClass, } from "./probes/answer-fingerprint";
+export type { FingerprintSample, FingerprintCellSample, } from "./engine/answer-fingerprint-runner";
+export { compareFingerprints, compareToProfiles, fingerprintClusters, jensenShannon, mergeFingerprints, } from "./rules/answer-fingerprint";
+export type { CompareOptions, CompareResult, CompareVerdict, ProfileVerdict, } from "./rules/answer-fingerprint";
 export type { TransportFn, TransportArgs, TransportResult } from "./transport";
 export { directTransport, browserTransport } from "./transport";
 //# sourceMappingURL=index.d.ts.map

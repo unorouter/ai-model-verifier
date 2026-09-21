@@ -18,7 +18,14 @@ function chat(req, ctx) {
             "content-type": "application/json",
             authorization: `Bearer ${ctx.apiKey}`,
         },
-        body: { model: req.model, ...limit, messages: req.messages },
+        body: {
+            model: req.model,
+            ...limit,
+            messages: req.messages,
+            ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
+            ...(req.topP !== undefined ? { top_p: req.topP } : {}),
+            ...(req.seed !== undefined ? { seed: req.seed } : {}),
+        },
     };
 }
 function text(data) {

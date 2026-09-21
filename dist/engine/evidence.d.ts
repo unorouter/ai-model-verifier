@@ -2,9 +2,12 @@ import type { TransportResult } from "../transport";
 import { type RunCtx } from "./context";
 import { type ProbeEval } from "./probe-runner";
 import { type SurveyOutcome } from "./survey-runner";
+import { type FingerprintSample } from "./answer-fingerprint-runner";
 export type FixedTextEvidence = {
     short: TransportResult;
     long: TransportResult;
+    /** The script-mixed text every vocabulary splits differently. */
+    diverse: TransportResult;
 };
 export type ThinkingReplyEvidence = {
     res: TransportResult;
@@ -20,6 +23,8 @@ export type EvidenceBag = {
     probes: ProbeEval[];
     /** The survey answers, recorded as they came. */
     survey: SurveyOutcome[];
+    /** One-word answer counts at temperature 1, for a caller to accumulate. */
+    answerFingerprint: FingerprintSample;
     fixedText: FixedTextEvidence;
     /** null when the wire has no count endpoint or the short reply had no usage. */
     countTokens: TransportResult | null;
@@ -30,10 +35,11 @@ export type EvidenceBag = {
 };
 export type EvidenceKey = keyof EvidenceBag;
 /** Collection order when several keys are needed: probes first, then the extras. */
-export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "thinkingReply", "fixedText", "countTokens", "floorReply"];
+export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "answerFingerprint", "thinkingReply", "fixedText", "countTokens", "floorReply"];
 export declare class EvidenceStore {
     private readonly probes;
     private readonly survey;
+    private readonly answerFingerprint;
     private readonly fixedText;
     private readonly countTokens;
     private readonly thinkingReply;
