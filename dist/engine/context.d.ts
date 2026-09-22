@@ -18,9 +18,11 @@ export type ResolvedChecks = {
     survey: boolean;
     answerFingerprint: {
         repeats: number;
+        concurrency: number;
     } | null;
 };
 export declare const DEFAULT_FINGERPRINT_REPEATS = 3;
+export declare const DEFAULT_FINGERPRINT_CONCURRENCY = 4;
 export declare function resolveChecks(checks: Checks | undefined): ResolvedChecks;
 /** Everything a rule may read about the run. */
 export type RunCtx<V extends string = string, M extends string = string> = {

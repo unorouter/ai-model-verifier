@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.5.0
+
+- The answer fingerprint keeps `checks.answerFingerprint.concurrency` calls in
+  flight per lane (default 4) instead of running all 24 in a row: on a
+  reasoning model the sequential battery took a median of 105 s and up to
+  460 s per lane, four times the rest of the ladder. `concurrency: 1` restores
+  the old pacing.
+
 ## 3.4.0
 
 - Answer fingerprint (`answer-fingerprint`, note layer, `checks.answerFingerprint`

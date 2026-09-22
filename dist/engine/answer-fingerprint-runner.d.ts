@@ -26,8 +26,8 @@ export type FingerprintSample = {
 };
 export declare const emptyCell: () => FingerprintCellSample;
 /**
- * Every call sequential: the marketplaces throttle per account and the
- * caller's pacing may not know this host. Lanes run in parallel elsewhere.
+ * A few calls in flight per lane: 24 in a row cost minutes on a thinker, and a
+ * marketplace throttles per merchant, so never all of them at once.
  */
 export declare function collectAnswerFingerprint(ctx: RunCtx): Promise<FingerprintSample>;
 //# sourceMappingURL=answer-fingerprint-runner.d.ts.map

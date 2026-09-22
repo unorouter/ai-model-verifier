@@ -1,5 +1,6 @@
 import { isRecord } from "../internal/utils";
 export const DEFAULT_FINGERPRINT_REPEATS = 3;
+export const DEFAULT_FINGERPRINT_CONCURRENCY = 4;
 export function resolveChecks(checks) {
     const c = checks ?? {};
     return {
@@ -29,6 +30,10 @@ export function resolveChecks(checks) {
                 repeats: typeof c.answerFingerprint === "object"
                     ? (c.answerFingerprint.repeats ?? DEFAULT_FINGERPRINT_REPEATS)
                     : DEFAULT_FINGERPRINT_REPEATS,
+                concurrency: typeof c.answerFingerprint === "object"
+                    ? (c.answerFingerprint.concurrency ??
+                        DEFAULT_FINGERPRINT_CONCURRENCY)
+                    : DEFAULT_FINGERPRINT_CONCURRENCY,
             }
             : null,
     };

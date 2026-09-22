@@ -836,10 +836,10 @@ describe("answer fingerprint", () => {
     expect(compareToProfiles(wide, [{ name: "official", sample: other }]).verdict).toBe("novel");
   });
 
-  test("runRules asks every cell `repeats` times, sequentially, and reports counts without a finding", async () => {
+  test("runRules asks every cell `repeats` times, at most 4 at once, and reports counts without a finding", async () => {
     const calls: string[] = [];
     let inFlight = 0;
-    let overlap = false;
+    let maxInFlight = 0;
     const inner = anthropicWire({
       answer: (p) => {
         const c = cellOf(p);
@@ -852,7 +852,7 @@ describe("answer fingerprint", () => {
       const c = cellOf(promptOf(bodyOf(a)));
       if (c) {
         inFlight++;
-        if (inFlight > 1) overlap = true;
+        maxInFlight = Math.max(maxInFlight, inFlight);
         calls.push(c);
         const r = await inner(a);
         inFlight--;
@@ -870,7 +870,8 @@ describe("answer fingerprint", () => {
     });
     expect(run.findings).toEqual([]);
     expect(calls.length).toBe(24);
-    expect(overlap).toBe(false);
+    expect(maxInFlight).toBeGreaterThan(1);
+    expect(maxInFlight).toBeLessThanOrEqual(4);
     const fp = run.reports.answerFingerprint!;
     expect(fp.calls).toBe(24);
     // Replies 2, 3 and 4 of each list: "42", "seven", "Sure, 17.".

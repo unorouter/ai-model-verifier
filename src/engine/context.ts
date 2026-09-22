@@ -17,10 +17,11 @@ export type ResolvedChecks = {
   thinkingFloor: { minCompletionTokens: number | null } | null;
   tokenizerFingerprint: { signatures: TierSignatures | undefined } | null;
   survey: boolean;
-  answerFingerprint: { repeats: number } | null;
+  answerFingerprint: { repeats: number; concurrency: number } | null;
 };
 
 export const DEFAULT_FINGERPRINT_REPEATS = 3;
+export const DEFAULT_FINGERPRINT_CONCURRENCY = 4;
 
 export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
   const c = checks ?? {};
@@ -55,6 +56,11 @@ export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
             typeof c.answerFingerprint === "object"
               ? (c.answerFingerprint.repeats ?? DEFAULT_FINGERPRINT_REPEATS)
               : DEFAULT_FINGERPRINT_REPEATS,
+          concurrency:
+            typeof c.answerFingerprint === "object"
+              ? (c.answerFingerprint.concurrency ??
+                DEFAULT_FINGERPRINT_CONCURRENCY)
+              : DEFAULT_FINGERPRINT_CONCURRENCY,
         }
       : null,
   };

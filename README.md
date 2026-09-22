@@ -112,7 +112,8 @@ survey.
 The answer fingerprint (`answer-fingerprint`, opt-in via `checks.answerFingerprint` or `only`)
 asks eight one-word questions at temperature 1 (a random number, a colour, a letter, a city, a
 coin flip, an animal, a favourite number, a fruit), `repeats` times each (default 3, 24 calls of
-32 output tokens), and reports the answer counts per cell. One run says nothing; the answer
+32 output tokens, `concurrency` of them in flight, default 4), and reports the answer counts per
+cell. One run says nothing; the answer
 distribution of a model is specific to it once a cell holds 10 or more valid answers (the
 method of arXiv 2607.10252), so a caller merges runs over days with `mergeFingerprints` and
 compares a lane against the profiles it trusts with `compareFingerprints` (Jensen-Shannon

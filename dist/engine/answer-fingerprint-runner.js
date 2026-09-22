@@ -43,41 +43,52 @@ async function askOnce(ctx, cell) {
     return { text, detectedModel };
 }
 /**
- * Every call sequential: the marketplaces throttle per account and the
- * caller's pacing may not know this host. Lanes run in parallel elsewhere.
+ * A few calls in flight per lane: 24 in a row cost minutes on a thinker, and a
+ * marketplace throttles per merchant, so never all of them at once.
  */
 export async function collectAnswerFingerprint(ctx) {
     const started = performance.now();
     const repeats = ctx.checks.answerFingerprint?.repeats ?? 0;
+    const width = Math.max(1, ctx.checks.answerFingerprint?.concurrency ?? 1);
+    const jobs = FINGERPRINT_CELLS.flatMap((cell) => Array.from({ length: repeats }, () => cell));
+    const replies = [];
+    let next = 0;
+    const worker = async () => {
+        for (let i = next++; i < jobs.length; i = next++) {
+            const cell = jobs[i];
+            if (cell)
+                replies[i] = await askOnce(ctx, cell);
+        }
+    };
+    await Promise.all(Array.from({ length: Math.min(width, jobs.length) }, worker));
     const cells = {};
+    for (const cell of FINGERPRINT_CELLS)
+        cells[cell.label] = emptyCell();
     const raw = [];
     let detectedModel = null;
-    let calls = 0;
-    for (const cell of FINGERPRINT_CELLS) {
-        const c = emptyCell();
-        for (let i = 0; i < repeats; i++) {
-            const r = await askOnce(ctx, cell);
-            calls++;
-            detectedModel ??= r.detectedModel;
-            raw.push({
-                cell: cell.label,
-                text: r.text === null ? null : r.text.slice(0, RAW_CAP),
-                ...(r.error !== undefined ? { error: r.error } : {}),
-            });
-            if (r.error !== undefined) {
-                c.errors++;
-                continue;
-            }
-            const { answer, cls } = classifyAnswer(r.text, cell);
-            c[cls]++;
-            if (answer !== null)
-                c.answers[answer] = (c.answers[answer] ?? 0) + 1;
+    for (const [i, cell] of jobs.entries()) {
+        const r = replies[i];
+        const c = cells[cell.label];
+        if (!r || !c)
+            continue;
+        detectedModel ??= r.detectedModel;
+        raw.push({
+            cell: cell.label,
+            text: r.text === null ? null : r.text.slice(0, RAW_CAP),
+            ...(r.error !== undefined ? { error: r.error } : {}),
+        });
+        if (r.error !== undefined) {
+            c.errors++;
+            continue;
         }
-        cells[cell.label] = c;
+        const { answer, cls } = classifyAnswer(r.text, cell);
+        c[cls]++;
+        if (answer !== null)
+            c.answers[answer] = (c.answers[answer] ?? 0) + 1;
     }
     return {
         cells,
-        calls,
+        calls: jobs.length,
         temperature: TEMPERATURE,
         raw,
         detectedModel,

@@ -55,9 +55,10 @@ export type Checks = {
     };
     /** Ask the survey questions and report the answers; never a verdict. */
     survey?: boolean;
-    /** The one-word answer battery at temperature 1, `repeats` per cell (default 3); never a verdict. */
+    /** The one-word answer battery at temperature 1, `repeats` per cell (default 3), `concurrency` calls in flight (default 4); never a verdict. */
     answerFingerprint?: boolean | {
         repeats?: number;
+        concurrency?: number;
     };
 };
 export type VerifyOptions<V extends string = VendorId> = {

@@ -1,6 +1,6 @@
 {
   "name": "ai-model-verifier",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "Verify an AI API endpoint really serves the model it claims: a vendor adapter per wire, a maker table for who trained what, a rule table over shared evidence, and per model facts. Model substitution, Claude thinking signatures, token billing accuracy, envelope and throughput evidence.",
   "license": "AGPL-3.0-only",
   "type": "module",
