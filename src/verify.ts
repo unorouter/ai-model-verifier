@@ -153,6 +153,9 @@ const publicProbe = (p: ProbeEval): ProbeOutcome => ({
   usage: p.usage,
   detectedModel: p.detectedModel,
   reason: p.reason,
+  finishReason: p.finishReason,
+  reasoning: p.reasoning,
+  errorBody: p.errorBody,
 });
 
 function sumUsage(usages: (ProbeUsage | null)[]): ProbeUsage | null {

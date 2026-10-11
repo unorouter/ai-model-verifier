@@ -1,7 +1,9 @@
 import { echoesNonce } from "../probes/prompts";
 import { SURVEY, stripNonce, } from "../probes/survey";
 import { buildChat, callWire } from "./context";
+import { errorBodyOf } from "./probe-runner";
 const ANSWER_CAP = 2000;
+const capThought = (t) => t === null ? null : t.length > ANSWER_CAP ? `${t.slice(0, ANSWER_CAP)}...` : t;
 async function ask(ctx, q) {
     const started = performance.now();
     const nonce = ctx.nonce();
@@ -23,7 +25,10 @@ async function ask(ctx, q) {
         latencyMs,
         usage: null,
         reasoning: null,
+        thought: null,
         detectedModel: null,
+        finishReason: null,
+        errorBody: null,
     };
     const log = (pass, responseText, error) => ctx.onProbe?.({
         label: q.label,
@@ -37,7 +42,7 @@ async function ask(ctx, q) {
     if (res.error !== null || res.status === null || res.status >= 400) {
         const error = res.error ?? `HTTP ${res.status}`;
         log(false, null, error);
-        return { ...empty, error };
+        return { ...empty, error, errorBody: errorBodyOf(res.data) };
     }
     const text = ctx.wire.read.text(res.data);
     const meta = ctx.wire.read.meta(res.data);
@@ -48,6 +53,7 @@ async function ask(ctx, q) {
             usage: meta.usage,
             detectedModel: meta.detectedModel,
             error: "upstream error envelope",
+            errorBody: errorBodyOf(res.data),
         };
     }
     const answer = stripNonce(text, nonce);
@@ -61,7 +67,9 @@ async function ask(ctx, q) {
         correct,
         usage: meta.usage,
         reasoning: ctx.wire.read.reasoningUsage?.(res.data) ?? null,
+        thought: capThought(ctx.wire.read.reasoningText?.(res.data) ?? null),
         detectedModel: meta.detectedModel,
+        finishReason: meta.finishReason,
         error: null,
     };
 }

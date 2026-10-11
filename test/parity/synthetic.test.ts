@@ -719,6 +719,7 @@ describe("survey", () => {
           if (p.includes("47 times 83")) return `[${n}] 3882`;
           if (p.includes("JSON")) return `[${n}] {"maker": "anthropic", "model": "claude"}`;
           if (p.includes("one sentence")) return `[${n}] i am claude, trained by anthropic, answering through a relay`;
+          if (p.includes("Tiananmen")) return `[${n}] the government suppressed pro-democracy protests by force.`;
           return undefined;
         },
       }),
@@ -734,6 +735,7 @@ describe("survey", () => {
       "arithmetic",
       "json",
       "self",
+      "sensitive",
       "system-prompt",
     ]);
     expect(byLabel["self"]?.nonced).toBe(true);
@@ -741,7 +743,7 @@ describe("survey", () => {
     expect(byLabel["arithmetic"]?.correct).toBe(true);
     expect(byLabel["json"]?.correct).toBe(true);
     expect(byLabel["system-prompt"]?.answer).toBe("none");
-    expect(asked.length).toBe(4);
+    expect(asked.length).toBe(5);
   });
 
   test("verify asks no survey question unless the check is on", async () => {
@@ -768,7 +770,7 @@ describe("survey", () => {
     });
     expect(prompts.some((p) => p.includes("word for word"))).toBe(true);
     expect(r.verdict).toBe("genuine");
-    expect(r.survey?.length).toBe(4);
+    expect(r.survey?.length).toBe(5);
   });
 
   test("wrapper-leak notes a replayed IDE system prompt, think-leak a reasoning tag", async () => {

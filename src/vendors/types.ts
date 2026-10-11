@@ -53,6 +53,8 @@ export type BuiltRequest = {
 export type ProbeMeta = {
   detectedModel: string | null;
   usage: ProbeUsage | null;
+  /** Why generation stopped, as the wire spells it (`stop`, `length`, `end_turn`, `STOP`). */
+  finishReason: string | null;
 };
 
 export type ThinkingBlockRead = {

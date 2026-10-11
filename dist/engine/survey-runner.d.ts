@@ -18,8 +18,14 @@ export type SurveyOutcome = {
     usage: ProbeUsage | null;
     /** Hidden and visible output counts when the wire reports them. */
     reasoning: ReasoningUsage | null;
+    /** Visible reasoning text, lowercased and capped; null when none came. */
+    thought: string | null;
     detectedModel: string | null;
     error: string | null;
+    /** Why generation stopped, as the wire spells it; null with no answer. */
+    finishReason: string | null;
+    /** The error body of a refused request, capped; null when it answered. */
+    errorBody: string | null;
 };
 export declare function collectSurvey(ctx: RunCtx): Promise<SurveyOutcome[]>;
 //# sourceMappingURL=survey-runner.d.ts.map

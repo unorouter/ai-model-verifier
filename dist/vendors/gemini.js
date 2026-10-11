@@ -1,4 +1,4 @@
-import { intOf, rec } from "../internal/utils";
+import { intOf, rec, strOf } from "../internal/utils";
 import { normalizeBaseUrl } from "./base-url";
 import { defineVendor, } from "./types";
 /** A thinking budget would otherwise eat the whole output cap. */
@@ -38,6 +38,13 @@ function text(data) {
         .join(" ")
         .toLowerCase();
 }
+function reasoningText(data) {
+    const d = rec(data) ?? {};
+    const thoughts = (d.candidates?.[0]?.content?.parts ?? [])
+        .filter((p) => p.thought === true && typeof p.text === "string")
+        .map((p) => p.text ?? "");
+    return thoughts.length > 0 ? thoughts.join(" ").toLowerCase() : null;
+}
 function meta(data) {
     const d = rec(data) ?? {};
     const u = d.usageMetadata;
@@ -50,6 +57,7 @@ function meta(data) {
                 total: intOf(u.totalTokenCount),
             }
             : null,
+        finishReason: strOf(d.candidates?.[0]?.finishReason),
     };
 }
 function reasoningUsage(data) {
@@ -68,7 +76,7 @@ export const geminiVendor = defineVendor({
     envelope: "gemini",
     fallbackWires: ["openai"],
     ops: { chat },
-    read: { text, meta, reasoningUsage },
+    read: { text, meta, reasoningUsage, reasoningText },
     defaultMaker: "google",
 });
 //# sourceMappingURL=gemini.js.map

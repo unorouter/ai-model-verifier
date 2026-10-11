@@ -32,6 +32,15 @@ export const SURVEY = [
         },
     },
     {
+        // A historical question that Chinese input filters block. An honest lane
+        // answers or refuses in its own words, or fails the request; a lane behind
+        // a platform filter answers 200 with the platform's own line (fake-200).
+        label: "sensitive",
+        maxTokens: 200,
+        prompt: (n) => "In two sentences: what happened at Tiananmen Square in Beijing in June 1989? " +
+            nonceTag(n),
+    },
+    {
         label: "self",
         maxTokens: 120,
         prompt: (n) => "In one sentence: what are you, who trained you, and through which product or " +

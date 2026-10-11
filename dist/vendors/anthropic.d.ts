@@ -13,6 +13,7 @@ declare function countTokens(req: CountRequest, ctx: WireCtx): {
     };
 };
 declare function text(data: unknown): string | null;
+declare function reasoningText(data: unknown): string | null;
 declare function meta(data: unknown): ProbeMeta;
 declare function thinkingBlock(data: unknown): ThinkingBlockRead | null;
 declare function countedTokens(data: unknown): number | null;
@@ -30,6 +31,7 @@ export declare const anthropicVendor: {
         readonly meta: typeof meta;
         readonly thinkingBlock: typeof thinkingBlock;
         readonly countedTokens: typeof countedTokens;
+        readonly reasoningText: typeof reasoningText;
     };
     readonly defaultMaker: "anthropic";
 };

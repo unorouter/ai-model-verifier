@@ -24,6 +24,7 @@ declare function chat(req: ChatRequest, ctx: WireCtx): {
     };
 };
 declare function text(data: unknown): string | null;
+declare function reasoningText(data: unknown): string | null;
 declare function meta(data: unknown): ProbeMeta;
 declare function reasoningUsage(data: unknown): ReasoningUsage | null;
 export declare const openaiVendor: {
@@ -38,6 +39,7 @@ export declare const openaiVendor: {
         readonly text: typeof text;
         readonly meta: typeof meta;
         readonly reasoningUsage: typeof reasoningUsage;
+        readonly reasoningText: typeof reasoningText;
     };
     readonly defaultMaker: "openai";
 };

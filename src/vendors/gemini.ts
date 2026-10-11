@@ -1,4 +1,4 @@
-import { intOf, rec } from "../internal/utils";
+import { intOf, rec, strOf } from "../internal/utils";
 import { normalizeBaseUrl } from "./base-url";
 import {
   defineVendor,
@@ -12,6 +12,7 @@ type GeminiResponse = {
   error?: unknown;
   modelVersion?: string;
   candidates?: Array<{
+    finishReason?: unknown;
     content?: { parts?: Array<{ text?: string; thought?: boolean }> };
   }>;
   usageMetadata?: {
@@ -81,6 +82,7 @@ function meta(data: unknown): ProbeMeta {
           total: intOf(u.totalTokenCount),
         }
       : null,
+    finishReason: strOf(d.candidates?.[0]?.finishReason),
   };
 }
 

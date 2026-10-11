@@ -1,4 +1,4 @@
-import { intOf, rec } from "../internal/utils";
+import { intOf, rec, strOf } from "../internal/utils";
 import { normalizeBaseUrl } from "./base-url";
 import {
   defineVendor,
@@ -12,6 +12,7 @@ type OpenAIChatResponse = {
   error?: unknown;
   model?: string;
   choices?: Array<{
+    finish_reason?: unknown;
     message?: {
       content?: string | Array<{ type?: string; text?: string }> | null;
       reasoning_content?: unknown;
@@ -97,6 +98,7 @@ function meta(data: unknown): ProbeMeta {
           total: intOf(u.total_tokens),
         }
       : null,
+    finishReason: strOf(d.choices?.[0]?.finish_reason),
   };
 }
 

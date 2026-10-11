@@ -4,5 +4,6 @@ export declare function errMessage(err: unknown): string;
 export declare function sleep(ms: number): Promise<void>;
 /** Rejects booleans and floats: usage counts are whole tokens or nothing. */
 export declare function intOf(v: unknown): number | null;
+export declare function strOf(v: unknown): string | null;
 export declare function hostOf(url: string): string;
 //# sourceMappingURL=utils.d.ts.map

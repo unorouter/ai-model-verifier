@@ -14,6 +14,9 @@ export function sleep(ms) {
 export function intOf(v) {
     return typeof v === "number" && Number.isInteger(v) && v >= 0 ? v : null;
 }
+export function strOf(v) {
+    return typeof v === "string" && v !== "" ? v : null;
+}
 export function hostOf(url) {
     try {
         return new URL(url).host;

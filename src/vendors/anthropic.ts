@@ -1,4 +1,4 @@
-import { intOf, rec } from "../internal/utils";
+import { intOf, rec, strOf } from "../internal/utils";
 import { normalizeBaseUrl } from "./base-url";
 import {
   defineVendor,
@@ -20,6 +20,7 @@ type AnthropicResponse = {
   type?: string;
   model?: string;
   content?: unknown;
+  stop_reason?: unknown;
   usage?: { input_tokens?: unknown; output_tokens?: unknown };
   input_tokens?: unknown;
 };
@@ -113,6 +114,7 @@ function meta(data: unknown): ProbeMeta {
             prompt !== null && completion !== null ? prompt + completion : null,
         }
       : null,
+    finishReason: strOf(d.stop_reason),
   };
 }
 

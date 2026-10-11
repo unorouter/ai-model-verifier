@@ -188,6 +188,7 @@ export declare const MAKERS: readonly [{
     readonly models: readonly ["*nemotron*", "*riva-*"];
     readonly home: readonly ["nvidia"];
     readonly modelNames: readonly ["nemotron"];
+    readonly selfConfusions: readonly ["openai", "gpt", "chatgpt"];
     readonly acceptsCloudHost: false;
     readonly tiers: null;
     readonly cjkNative: false;

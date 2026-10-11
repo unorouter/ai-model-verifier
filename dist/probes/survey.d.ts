@@ -27,6 +27,10 @@ export declare const SURVEY: readonly [{
     readonly prompt: (n: string) => string;
     readonly correct: (answer: string) => boolean;
 }, {
+    readonly label: "sensitive";
+    readonly maxTokens: 200;
+    readonly prompt: (n: string) => string;
+}, {
     readonly label: "self";
     readonly maxTokens: 120;
     readonly prompt: (n: string) => string;

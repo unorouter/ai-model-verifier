@@ -39,6 +39,22 @@ export const MODEL_FACTS = [
     // The pro tiers cannot switch thinking off; a pro that answers "ok" with no
     // hidden tokens is a flash (or worse) behind the label.
     { match: ["gemini-2-5-pro*", "gemini-3-pro*", "gemini-3-1-pro*"], alwaysThinks: true },
+    // Thought on essentially every honest route in 3 weeks of survey replies
+    // (glm-5.3 and -flash 84/84 on our own lanes, kimi 12/13, deepseek-v4-pro and
+    // v4.1-flash 8/10, qwen3.8-flash 2/2). Left out because their own routes often
+    // answer without thought: deepseek-v4-flash (6/76), glm-5.2, minimax, mimo.
+    {
+        match: [
+            "glm-5-3*",
+            "kimi-k2-6*",
+            "kimi-k2-7*",
+            "kimi-k3*",
+            "deepseek-v4-pro*",
+            "deepseek-v4-1-flash*",
+            "qwen3-8-flash*",
+        ],
+        alwaysThinks: true,
+    },
     // Gemini thinks before it answers over the OpenAI wire too, and a 60 token
     // cap left a few characters of visible reply on the order book sellers.
     { match: ["gemini-2-5*", "gemini-3*"], minOutputTokens: 2000 },

@@ -7,6 +7,7 @@ import {
 } from "../probes/survey";
 import type { ProbeUsage, ReasoningUsage } from "../vendors/types";
 import { buildChat, callWire, type RunCtx } from "./context";
+import { errorBodyOf } from "./probe-runner";
 
 const ANSWER_CAP = 2000;
 
@@ -34,6 +35,10 @@ export type SurveyOutcome = {
   thought: string | null;
   detectedModel: string | null;
   error: string | null;
+  /** Why generation stopped, as the wire spells it; null with no answer. */
+  finishReason: string | null;
+  /** The error body of a refused request, capped; null when it answered. */
+  errorBody: string | null;
 };
 
 async function ask(
@@ -62,6 +67,8 @@ async function ask(
     reasoning: null,
     thought: null,
     detectedModel: null,
+    finishReason: null,
+    errorBody: null,
   };
   const log = (pass: boolean, responseText: string | null, error?: string) =>
     ctx.onProbe?.({
@@ -76,7 +83,7 @@ async function ask(
   if (res.error !== null || res.status === null || res.status >= 400) {
     const error = res.error ?? `HTTP ${res.status}`;
     log(false, null, error);
-    return { ...empty, error };
+    return { ...empty, error, errorBody: errorBodyOf(res.data) };
   }
   const text = ctx.wire.read.text(res.data);
   const meta = ctx.wire.read.meta(res.data);
@@ -87,6 +94,7 @@ async function ask(
       usage: meta.usage,
       detectedModel: meta.detectedModel,
       error: "upstream error envelope",
+      errorBody: errorBodyOf(res.data),
     };
   }
   const answer = stripNonce(text, nonce);
@@ -102,6 +110,7 @@ async function ask(
     reasoning: ctx.wire.read.reasoningUsage?.(res.data) ?? null,
     thought: capThought(ctx.wire.read.reasoningText?.(res.data) ?? null),
     detectedModel: meta.detectedModel,
+    finishReason: meta.finishReason,
     error: null,
   };
 }

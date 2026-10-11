@@ -24,6 +24,7 @@ export declare const VENDORS: readonly [{
         readonly meta: (data: unknown) => import("./types").ProbeMeta;
         readonly thinkingBlock: (data: unknown) => import("./types").ThinkingBlockRead | null;
         readonly countedTokens: (data: unknown) => number | null;
+        readonly reasoningText: (data: unknown) => string | null;
     };
     readonly defaultMaker: "anthropic";
 }, {
@@ -61,6 +62,7 @@ export declare const VENDORS: readonly [{
         readonly text: (data: unknown) => string | null;
         readonly meta: (data: unknown) => import("./types").ProbeMeta;
         readonly reasoningUsage: (data: unknown) => import("./types").ReasoningUsage | null;
+        readonly reasoningText: (data: unknown) => string | null;
     };
     readonly defaultMaker: "openai";
 }, {
@@ -93,6 +95,7 @@ export declare const VENDORS: readonly [{
         readonly text: (data: unknown) => string | null;
         readonly meta: (data: unknown) => import("./types").ProbeMeta;
         readonly reasoningUsage: (data: unknown) => import("./types").ReasoningUsage | null;
+        readonly reasoningText: (data: unknown) => string | null;
     };
     readonly defaultMaker: "google";
 }];

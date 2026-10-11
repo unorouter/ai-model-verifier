@@ -1,4 +1,4 @@
-import { intOf, rec } from "../internal/utils";
+import { intOf, rec, strOf } from "../internal/utils";
 import { normalizeBaseUrl } from "./base-url";
 import { defineVendor, } from "./types";
 function chat(req, ctx) {
@@ -43,6 +43,23 @@ function text(data) {
             .toLowerCase();
     return null;
 }
+// Relays spell visible reasoning three ways: DeepSeek's reasoning_content,
+// OpenRouter's reasoning string, and its reasoning_details array.
+function reasoningText(data) {
+    const d = rec(data) ?? {};
+    const m = d.choices?.[0]?.message;
+    if (!m)
+        return null;
+    const parts = [];
+    for (const v of [m.reasoning_content, m.reasoning])
+        if (typeof v === "string" && v.trim())
+            parts.push(v);
+    for (const r of m.reasoning_details ?? [])
+        for (const v of [r?.text, r?.summary])
+            if (typeof v === "string" && v.trim())
+                parts.push(v);
+    return parts.length > 0 ? parts.join(" ").toLowerCase() : null;
+}
 function meta(data) {
     const d = rec(data) ?? {};
     const u = d.usage;
@@ -55,6 +72,7 @@ function meta(data) {
                 total: intOf(u.total_tokens),
             }
             : null,
+        finishReason: strOf(d.choices?.[0]?.finish_reason),
     };
 }
 function reasoningUsage(data) {
@@ -74,7 +92,7 @@ export const openaiVendor = defineVendor({
     envelope: "openai",
     fallbackWires: [],
     ops: { chat },
-    read: { text, meta, reasoningUsage },
+    read: { text, meta, reasoningUsage, reasoningText },
     defaultMaker: "openai",
 });
 //# sourceMappingURL=openai.js.map

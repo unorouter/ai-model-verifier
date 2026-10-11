@@ -17,6 +17,15 @@ const RESPONSE_CAP = 2000;
 const cap = (text: string) =>
   text.length > RESPONSE_CAP ? `${text.slice(0, RESPONSE_CAP)}...` : text;
 
+const ERROR_BODY_CAP = 500;
+
+/** A refused request's body as text, for reading why it was refused. */
+export function errorBodyOf(data: unknown): string | null {
+  if (data === null || data === undefined) return null;
+  const s = typeof data === "string" ? data : JSON.stringify(data);
+  return s.length > ERROR_BODY_CAP ? `${s.slice(0, ERROR_BODY_CAP)}...` : s;
+}
+
 /** A probe's outcome plus what the rules need but the result never carries. */
 export type ProbeEval = ProbeOutcome & {
   text: string | undefined;
@@ -55,6 +64,9 @@ async function runProbe(
     detectedModel: null,
     responseText: null,
     httpStatus: null,
+    finishReason: null,
+    reasoning: null,
+    errorBody: null,
     text: undefined,
     raw: null,
     corsBlocked: false,
@@ -102,6 +114,7 @@ async function runProbe(
         httpStatus: res.status,
         reason: probeReason(false, null, false, true),
         corsBlocked: res.corsBlocked,
+        errorBody: errorBodyOf(res.data),
         raw: res.data,
       };
     }
@@ -121,6 +134,7 @@ async function runProbe(
         usage: meta.usage,
         detectedModel: meta.detectedModel,
         reason: "upstream error envelope",
+        errorBody: errorBodyOf(res.data),
         raw: res.data,
       };
     }
@@ -150,6 +164,8 @@ async function runProbe(
       httpStatus: res.status,
       usage: meta.usage,
       detectedModel: meta.detectedModel,
+      finishReason: meta.finishReason,
+      reasoning: ctx.wire.read.reasoningUsage?.(res.data) ?? null,
       reason: probeReason(pass, signal, false, false),
       text,
       raw: res.data,
@@ -173,6 +189,8 @@ async function runProbe(
       httpStatus: weak.status,
       usage: meta.usage,
       detectedModel: meta.detectedModel,
+      finishReason: meta.finishReason,
+      reasoning: ctx.wire.read.reasoningUsage?.(weak.raw) ?? null,
       reason: pass
         ? "passed (no nonce echo)"
         : probeReason(pass, signal, false, false),

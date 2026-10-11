@@ -19,6 +19,10 @@ export function intOf(v: unknown): number | null {
   return typeof v === "number" && Number.isInteger(v) && v >= 0 ? v : null;
 }
 
+export function strOf(v: unknown): string | null {
+  return typeof v === "string" && v !== "" ? v : null;
+}
+
 export function hostOf(url: string): string {
   try {
     return new URL(url).host;

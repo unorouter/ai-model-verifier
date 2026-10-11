@@ -1,5 +1,37 @@
 # Changelog
 
+## 3.7.0
+
+- Every probe and survey reply records `finishReason` (as the wire spells it:
+  `stop`, `length`, `end_turn`, `STOP`) and the probes record `reasoning`
+  (hidden and visible output counts), so a lane that never thinks or that cuts
+  answers short shows up in the probe log, not only in the survey.
+  `ProbeMeta.finishReason` is read on all three wires.
+- A refused request keeps its body (`errorBody`, capped at 500 characters) on
+  probes and survey replies: why it was refused is the evidence, not just the
+  status.
+- Survey question `sensitive`: a historical question that Chinese input filters
+  block.
+- `fake-200` (evidence, runs with the survey): a platform refusal or a
+  reseller's error page delivered as the reply at HTTP 200. Over three weeks of
+  stored runs it matched 4 lanes, all real ("[req_...] **ai provider
+  temporarily unavailable**"), and nothing else.
+- `mask-contradiction` (note): the instruction replay assigns another maker's
+  identity. A note because those replays were single runs in 20 to 57, a model
+  reciting a remembered prompt.
+- `alwaysThinks` for glm-5.3, kimi-k2.6, k2.7 and k3, deepseek-v4-pro,
+  deepseek-v4.1-flash and qwen3.8-flash, from survey replies on their honest
+  routes; deepseek-v4-flash, glm-5.2, minimax and mimo answered without thought
+  there and stay out.
+- NVIDIA carries `selfConfusions` openai, gpt, chatgpt: Nemotron replays "you
+  are chatgpt" on NVIDIA's own NIM accounts.
+
+## 3.6.0
+
+- `masked-identity` (evidence): the probes' reasoning (and any reasoning leaked
+  into the content) restates an instruction to hide the backend.
+- Reasoning text is read on every wire (`read.reasoningText`).
+
 ## 3.5.0
 
 - The answer fingerprint keeps `checks.answerFingerprint.concurrency` calls in

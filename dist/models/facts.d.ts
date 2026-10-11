@@ -42,6 +42,9 @@ export declare const MODEL_FACTS: readonly [{
     readonly match: readonly ["gemini-2-5-pro*", "gemini-3-pro*", "gemini-3-1-pro*"];
     readonly alwaysThinks: true;
 }, {
+    readonly match: readonly ["glm-5-3*", "kimi-k2-6*", "kimi-k2-7*", "kimi-k3*", "deepseek-v4-pro*", "deepseek-v4-1-flash*", "qwen3-8-flash*"];
+    readonly alwaysThinks: true;
+}, {
     readonly match: readonly ["gemini-2-5*", "gemini-3*"];
     readonly minOutputTokens: 2000;
 }, {

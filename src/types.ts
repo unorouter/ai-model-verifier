@@ -6,7 +6,7 @@ import type { RuleId } from "./rules/table";
 import type { TransportFn, TransportMode } from "./transport";
 import type { MakerId } from "./makers/table";
 import type { VendorId } from "./vendors/table";
-import type { BuiltRequest, ProbeUsage } from "./vendors/types";
+import type { BuiltRequest, ProbeUsage, ReasoningUsage } from "./vendors/types";
 import type { TierSignatures } from "./rules/tokenizer-fingerprint";
 
 export type {
@@ -35,6 +35,12 @@ export type ProbeOutcome = {
   usage: ProbeUsage | null;
   detectedModel: string | null;
   reason: string | null;
+  /** Why generation stopped, as the wire spells it; null with no answer. */
+  finishReason: string | null;
+  /** Hidden and visible output counts when the wire reports them. */
+  reasoning: ReasoningUsage | null;
+  /** The error body of a refused request, capped; null when it answered. */
+  errorBody: string | null;
 };
 
 /** One request of a probe, survey question or fingerprint cell, including the nonce retries; for a caller's own log. */

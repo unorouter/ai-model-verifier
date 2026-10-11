@@ -7,6 +7,14 @@ const NONCE_MISMATCH_RETRIES = 2;
 const NONCE_MISMATCH_BACKOFF_MS = 500;
 const RESPONSE_CAP = 2000;
 const cap = (text) => text.length > RESPONSE_CAP ? `${text.slice(0, RESPONSE_CAP)}...` : text;
+const ERROR_BODY_CAP = 500;
+/** A refused request's body as text, for reading why it was refused. */
+export function errorBodyOf(data) {
+    if (data === null || data === undefined)
+        return null;
+    const s = typeof data === "string" ? data : JSON.stringify(data);
+    return s.length > ERROR_BODY_CAP ? `${s.slice(0, ERROR_BODY_CAP)}...` : s;
+}
 export function probeReason(pass, signal, muxFailure, transient) {
     if (signal === "coding-tool")
         return "coding-tool wrapper detected";
@@ -37,6 +45,9 @@ async function runProbe(ctx, probe) {
         detectedModel: null,
         responseText: null,
         httpStatus: null,
+        finishReason: null,
+        reasoning: null,
+        errorBody: null,
         text: undefined,
         raw: null,
         corsBlocked: false,
@@ -77,6 +88,7 @@ async function runProbe(ctx, probe) {
                 httpStatus: res.status,
                 reason: probeReason(false, null, false, true),
                 corsBlocked: res.corsBlocked,
+                errorBody: errorBodyOf(res.data),
                 raw: res.data,
             };
         }
@@ -95,6 +107,7 @@ async function runProbe(ctx, probe) {
                 usage: meta.usage,
                 detectedModel: meta.detectedModel,
                 reason: "upstream error envelope",
+                errorBody: errorBodyOf(res.data),
                 raw: res.data,
             };
         }
@@ -117,6 +130,8 @@ async function runProbe(ctx, probe) {
             httpStatus: res.status,
             usage: meta.usage,
             detectedModel: meta.detectedModel,
+            finishReason: meta.finishReason,
+            reasoning: ctx.wire.read.reasoningUsage?.(res.data) ?? null,
             reason: probeReason(pass, signal, false, false),
             text,
             raw: res.data,
@@ -139,6 +154,8 @@ async function runProbe(ctx, probe) {
             httpStatus: weak.status,
             usage: meta.usage,
             detectedModel: meta.detectedModel,
+            finishReason: meta.finishReason,
+            reasoning: ctx.wire.read.reasoningUsage?.(weak.raw) ?? null,
             reason: pass
                 ? "passed (no nonce echo)"
                 : probeReason(pass, signal, false, false),

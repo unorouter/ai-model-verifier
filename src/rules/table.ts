@@ -16,6 +16,8 @@ import { surveyRule } from "./survey";
 import { answerFingerprintRule } from "./answer-fingerprint";
 import { thinkLeakRule } from "./think-leak";
 import { maskedIdentityRule } from "./masked-identity";
+import { maskContradictionRule } from "./mask-contradiction";
+import { fake200Rule } from "./fake-200";
 import { wrapperLeakRule } from "./wrapper-leak";
 import { thinkingFloorRule } from "./thinking-floor";
 import { throughputRule } from "./throughput";
@@ -32,6 +34,7 @@ export const RULES = [
   thinkingFloorRule,
   tokenizerFingerprintRule,
   maskedIdentityRule,
+  fake200Rule,
   codingToolRule,
   scamRule,
   cjkLeakRule,
@@ -47,6 +50,7 @@ export const RULES = [
   throughputRule,
   thinkLeakRule,
   wrapperLeakRule,
+  maskContradictionRule,
   surveyRule,
   answerFingerprintRule,
 ] as const satisfies readonly Rule[];

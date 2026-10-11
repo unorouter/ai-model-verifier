@@ -103,6 +103,12 @@ A disguised model (`masked-identity`) is caught from its own reasoning: the
 wrapper that makes it answer under another name tells it to never mention its
 real maker or the provider behind it, and the reasoning restates that
 instruction even when every identity answer is coached.
+A platform refusal sent as the answer (`fake-200`, runs with the survey) fails
+a lane that replies at HTTP 200 with its filter's own line or the reseller's
+error page instead of the model ("系统检测到您当前输入的信息存在敏感内容", "[req_...] request
+rejected by ai provider"): a gateway bills that as a reply and never fails over.
+The survey's `sensitive` question is the one that trips content filters; a model
+refusing in its own words, or a request that fails outright, is fine.
 
 A model whose id names no maker is judged by the wire's default maker, and a
 model that only says "I am an AI assistant" fails the identity probe, which the
@@ -128,7 +134,10 @@ does not name a version or a quantisation level, and nothing in the literature d
 
 Two more note rules read what the lane leaks about itself: `think-leak` (reasoning returned
 inside the content, which also poisons the identity probes) and `wrapper-leak` (the survey's
-replay of prior instructions matches a known IDE or agent wrapper).
+replay of prior instructions matches a known IDE or agent wrapper). `mask-contradiction`
+notes a replay that assigns another maker's identity ("you are claude" on a glm lane). It is a
+note because a model with no instructions recites a remembered prompt when asked to repeat
+one: every hit in three weeks of runs was a single run in 20 to 57.
 
 A maker may carry `selfConfusions`, names the model habitually gives for itself that are not
 evidence of a swap: DeepSeek answers "openai" or "chatgpt" about half the time on the routes

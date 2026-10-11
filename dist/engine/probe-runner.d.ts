@@ -1,6 +1,8 @@
 import { type ProbeSignal } from "../probes/table";
 import type { ProbeOutcome } from "../types";
 import { type RunCtx } from "./context";
+/** A refused request's body as text, for reading why it was refused. */
+export declare function errorBodyOf(data: unknown): string | null;
 /** A probe's outcome plus what the rules need but the result never carries. */
 export type ProbeEval = ProbeOutcome & {
     text: string | undefined;

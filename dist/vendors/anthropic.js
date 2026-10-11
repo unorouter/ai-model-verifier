@@ -1,4 +1,4 @@
-import { intOf, rec } from "../internal/utils";
+import { intOf, rec, strOf } from "../internal/utils";
 import { normalizeBaseUrl } from "./base-url";
 import { defineVendor, } from "./types";
 // Anthropic refuses a browser preflight unless the caller opts in with this
@@ -65,6 +65,12 @@ function text(data) {
         .join(" ")
         .toLowerCase();
 }
+function reasoningText(data) {
+    const thoughts = blocksOf(data)
+        .filter((b) => b.type === "thinking" && typeof b.thinking === "string")
+        .map((b) => b.thinking ?? "");
+    return thoughts.length > 0 ? thoughts.join(" ").toLowerCase() : null;
+}
 function meta(data) {
     const d = rec(data) ?? {};
     const u = d.usage;
@@ -79,6 +85,7 @@ function meta(data) {
                 total: prompt !== null && completion !== null ? prompt + completion : null,
             }
             : null,
+        finishReason: strOf(d.stop_reason),
     };
 }
 function thinkingBlock(data) {
@@ -103,7 +110,7 @@ export const anthropicVendor = defineVendor({
     envelope: "anthropic",
     fallbackWires: ["openai"],
     ops: { chat, countTokens },
-    read: { text, meta, thinkingBlock, countedTokens },
+    read: { text, meta, thinkingBlock, countedTokens, reasoningText },
     defaultMaker: "anthropic",
 });
 //# sourceMappingURL=anthropic.js.map

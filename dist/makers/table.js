@@ -263,6 +263,9 @@ export const MAKERS = [
         models: ["*nemotron*", "*riva-*"],
         home: ["nvidia"],
         modelNames: ["nemotron"],
+        // Nemotron on NVIDIA's own NIM accounts replays "you are chatgpt" as its
+        // prior instructions (2026-10-11, nvda1 and nvda2): its own confusion.
+        selfConfusions: ["openai", "gpt", "chatgpt"],
         acceptsCloudHost: false,
         tiers: null,
         cjkNative: false,

@@ -44,6 +44,8 @@ export type BuiltRequest = {
 export type ProbeMeta = {
     detectedModel: string | null;
     usage: ProbeUsage | null;
+    /** Why generation stopped, as the wire spells it (`stop`, `length`, `end_turn`, `STOP`). */
+    finishReason: string | null;
 };
 export type ThinkingBlockRead = {
     /** The raw block, for replay. */
@@ -76,6 +78,9 @@ export type VendorAdapter<Id extends string = string> = {
         meta(data: unknown): ProbeMeta;
         thinkingBlock?(data: unknown): ThinkingBlockRead | null;
         reasoningUsage?(data: unknown): ReasoningUsage | null;
+        /** Lowercased visible reasoning (reasoning_content, thinking blocks,
+         *  thought parts); null when the reply carries none. */
+        reasoningText?(data: unknown): string | null;
         countedTokens?(data: unknown): number | null;
     };
     /** Maker whose vocabulary judges a model the facts table does not know. */
