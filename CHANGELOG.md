@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.7.1
+
+- `modelsMatch` also tolerates a relay's route tag on the requested id
+  (`[free]deepseek-v4.1-flash` against `deepseek-ai/deepseek-v4.1-flash`) and
+  Kimi spelled without its `k` (`kimi-k2.7-code` against `kimi-2.7`, echoed by
+  seven a7 lanes). Every other substitution seen in three weeks of runs still
+  mismatches (SenseNova, MiniMax, `auto` and `codely-basic` behind deepseek,
+  qwen and glm names; `gpt-oss-20b` behind `gpt-5-mini`).
+
 ## 3.7.0
 
 - Every probe and survey reply records `finishReason` (as the wire spells it:
