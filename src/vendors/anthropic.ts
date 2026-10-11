@@ -91,6 +91,13 @@ function text(data: unknown): string | null {
     .toLowerCase();
 }
 
+function reasoningText(data: unknown): string | null {
+  const thoughts = blocksOf(data)
+    .filter((b) => b.type === "thinking" && typeof b.thinking === "string")
+    .map((b) => b.thinking ?? "");
+  return thoughts.length > 0 ? thoughts.join(" ").toLowerCase() : null;
+}
+
 function meta(data: unknown): ProbeMeta {
   const d: AnthropicResponse = rec(data) ?? {};
   const u = d.usage;
@@ -132,6 +139,6 @@ export const anthropicVendor = defineVendor({
   envelope: "anthropic",
   fallbackWires: ["openai"],
   ops: { chat, countTokens },
-  read: { text, meta, thinkingBlock, countedTokens },
+  read: { text, meta, thinkingBlock, countedTokens, reasoningText },
   defaultMaker: "anthropic",
 });

@@ -11,7 +11,9 @@ import {
 type GeminiResponse = {
   error?: unknown;
   modelVersion?: string;
-  candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  candidates?: Array<{
+    content?: { parts?: Array<{ text?: string; thought?: boolean }> };
+  }>;
   usageMetadata?: {
     promptTokenCount?: unknown;
     candidatesTokenCount?: unknown;
@@ -59,6 +61,14 @@ function text(data: unknown): string | null {
     .toLowerCase();
 }
 
+function reasoningText(data: unknown): string | null {
+  const d: GeminiResponse = rec(data) ?? {};
+  const thoughts = (d.candidates?.[0]?.content?.parts ?? [])
+    .filter((p) => p.thought === true && typeof p.text === "string")
+    .map((p) => p.text ?? "");
+  return thoughts.length > 0 ? thoughts.join(" ").toLowerCase() : null;
+}
+
 function meta(data: unknown): ProbeMeta {
   const d: GeminiResponse = rec(data) ?? {};
   const u = d.usageMetadata;
@@ -90,6 +100,6 @@ export const geminiVendor = defineVendor({
   envelope: "gemini",
   fallbackWires: ["openai"],
   ops: { chat },
-  read: { text, meta, reasoningUsage },
+  read: { text, meta, reasoningUsage, reasoningText },
   defaultMaker: "google",
 });

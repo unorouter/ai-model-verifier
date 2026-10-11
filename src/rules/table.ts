@@ -15,6 +15,7 @@ import { signatureRule } from "./thinking-signature";
 import { surveyRule } from "./survey";
 import { answerFingerprintRule } from "./answer-fingerprint";
 import { thinkLeakRule } from "./think-leak";
+import { maskedIdentityRule } from "./masked-identity";
 import { wrapperLeakRule } from "./wrapper-leak";
 import { thinkingFloorRule } from "./thinking-floor";
 import { throughputRule } from "./throughput";
@@ -30,6 +31,7 @@ import type { Rule } from "./types";
 export const RULES = [
   thinkingFloorRule,
   tokenizerFingerprintRule,
+  maskedIdentityRule,
   codingToolRule,
   scamRule,
   cjkLeakRule,

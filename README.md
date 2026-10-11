@@ -99,6 +99,10 @@ response-mixing proxies (`mux`); another maker named as the maker, judged by the
 requested model's own maker rather than the wire; the reply's own `model` field naming another tier
 (`served-model-mismatch`) or another model (`substituted`); and a probe quorum
 that only fails on non-transient evidence.
+A disguised model (`masked-identity`) is caught from its own reasoning: the
+wrapper that makes it answer under another name tells it to never mention its
+real maker or the provider behind it, and the reasoning restates that
+instruction even when every identity answer is coached.
 
 A model whose id names no maker is judged by the wire's default maker, and a
 model that only says "I am an AI assistant" fails the identity probe, which the

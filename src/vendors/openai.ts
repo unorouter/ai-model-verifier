@@ -14,6 +14,9 @@ type OpenAIChatResponse = {
   choices?: Array<{
     message?: {
       content?: string | Array<{ type?: string; text?: string }> | null;
+      reasoning_content?: unknown;
+      reasoning?: unknown;
+      reasoning_details?: Array<{ text?: unknown; summary?: unknown }> | null;
     };
   }>;
   usage?: {
@@ -67,6 +70,21 @@ function text(data: unknown): string | null {
   return null;
 }
 
+// Relays spell visible reasoning three ways: DeepSeek's reasoning_content,
+// OpenRouter's reasoning string, and its reasoning_details array.
+function reasoningText(data: unknown): string | null {
+  const d: OpenAIChatResponse = rec(data) ?? {};
+  const m = d.choices?.[0]?.message;
+  if (!m) return null;
+  const parts: string[] = [];
+  for (const v of [m.reasoning_content, m.reasoning])
+    if (typeof v === "string" && v.trim()) parts.push(v);
+  for (const r of m.reasoning_details ?? [])
+    for (const v of [r?.text, r?.summary])
+      if (typeof v === "string" && v.trim()) parts.push(v);
+  return parts.length > 0 ? parts.join(" ").toLowerCase() : null;
+}
+
 function meta(data: unknown): ProbeMeta {
   const d: OpenAIChatResponse = rec(data) ?? {};
   const u = d.usage;
@@ -101,6 +119,6 @@ export const openaiVendor = defineVendor({
   envelope: "openai",
   fallbackWires: [],
   ops: { chat },
-  read: { text, meta, reasoningUsage },
+  read: { text, meta, reasoningUsage, reasoningText },
   defaultMaker: "openai",
 });

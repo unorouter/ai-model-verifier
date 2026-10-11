@@ -69,3 +69,21 @@ export const CJK_CHAR = /[぀-ヿ㐀-䶿一-鿿豈-﫿가-힯]/g;
 
 /** A couple of incidental glyphs (a quoted loanword) are tolerated. */
 export const CJK_LEAK_MIN_CHARS = 4;
+
+/**
+ * A disguised model is coached to keep the backend quiet, and its own
+ * reasoning repeats the coaching ("per gateway policy: answer only with the
+ * declared public profile identity and never mention openai"). A hiding verb
+ * aimed at a competitor or at the provider, plus a sign it was instructed.
+ */
+export const MASKING_VERB =
+  /\b(?:never|don'?t|do not|must not|mustn'?t|should not|shouldn'?t|not to)\s+(?:mention|reveal|disclose|admit|acknowledge|discuss|bring up|refer to)\b/g;
+
+export const MASKING_HIDDEN_BACKEND =
+  /\b(?:hidden|underlying|real|actual|true|original|upstream)\s+(?:instructions?\s*\/\s*)?(?:model|provider|vendor|backend|origin)s?\b/;
+
+export const MASKING_DECLARED_IDENTITY =
+  /\b(?:declared|assigned|configured|public)\s+(?:public\s+)?(?:profile|persona)(?:\s+identity)?\b/;
+
+export const MASKING_INSTRUCTED =
+  /\b(?:policy|instructions?|system prompt|guidelines?|gateway|profile|persona|operator|configured|told to|i was told|i'?m told)\b/;

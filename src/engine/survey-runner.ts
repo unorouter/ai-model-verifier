@@ -10,6 +10,9 @@ import { buildChat, callWire, type RunCtx } from "./context";
 
 const ANSWER_CAP = 2000;
 
+const capThought = (t: string | null) =>
+  t === null ? null : t.length > ANSWER_CAP ? `${t.slice(0, ANSWER_CAP)}...` : t;
+
 /** One survey answer as it came; nothing here decides anything. */
 export type SurveyOutcome = {
   label: SurveyLabel;
@@ -27,6 +30,8 @@ export type SurveyOutcome = {
   usage: ProbeUsage | null;
   /** Hidden and visible output counts when the wire reports them. */
   reasoning: ReasoningUsage | null;
+  /** Visible reasoning text, lowercased and capped; null when none came. */
+  thought: string | null;
   detectedModel: string | null;
   error: string | null;
 };
@@ -55,6 +60,7 @@ async function ask(
     latencyMs,
     usage: null,
     reasoning: null,
+    thought: null,
     detectedModel: null,
   };
   const log = (pass: boolean, responseText: string | null, error?: string) =>
@@ -94,6 +100,7 @@ async function ask(
     correct,
     usage: meta.usage,
     reasoning: ctx.wire.read.reasoningUsage?.(res.data) ?? null,
+    thought: capThought(ctx.wire.read.reasoningText?.(res.data) ?? null),
     detectedModel: meta.detectedModel,
     error: null,
   };
