@@ -22,6 +22,7 @@ function chat(req, ctx) {
             model: req.model,
             ...limit,
             messages: req.messages,
+            ...(req.reasoningEffort ? { reasoning_effort: req.reasoningEffort } : {}),
             ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
             ...(req.topP !== undefined ? { top_p: req.topP } : {}),
             ...(req.seed !== undefined ? { seed: req.seed } : {}),

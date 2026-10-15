@@ -35,4 +35,9 @@ export const DIVERSE_PROMPT = `${SHORT_PROMPT}\n\nReference text: 深度学习�
  */
 export const SIGNATURE_PROMPT = "Find the greatest common divisor of 2378 and 1547 using the Euclidean algorithm.";
 export const FLOOR_PROMPT = "Reply with only the word ok.";
+/**
+ * Small enough to answer in one token, hard enough that a model asked for high
+ * effort thinks first: genuine Gemini 4 spent 300 or more thought tokens on it.
+ */
+export const ASKED_THINKING_PROMPT = "A bat and a ball cost 1.10 in total. The bat costs 1.00 more than the ball. How much does the ball cost? Reply with only the number.";
 //# sourceMappingURL=prompts.js.map

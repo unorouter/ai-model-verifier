@@ -20,6 +20,8 @@ export type ChatRequest = {
     maxTokens: number;
     messages: readonly ChatMessage[];
     thinking?: ThinkingSpec;
+    /** Ask for the most reasoning the endpoint offers. */
+    reasoningEffort?: "high";
     /** Sampling controls; absent means the endpoint's default. */
     temperature?: number;
     topP?: number;

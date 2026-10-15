@@ -14,6 +14,14 @@ export type {
   ThinkingFloorState,
 } from "./thinking-floor";
 export {
+  MIN_ASKED_THINKING_TOKENS,
+  judgeThinkingHonored,
+} from "./thinking-honored";
+export type {
+  ThinkingHonoredResult,
+  ThinkingHonoredState,
+} from "./thinking-honored";
+export {
   DEFAULT_TIER_SIGNATURES,
   fingerprintDrifted,
   judgeTokenizerFingerprint,

@@ -3,6 +3,8 @@ export { defineRule } from "./types";
 export type * from "./types";
 export { DEFAULT_MIN_COMPLETION_TOKENS, judgeThinkingFloor, judgeReasoningUsage, mustAlwaysThink, readThinkingUsage, } from "./thinking-floor";
 export type { ThinkingFloorOptions, ThinkingFloorResult, ThinkingFloorState, } from "./thinking-floor";
+export { MIN_ASKED_THINKING_TOKENS, judgeThinkingHonored, } from "./thinking-honored";
+export type { ThinkingHonoredResult, ThinkingHonoredState, } from "./thinking-honored";
 export { DEFAULT_TIER_SIGNATURES, fingerprintDrifted, judgeTokenizerFingerprint, tierForDelta, } from "./tokenizer-fingerprint";
 export type { TierSignatures, TokenizerFingerprintResult, TokenizerFingerprintState, } from "./tokenizer-fingerprint";
 export type { SignatureResult, SignatureState } from "./thinking-signature";

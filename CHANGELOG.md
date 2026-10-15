@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.8.0
+
+- New verdict rule `thinking-honored` (opt-in with `thinkingFloor`) for models
+  that think only when asked, marked by the new model fact `thinksWhenAsked`
+  (`gemini-4*`). It asks a small reasoning question at high effort
+  (`reasoning_effort` on the OpenAI wire, `thinkingConfig.thinkingLevel` with
+  `includeThoughts` on Gemini's) and fails a reply carrying fewer than
+  `MIN_ASKED_THINKING_TOKENS` (100) thought tokens: reasoning tokens when
+  reported, else the completion count. Google spent 304 to 360 on it; a7
+  merchants selling Gemini 4 answered with 0 or 47 to 59, and users saw short,
+  flat replies there.
+- `ChatRequest.reasoningEffort` asks a wire for its highest reasoning effort.
+- `gemini-4*` gets the 2000 token output floor the other Gemini thinkers have.
+
 ## 3.7.1
 
 - `modelsMatch` also tolerates a relay's route tag on the requested id

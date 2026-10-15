@@ -46,6 +46,14 @@ function chat(req: ChatRequest, ctx: WireCtx) {
           : {}),
         ...(req.topP !== undefined ? { topP: req.topP } : {}),
         ...(req.seed !== undefined ? { seed: req.seed } : {}),
+        ...(req.reasoningEffort
+          ? {
+              thinkingConfig: {
+                thinkingLevel: req.reasoningEffort,
+                includeThoughts: true,
+              },
+            }
+          : {}),
       },
     },
   };

@@ -5,6 +5,7 @@ import type { FingerprintSample } from "../engine/answer-fingerprint-runner";
 import type { ResponseMetadata } from "./response-metadata";
 import type { SignatureResult } from "./thinking-signature";
 import type { ThinkingFloorResult } from "./thinking-floor";
+import type { ThinkingHonoredResult } from "./thinking-honored";
 import type { ThroughputSample } from "./throughput";
 import type { TokenTruthResult } from "./token-truth";
 import type { TokenizerFingerprintResult } from "./tokenizer-fingerprint";
@@ -40,6 +41,7 @@ export type Reports = {
   signature?: SignatureResult;
   tokenTruth?: TokenTruthResult;
   thinkingFloor?: ThinkingFloorResult;
+  thinkingHonored?: ThinkingHonoredResult;
   tokenizerFingerprint?: TokenizerFingerprintResult;
   responseMetadata?: ResponseMetadata;
   throughput?: ThroughputSample | null;

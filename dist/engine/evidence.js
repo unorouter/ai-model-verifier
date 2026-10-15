@@ -1,4 +1,4 @@
-import { COUNT_PROBE_MAX_TOKENS, DIVERSE_PROMPT, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, } from "../probes/prompts";
+import { COUNT_PROBE_MAX_TOKENS, DIVERSE_PROMPT, ASKED_THINKING_PROMPT, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, } from "../probes/prompts";
 import { callWire, chat, wireCtx } from "./context";
 import { collectProbes } from "./probe-runner";
 import { collectSurvey } from "./survey-runner";
@@ -17,6 +17,7 @@ export const EVIDENCE_ORDER = [
     "fixedText",
     "countTokens",
     "floorReply",
+    "askedThinkingReply",
 ];
 const ok = (r) => r.status !== null && r.status < 400;
 async function collectFixedText(ctx) {
@@ -78,6 +79,15 @@ async function collectFloorReply(ctx) {
         messages: [{ role: "user", content: FLOOR_PROMPT }],
     });
 }
+async function collectAskedThinkingReply(ctx) {
+    if (!ctx.facts.thinksWhenAsked)
+        return null;
+    return chat(ctx, {
+        maxTokens: FLOOR_MAX_TOKENS,
+        reasoningEffort: "high",
+        messages: [{ role: "user", content: ASKED_THINKING_PROMPT }],
+    });
+}
 const memo = (fn) => {
     let p;
     return () => (p ??= fn());
@@ -90,6 +100,7 @@ export class EvidenceStore {
     countTokens;
     thinkingReply;
     floorReply;
+    askedThinkingReply;
     constructor(ctx) {
         this.probes = memo(() => collectProbes(ctx));
         this.survey = memo(() => collectSurvey(ctx));
@@ -98,6 +109,7 @@ export class EvidenceStore {
         this.countTokens = memo(() => collectCountTokens(ctx, this));
         this.thinkingReply = memo(() => collectThinkingReply(ctx));
         this.floorReply = memo(() => collectFloorReply(ctx));
+        this.askedThinkingReply = memo(() => collectAskedThinkingReply(ctx));
     }
     get(key) {
         switch (key) {
@@ -115,6 +127,8 @@ export class EvidenceStore {
                 return this.thinkingReply();
             case "floorReply":
                 return this.floorReply();
+            case "askedThinkingReply":
+                return this.askedThinkingReply();
         }
     }
 }

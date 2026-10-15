@@ -1,6 +1,7 @@
 import {
   COUNT_PROBE_MAX_TOKENS,
   DIVERSE_PROMPT,
+  ASKED_THINKING_PROMPT,
   FLOOR_PROMPT,
   LONG_PROMPT,
   SHORT_PROMPT,
@@ -52,6 +53,8 @@ export type EvidenceBag = {
   thinkingReply: ThinkingReplyEvidence;
   /** null when the model may legitimately answer without thinking. */
   floorReply: TransportResult | null;
+  /** null unless the model thinks only when asked: the reply to a high-effort request. */
+  askedThinkingReply: TransportResult | null;
 };
 
 export type EvidenceKey = keyof EvidenceBag;
@@ -65,6 +68,7 @@ export const EVIDENCE_ORDER = [
   "fixedText",
   "countTokens",
   "floorReply",
+  "askedThinkingReply",
 ] as const satisfies readonly EvidenceKey[];
 
 const ok = (r: TransportResult) => r.status !== null && r.status < 400;
@@ -139,6 +143,17 @@ async function collectFloorReply(ctx: RunCtx): Promise<TransportResult | null> {
   });
 }
 
+async function collectAskedThinkingReply(
+  ctx: RunCtx,
+): Promise<TransportResult | null> {
+  if (!ctx.facts.thinksWhenAsked) return null;
+  return chat(ctx, {
+    maxTokens: FLOOR_MAX_TOKENS,
+    reasoningEffort: "high",
+    messages: [{ role: "user", content: ASKED_THINKING_PROMPT }],
+  });
+}
+
 const memo = <T>(fn: () => Promise<T>) => {
   let p: Promise<T> | undefined;
   return () => (p ??= fn());
@@ -152,6 +167,7 @@ export class EvidenceStore {
   private readonly countTokens: () => Promise<TransportResult | null>;
   private readonly thinkingReply: () => Promise<ThinkingReplyEvidence>;
   private readonly floorReply: () => Promise<TransportResult | null>;
+  private readonly askedThinkingReply: () => Promise<TransportResult | null>;
 
   constructor(ctx: RunCtx) {
     this.probes = memo(() => collectProbes(ctx));
@@ -161,6 +177,7 @@ export class EvidenceStore {
     this.countTokens = memo(() => collectCountTokens(ctx, this));
     this.thinkingReply = memo(() => collectThinkingReply(ctx));
     this.floorReply = memo(() => collectFloorReply(ctx));
+    this.askedThinkingReply = memo(() => collectAskedThinkingReply(ctx));
   }
 
   get<K extends EvidenceKey>(key: K): Promise<EvidenceBag[K]>;
@@ -180,6 +197,8 @@ export class EvidenceStore {
         return this.thinkingReply();
       case "floorReply":
         return this.floorReply();
+      case "askedThinkingReply":
+        return this.askedThinkingReply();
     }
   }
 }

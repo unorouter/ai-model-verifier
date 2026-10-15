@@ -32,10 +32,12 @@ export type EvidenceBag = {
     thinkingReply: ThinkingReplyEvidence;
     /** null when the model may legitimately answer without thinking. */
     floorReply: TransportResult | null;
+    /** null unless the model thinks only when asked: the reply to a high-effort request. */
+    askedThinkingReply: TransportResult | null;
 };
 export type EvidenceKey = keyof EvidenceBag;
 /** Collection order when several keys are needed: probes first, then the extras. */
-export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "answerFingerprint", "thinkingReply", "fixedText", "countTokens", "floorReply"];
+export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "answerFingerprint", "thinkingReply", "fixedText", "countTokens", "floorReply", "askedThinkingReply"];
 export declare class EvidenceStore {
     private readonly probes;
     private readonly survey;
@@ -44,6 +46,7 @@ export declare class EvidenceStore {
     private readonly countTokens;
     private readonly thinkingReply;
     private readonly floorReply;
+    private readonly askedThinkingReply;
     constructor(ctx: RunCtx);
     get<K extends EvidenceKey>(key: K): Promise<EvidenceBag[K]>;
 }

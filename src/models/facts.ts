@@ -22,6 +22,8 @@ export type ModelFacts<M extends string = MakerId> = {
   tokenizer: TokenizerGeneration | null;
   /** Cannot switch reasoning off (a reply with no thought tokens is a cheaper tier). */
   alwaysThinks: boolean;
+  /** Thinks only when asked: at high effort a reply with no thought means the effort was dropped. */
+  thinksWhenAsked: boolean;
   /** Reasoning models need room for hidden thought before the visible answer. */
   minOutputTokens: number | null;
 };
@@ -82,9 +84,13 @@ export const MODEL_FACTS = [
     ],
     alwaysThinks: true,
   },
+  // Gemini 4 at low or medium effort often skips thinking entirely, so only a
+  // high-effort request is evidence: Google spent 304 to 360 thought tokens on
+  // the probe, the a7 merchants that dropped the effort 0 to 59.
+  { match: "gemini-4*", thinksWhenAsked: true },
   // Gemini thinks before it answers over the OpenAI wire too, and a 60 token
   // cap left a few characters of visible reply on the order book sellers.
-  { match: ["gemini-2-5*", "gemini-3*"], minOutputTokens: 2000 },
+  { match: ["gemini-2-5*", "gemini-3*", "gemini-4*"], minOutputTokens: 2000 },
   // Open-weight thinkers answer after a hidden reasoning pass on every relay
   // that leaves it on; a 60 token cap returned a bracket and nothing else.
   {
@@ -129,6 +135,7 @@ const DEFAULTS: ModelFacts<string> = {
   thinking: "none",
   tokenizer: null,
   alwaysThinks: false,
+  thinksWhenAsked: false,
   minOutputTokens: null,
 };
 
@@ -137,6 +144,7 @@ const FACT_KEYS = [
   "thinking",
   "tokenizer",
   "alwaysThinks",
+  "thinksWhenAsked",
   "minOutputTokens",
 ] as const satisfies readonly (keyof ModelFacts)[];
 

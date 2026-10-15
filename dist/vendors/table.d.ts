@@ -44,6 +44,7 @@ export declare const VENDORS: readonly [{
                 max_completion_tokens?: undefined;
                 model: string;
                 messages: readonly import("./types").ChatMessage[];
+                reasoning_effort?: "high" | undefined;
                 temperature?: number | undefined;
                 top_p?: number | undefined;
                 seed?: number | undefined;
@@ -52,6 +53,7 @@ export declare const VENDORS: readonly [{
                 max_completion_tokens: number;
                 model: string;
                 messages: readonly import("./types").ChatMessage[];
+                reasoning_effort?: "high" | undefined;
                 temperature?: number | undefined;
                 top_p?: number | undefined;
                 seed?: number | undefined;
@@ -87,6 +89,10 @@ export declare const VENDORS: readonly [{
                     temperature?: number | undefined;
                     topP?: number | undefined;
                     seed?: number | undefined;
+                    thinkingConfig?: {
+                        thinkingLevel: "high";
+                        includeThoughts: boolean;
+                    } | undefined;
                 };
             };
         };

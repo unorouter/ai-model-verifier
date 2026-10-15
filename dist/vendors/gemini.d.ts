@@ -15,6 +15,10 @@ declare function chat(req: ChatRequest, ctx: WireCtx): {
             temperature?: number | undefined;
             topP?: number | undefined;
             seed?: number | undefined;
+            thinkingConfig?: {
+                thinkingLevel: "high";
+                includeThoughts: boolean;
+            } | undefined;
         };
     };
 };

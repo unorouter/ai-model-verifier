@@ -20,6 +20,7 @@ import { maskContradictionRule } from "./mask-contradiction";
 import { fake200Rule } from "./fake-200";
 import { wrapperLeakRule } from "./wrapper-leak";
 import { thinkingFloorRule } from "./thinking-floor";
+import { thinkingHonoredRule } from "./thinking-honored";
 import { throughputRule } from "./throughput";
 import { tokenTruthRule } from "./token-truth";
 import { tokenizerFingerprintRule } from "./tokenizer-fingerprint";
@@ -32,6 +33,7 @@ import type { Rule } from "./types";
  */
 export const RULES = [
   thinkingFloorRule,
+  thinkingHonoredRule,
   tokenizerFingerprintRule,
   maskedIdentityRule,
   fake200Rule,

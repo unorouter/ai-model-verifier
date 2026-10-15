@@ -90,7 +90,9 @@ const { verify } = createVerifier({
 ## What it detects
 
 Verdict rules, in precedence order: a must-think model answering with no
-reasoning tokens (`thinking-floor`, opt-in); a tokenizer fingerprint matching a
+reasoning tokens (`thinking-floor`, opt-in); a model that thinks only when asked
+answering a high-effort request with too little thought (`thinking-honored`,
+opt-in with `thinkingFloor`); a tokenizer fingerprint matching a
 cheaper tier under a caller-supplied calibration (`tokenizer-fingerprint`,
 opt-in; ships no table, see the rule's note); `coding-tool` refusals (Kiro or
 Amazon Q wearing a Claude badge); scam pages; CJK language leaks from a

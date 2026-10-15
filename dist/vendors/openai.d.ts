@@ -10,6 +10,7 @@ declare function chat(req: ChatRequest, ctx: WireCtx): {
         max_completion_tokens?: undefined;
         model: string;
         messages: readonly import("./types").ChatMessage[];
+        reasoning_effort?: "high" | undefined;
         temperature?: number | undefined;
         top_p?: number | undefined;
         seed?: number | undefined;
@@ -18,6 +19,7 @@ declare function chat(req: ChatRequest, ctx: WireCtx): {
         max_completion_tokens: number;
         model: string;
         messages: readonly import("./types").ChatMessage[];
+        reasoning_effort?: "high" | undefined;
         temperature?: number | undefined;
         top_p?: number | undefined;
         seed?: number | undefined;

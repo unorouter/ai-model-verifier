@@ -18,6 +18,8 @@ export type ModelFacts<M extends string = MakerId> = {
     tokenizer: TokenizerGeneration | null;
     /** Cannot switch reasoning off (a reply with no thought tokens is a cheaper tier). */
     alwaysThinks: boolean;
+    /** Thinks only when asked: at high effort a reply with no thought means the effort was dropped. */
+    thinksWhenAsked: boolean;
     /** Reasoning models need room for hidden thought before the visible answer. */
     minOutputTokens: number | null;
 };
@@ -45,7 +47,10 @@ export declare const MODEL_FACTS: readonly [{
     readonly match: readonly ["glm-5-3*", "kimi-k2-6*", "kimi-k2-7*", "kimi-k3*", "deepseek-v4-pro*", "deepseek-v4-1-flash*", "qwen3-8-flash*"];
     readonly alwaysThinks: true;
 }, {
-    readonly match: readonly ["gemini-2-5*", "gemini-3*"];
+    readonly match: "gemini-4*";
+    readonly thinksWhenAsked: true;
+}, {
+    readonly match: readonly ["gemini-2-5*", "gemini-3*", "gemini-4*"];
     readonly minOutputTokens: 2000;
 }, {
     readonly match: readonly ["glm-5*", "kimi-k2-6*", "kimi-k2-7*", "kimi-k3*", "deepseek-v4*", "minimax-m2-5*", "minimax-m2-7*", "minimax-m3*", "mimo-v2-5*", "qwen3-8*", "hy4*"];
