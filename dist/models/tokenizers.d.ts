@@ -8,12 +8,10 @@
  * three relays, Claude on five relay paths, which bill five different vectors
  * between them and so get one entry each.
  *
- * Kimi is left out: one relay billed two different vectors for kimi-k3 a day
- * apart, so a moonshot lane is never judged.
- *
  * Families share a vector where the tokenizers agree on these runs: Llama 4,
- * Muse Spark and Grok 4.3 all bill 101/80/101/120, so that entry names both
- * makers and only says "neither of these is Claude".
+ * Muse Spark and Grok 4.3 all bill 101/80/101/120, and DeepSeek, Step and Kimi
+ * all bill 101/61/101/120, so those entries name every maker and only rule out
+ * the others.
  */
 import type { MakerId } from "../makers/table";
 import { type ScriptVariant } from "../probes/prompts";

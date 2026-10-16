@@ -8,12 +8,10 @@
  * three relays, Claude on five relay paths, which bill five different vectors
  * between them and so get one entry each.
  *
- * Kimi is left out: one relay billed two different vectors for kimi-k3 a day
- * apart, so a moonshot lane is never judged.
- *
  * Families share a vector where the tokenizers agree on these runs: Llama 4,
- * Muse Spark and Grok 4.3 all bill 101/80/101/120, so that entry names both
- * makers and only says "neither of these is Claude".
+ * Muse Spark and Grok 4.3 all bill 101/80/101/120, and DeepSeek, Step and Kimi
+ * all bill 101/61/101/120, so those entries name every maker and only rule out
+ * the others.
  */
 import { SCRIPT_VARIANT_KEYS } from "../probes/prompts";
 const v = (digits, cjk, spaces, code) => ({ digits, cjk, spaces, code });
@@ -35,7 +33,7 @@ export const TOKENIZER_FAMILIES = [
     { id: "glm", makers: ["zhipu"], vector: v(191, 70, 101, 120) },
     {
         id: "deepseek",
-        makers: ["deepseek", "stepfun"],
+        makers: ["deepseek", "stepfun", "moonshot"],
         vector: v(101, 61, 101, 120),
     },
     {
@@ -43,6 +41,8 @@ export const TOKENIZER_FAMILIES = [
         makers: ["alibaba", "xiaomi", "tencent"],
         vector: v(301, 72, 101, 120),
     },
+    // Qwen 3.8 changed vocabulary: three a7 merchants billed this to the token.
+    { id: "qwen3.8", makers: ["alibaba"], vector: v(301, 61, 100, 149) },
     { id: "minimax", makers: ["minimax"], vector: v(101, 70, 101, 120) },
     { id: "ernie", makers: ["baidu"], vector: v(301, 70, 101, 150) },
     { id: "claude-direct", makers: ["anthropic"], vector: v(101, 151, 100, 149) },

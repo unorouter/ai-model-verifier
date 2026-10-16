@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.9.1
+
+- `TOKENIZER_FAMILIES`: Kimi's published tokenizer bills the DeepSeek vector
+  (101/61/101/120), so that entry names moonshot too and a Kimi lane on it
+  passes as its own family. New `qwen3.8` entry (301/61/100/149): Qwen 3.8
+  changed vocabulary, measured on three merchants.
+
 ## 3.9.0
 
 - New verdict rule `tokenizer-family` (opt-in with `tokenizerFamily`). It bills
