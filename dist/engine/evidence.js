@@ -1,4 +1,4 @@
-import { COUNT_PROBE_MAX_TOKENS, DIVERSE_PROMPT, ASKED_THINKING_PROMPT, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, } from "../probes/prompts";
+import { COUNT_PROBE_MAX_TOKENS, DIVERSE_PROMPT, ASKED_THINKING_PROMPT, FLOOR_PROMPT, LONG_PROMPT, SHORT_PROMPT, SIGNATURE_PROMPT, SCRIPT_BASE_PROMPT, SCRIPT_VARIANTS, } from "../probes/prompts";
 import { callWire, chat, wireCtx } from "./context";
 import { collectProbes } from "./probe-runner";
 import { collectSurvey } from "./survey-runner";
@@ -15,6 +15,7 @@ export const EVIDENCE_ORDER = [
     "answerFingerprint",
     "thinkingReply",
     "fixedText",
+    "scriptTokens",
     "countTokens",
     "floorReply",
     "askedThinkingReply",
@@ -31,6 +32,22 @@ async function collectFixedText(ctx) {
         ask(DIVERSE_PROMPT),
     ]);
     return { short, long, diverse };
+}
+async function collectScriptTokens(ctx) {
+    const ask = (prompt) => chat(ctx, {
+        maxTokens: COUNT_PROBE_MAX_TOKENS,
+        messages: [{ role: "user", content: prompt }],
+    });
+    // The anchor first: a relay that caches prefixes then bills every run the same way.
+    const base = await ask(SCRIPT_BASE_PROMPT);
+    const run = (k) => ask(SCRIPT_BASE_PROMPT + SCRIPT_VARIANTS[k]);
+    const [digits, cjk, spaces, code] = await Promise.all([
+        run("digits"),
+        run("cjk"),
+        run("spaces"),
+        run("code"),
+    ]);
+    return { base, variants: { digits, cjk, spaces, code } };
 }
 async function collectCountTokens(ctx, store) {
     const count = ctx.wire.ops.countTokens;
@@ -97,6 +114,7 @@ export class EvidenceStore {
     survey;
     answerFingerprint;
     fixedText;
+    scriptTokens;
     countTokens;
     thinkingReply;
     floorReply;
@@ -106,6 +124,7 @@ export class EvidenceStore {
         this.survey = memo(() => collectSurvey(ctx));
         this.answerFingerprint = memo(() => collectAnswerFingerprint(ctx));
         this.fixedText = memo(() => collectFixedText(ctx));
+        this.scriptTokens = memo(() => collectScriptTokens(ctx));
         this.countTokens = memo(() => collectCountTokens(ctx, this));
         this.thinkingReply = memo(() => collectThinkingReply(ctx));
         this.floorReply = memo(() => collectFloorReply(ctx));
@@ -121,6 +140,8 @@ export class EvidenceStore {
                 return this.answerFingerprint();
             case "fixedText":
                 return this.fixedText();
+            case "scriptTokens":
+                return this.scriptTokens();
             case "countTokens":
                 return this.countTokens();
             case "thinkingReply":

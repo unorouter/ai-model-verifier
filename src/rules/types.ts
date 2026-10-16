@@ -9,6 +9,7 @@ import type { ThinkingHonoredResult } from "./thinking-honored";
 import type { ThroughputSample } from "./throughput";
 import type { TokenTruthResult } from "./token-truth";
 import type { TokenizerFingerprintResult } from "./tokenizer-fingerprint";
+import type { TokenizerFamilyResult } from "./tokenizer-family";
 
 /**
  * How a finding weighs on the verdict. `fail` and `suspect` both make the
@@ -43,6 +44,7 @@ export type Reports = {
   thinkingFloor?: ThinkingFloorResult;
   thinkingHonored?: ThinkingHonoredResult;
   tokenizerFingerprint?: TokenizerFingerprintResult;
+  tokenizerFamily?: TokenizerFamilyResult;
   responseMetadata?: ResponseMetadata;
   throughput?: ThroughputSample | null;
   survey?: SurveyOutcome[];

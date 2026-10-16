@@ -15,6 +15,7 @@ export type ResolvedChecks = {
     tokenizerFingerprint: {
         signatures: TierSignatures | undefined;
     } | null;
+    tokenizerFamily: boolean;
     survey: boolean;
     answerFingerprint: {
         repeats: number;

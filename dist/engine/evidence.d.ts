@@ -1,3 +1,4 @@
+import { type ScriptVariant } from "../probes/prompts";
 import type { TransportResult } from "../transport";
 import { type RunCtx } from "./context";
 import { type ProbeEval } from "./probe-runner";
@@ -8,6 +9,10 @@ export type FixedTextEvidence = {
     long: TransportResult;
     /** The script-mixed text every vocabulary splits differently. */
     diverse: TransportResult;
+};
+export type ScriptTokensEvidence = {
+    base: TransportResult;
+    variants: Record<ScriptVariant, TransportResult>;
 };
 export type ThinkingReplyEvidence = {
     res: TransportResult;
@@ -26,6 +31,8 @@ export type EvidenceBag = {
     /** One-word answer counts at temperature 1, for a caller to accumulate. */
     answerFingerprint: FingerprintSample;
     fixedText: FixedTextEvidence;
+    /** The anchor and the four script runs the tokenizer family is read from. */
+    scriptTokens: ScriptTokensEvidence;
     /** null when the wire has no count endpoint or the short reply had no usage. */
     countTokens: TransportResult | null;
     /** null when the model has no thinking mode to ask for. */
@@ -37,12 +44,13 @@ export type EvidenceBag = {
 };
 export type EvidenceKey = keyof EvidenceBag;
 /** Collection order when several keys are needed: probes first, then the extras. */
-export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "answerFingerprint", "thinkingReply", "fixedText", "countTokens", "floorReply", "askedThinkingReply"];
+export declare const EVIDENCE_ORDER: readonly ["probes", "survey", "answerFingerprint", "thinkingReply", "fixedText", "scriptTokens", "countTokens", "floorReply", "askedThinkingReply"];
 export declare class EvidenceStore {
     private readonly probes;
     private readonly survey;
     private readonly answerFingerprint;
     private readonly fixedText;
+    private readonly scriptTokens;
     private readonly countTokens;
     private readonly thinkingReply;
     private readonly floorReply;

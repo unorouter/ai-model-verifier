@@ -6,6 +6,9 @@ import {
   LONG_PROMPT,
   SHORT_PROMPT,
   SIGNATURE_PROMPT,
+  SCRIPT_BASE_PROMPT,
+  SCRIPT_VARIANTS,
+  type ScriptVariant,
 } from "../probes/prompts";
 import type { TransportResult } from "../transport";
 import { callWire, chat, wireCtx, type RunCtx } from "./context";
@@ -29,6 +32,11 @@ export type FixedTextEvidence = {
   diverse: TransportResult;
 };
 
+export type ScriptTokensEvidence = {
+  base: TransportResult;
+  variants: Record<ScriptVariant, TransportResult>;
+};
+
 export type ThinkingReplyEvidence = {
   res: TransportResult;
   /** Only when the strict replay ran: the endpoint accepted the block back. */
@@ -47,6 +55,8 @@ export type EvidenceBag = {
   /** One-word answer counts at temperature 1, for a caller to accumulate. */
   answerFingerprint: FingerprintSample;
   fixedText: FixedTextEvidence;
+  /** The anchor and the four script runs the tokenizer family is read from. */
+  scriptTokens: ScriptTokensEvidence;
   /** null when the wire has no count endpoint or the short reply had no usage. */
   countTokens: TransportResult | null;
   /** null when the model has no thinking mode to ask for. */
@@ -66,6 +76,7 @@ export const EVIDENCE_ORDER = [
   "answerFingerprint",
   "thinkingReply",
   "fixedText",
+  "scriptTokens",
   "countTokens",
   "floorReply",
   "askedThinkingReply",
@@ -85,6 +96,25 @@ async function collectFixedText(ctx: RunCtx): Promise<FixedTextEvidence> {
     ask(DIVERSE_PROMPT),
   ]);
   return { short, long, diverse };
+}
+
+async function collectScriptTokens(ctx: RunCtx): Promise<ScriptTokensEvidence> {
+  const ask = (prompt: string) =>
+    chat(ctx, {
+      maxTokens: COUNT_PROBE_MAX_TOKENS,
+      messages: [{ role: "user", content: prompt }],
+    });
+  // The anchor first: a relay that caches prefixes then bills every run the same way.
+  const base = await ask(SCRIPT_BASE_PROMPT);
+  const run = (k: ScriptVariant) =>
+    ask(SCRIPT_BASE_PROMPT + SCRIPT_VARIANTS[k]);
+  const [digits, cjk, spaces, code] = await Promise.all([
+    run("digits"),
+    run("cjk"),
+    run("spaces"),
+    run("code"),
+  ]);
+  return { base, variants: { digits, cjk, spaces, code } };
 }
 
 async function collectCountTokens(
@@ -164,6 +194,7 @@ export class EvidenceStore {
   private readonly survey: () => Promise<SurveyOutcome[]>;
   private readonly answerFingerprint: () => Promise<FingerprintSample>;
   private readonly fixedText: () => Promise<FixedTextEvidence>;
+  private readonly scriptTokens: () => Promise<ScriptTokensEvidence>;
   private readonly countTokens: () => Promise<TransportResult | null>;
   private readonly thinkingReply: () => Promise<ThinkingReplyEvidence>;
   private readonly floorReply: () => Promise<TransportResult | null>;
@@ -174,6 +205,7 @@ export class EvidenceStore {
     this.survey = memo(() => collectSurvey(ctx));
     this.answerFingerprint = memo(() => collectAnswerFingerprint(ctx));
     this.fixedText = memo(() => collectFixedText(ctx));
+    this.scriptTokens = memo(() => collectScriptTokens(ctx));
     this.countTokens = memo(() => collectCountTokens(ctx, this));
     this.thinkingReply = memo(() => collectThinkingReply(ctx));
     this.floorReply = memo(() => collectFloorReply(ctx));
@@ -191,6 +223,8 @@ export class EvidenceStore {
         return this.answerFingerprint();
       case "fixedText":
         return this.fixedText();
+      case "scriptTokens":
+        return this.scriptTokens();
       case "countTokens":
         return this.countTokens();
       case "thinkingReply":

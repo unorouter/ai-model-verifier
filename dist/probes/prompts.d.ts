@@ -32,4 +32,20 @@ export declare const FLOOR_PROMPT = "Reply with only the word ok.";
  * effort thinks first: genuine Gemini 4 spent 300 or more thought tokens on it.
  */
 export declare const ASKED_THINKING_PROMPT = "A bat and a ball cost 1.10 in total. The bat costs 1.00 more than the ball. How much does the ball cost? Reply with only the number.";
+/**
+ * The tokenizer family probe: one anchor and four runs appended to it, each
+ * chosen because vocabularies split it differently (digits in ones or threes,
+ * Chinese by word or by character, whitespace runs). The four deltas together
+ * name a tokenizer family where one English run cannot. Fixed bytes, like the
+ * prompts above: the family table in models/tokenizers.ts was measured on these.
+ */
+export declare const SCRIPT_BASE_PROMPT = "Reply with only the word ok.";
+export declare const SCRIPT_VARIANTS: {
+    readonly digits: ` ${string}`;
+    readonly cjk: ` ${string}`;
+    readonly spaces: ` ${string}`;
+    readonly code: ` ${string}`;
+};
+export type ScriptVariant = keyof typeof SCRIPT_VARIANTS;
+export declare const SCRIPT_VARIANT_KEYS: readonly ["digits", "cjk", "spaces", "code"];
 //# sourceMappingURL=prompts.d.ts.map

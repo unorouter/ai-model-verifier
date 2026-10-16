@@ -59,6 +59,8 @@ export type Checks = {
     tokenizerFingerprint?: boolean | {
         signatures?: TierSignatures;
     };
+    /** Which vocabulary billed four script runs; fails a foreign family (see the rule). */
+    tokenizerFamily?: boolean;
     /** Ask the survey questions and report the answers; never a verdict. */
     survey?: boolean;
     /** The one-word answer battery at temperature 1, `repeats` per cell (default 3), `concurrency` calls in flight (default 4); never a verdict. */

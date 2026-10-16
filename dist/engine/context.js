@@ -24,6 +24,7 @@ export function resolveChecks(checks) {
                     : undefined,
             }
             : null,
+        tokenizerFamily: c.tokenizerFamily === true,
         survey: c.survey === true,
         answerFingerprint: c.answerFingerprint
             ? {

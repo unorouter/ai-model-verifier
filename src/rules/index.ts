@@ -60,3 +60,8 @@ export type {
   ProfileVerdict,
 } from "./answer-fingerprint";
 export type { ThroughputComparison, ThroughputSample } from "./throughput";
+export { judgeTokenizerFamily } from "./tokenizer-family";
+export type {
+  TokenizerFamilyResult,
+  TokenizerFamilyState,
+} from "./tokenizer-family";

@@ -16,6 +16,7 @@ export type ResolvedChecks = {
   tokenTruth: boolean;
   thinkingFloor: { minCompletionTokens: number | null } | null;
   tokenizerFingerprint: { signatures: TierSignatures | undefined } | null;
+  tokenizerFamily: boolean;
   survey: boolean;
   answerFingerprint: { repeats: number; concurrency: number } | null;
 };
@@ -49,6 +50,7 @@ export function resolveChecks(checks: Checks | undefined): ResolvedChecks {
               : undefined,
         }
       : null,
+    tokenizerFamily: c.tokenizerFamily === true,
     survey: c.survey === true,
     answerFingerprint: c.answerFingerprint
       ? {

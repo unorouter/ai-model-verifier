@@ -18,4 +18,6 @@ export type { FingerprintSample, FingerprintCellSample, } from "../engine/answer
 export { compareFingerprints, compareToProfiles, fingerprintClusters, jensenShannon, mergeFingerprints, DEFAULT_MATCH_BITS, DEFAULT_MISMATCH_BITS, DEFAULT_MIN_CELL_SAMPLES, } from "./answer-fingerprint";
 export type { CompareOptions, CompareResult, CompareVerdict, ProfileVerdict, } from "./answer-fingerprint";
 export type { ThroughputComparison, ThroughputSample } from "./throughput";
+export { judgeTokenizerFamily } from "./tokenizer-family";
+export type { TokenizerFamilyResult, TokenizerFamilyState, } from "./tokenizer-family";
 //# sourceMappingURL=index.d.ts.map

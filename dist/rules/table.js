@@ -13,6 +13,7 @@ import { thinkingHonoredRule } from "./thinking-honored";
 import { throughputRule } from "./throughput";
 import { tokenTruthRule } from "./token-truth";
 import { tokenizerFingerprintRule } from "./tokenizer-fingerprint";
+import { tokenizerFamilyRule } from "./tokenizer-family";
 /**
  * Precedence is this order: the first finding that is not a note decides the
  * verdict. Evidence rules sit above the probe ladder because they read facts a
@@ -22,6 +23,7 @@ export const RULES = [
     thinkingFloorRule,
     thinkingHonoredRule,
     tokenizerFingerprintRule,
+    tokenizerFamilyRule,
     maskedIdentityRule,
     fake200Rule,
     codingToolRule,

@@ -49,3 +49,25 @@ export const FLOOR_PROMPT = "Reply with only the word ok.";
  */
 export const ASKED_THINKING_PROMPT =
   "A bat and a ball cost 1.10 in total. The bat costs 1.00 more than the ball. How much does the ball cost? Reply with only the number.";
+
+/**
+ * The tokenizer family probe: one anchor and four runs appended to it, each
+ * chosen because vocabularies split it differently (digits in ones or threes,
+ * Chinese by word or by character, whitespace runs). The four deltas together
+ * name a tokenizer family where one English run cannot. Fixed bytes, like the
+ * prompts above: the family table in models/tokenizers.ts was measured on these.
+ */
+export const SCRIPT_BASE_PROMPT = "Reply with only the word ok.";
+export const SCRIPT_VARIANTS = {
+  digits: ` ${"1234567890".repeat(30)}`,
+  cjk: ` ${"我们今天去公园散步然后吃饭".repeat(10)}`,
+  spaces: ` ${"a ".repeat(100)}`,
+  code: ` ${"    if (x) {\n        return y;\n    }\n".repeat(10)}`,
+} as const;
+export type ScriptVariant = keyof typeof SCRIPT_VARIANTS;
+export const SCRIPT_VARIANT_KEYS = [
+  "digits",
+  "cjk",
+  "spaces",
+  "code",
+] as const satisfies readonly ScriptVariant[];

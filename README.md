@@ -94,7 +94,10 @@ reasoning tokens (`thinking-floor`, opt-in); a model that thinks only when asked
 answering a high-effort request with too little thought (`thinking-honored`,
 opt-in with `thinkingFloor`); a tokenizer fingerprint matching a
 cheaper tier under a caller-supplied calibration (`tokenizer-fingerprint`,
-opt-in; ships no table, see the rule's note); `coding-tool` refusals (Kiro or
+opt-in; ships no table, see the rule's note); input-token deltas on four script
+runs naming another maker's vocabulary (`tokenizer-family`, opt-in with
+`tokenizerFamily`; a persona prompt cannot change how the backend splits text);
+`coding-tool` refusals (Kiro or
 Amazon Q wearing a Claude badge); scam pages; CJK language leaks from a
 substituted Chinese model (skipped for makers that train on Chinese);
 response-mixing proxies (`mux`); another maker named as the maker, judged by the

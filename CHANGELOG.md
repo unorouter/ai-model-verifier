@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.9.0
+
+- New verdict rule `tokenizer-family` (opt-in with `tokenizerFamily`). It bills
+  one anchor prompt and four runs appended to it (digits, Chinese, spaces,
+  indented code; `SCRIPT_VARIANTS`) and reads the four input-token deltas as a
+  vector, which names the vocabulary behind the endpoint where one English run
+  cannot. `TOKENIZER_FAMILIES` holds the vectors: open families from each
+  maker's published tokenizer, Gemini and five Claude relay paths measured on
+  lanes passing every other rule. It fails only when the claimed maker has known
+  vectors, the measured one matches none of them, and it matches another
+  family that relays do not estimate with (OpenAI's two are marked
+  `estimator`). A Radox lane sold as `claude-fable-5.1` passed the identity
+  probes on most keys under a hidden persona prompt but billed 101/80/101/120,
+  the Llama 4 vocabulary Meta's Muse Spark uses (Grok 4.3 bills the same, so
+  that entry names both makers); every Claude path bills 135 or more on the
+  Chinese run.
+- `matchTokenizerFamilies`, `knowsMaker` and `judgeTokenizerFamily` are
+  exported for callers that measure on their own.
+
 ## 3.8.0
 
 - New verdict rule `thinking-honored` (opt-in with `thinkingFloor`) for models
