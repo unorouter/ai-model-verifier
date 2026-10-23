@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.9.2
+
+- `tokenizer-family` also fails when every run bills about one token per four
+  characters (new state `char-estimated`, `isCharacterEstimate`). No tokenizer
+  bills Chinese that lean, so the provider is making up usage and hiding the
+  backend's real counts; UTIM's "gemini-4-argon" billed 80/32/50/92 under a
+  hidden persona prompt that passed every identity probe.
+
 ## 3.9.1
 
 - `TOKENIZER_FAMILIES`: Kimi's published tokenizer bills the DeepSeek vector

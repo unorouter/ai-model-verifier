@@ -15,7 +15,11 @@
  */
 
 import type { MakerId } from "../makers/table";
-import { SCRIPT_VARIANT_KEYS, type ScriptVariant } from "../probes/prompts";
+import {
+  SCRIPT_VARIANT_KEYS,
+  SCRIPT_VARIANTS,
+  type ScriptVariant,
+} from "../probes/prompts";
 
 export type ScriptVector = Readonly<Record<ScriptVariant, number>>;
 
@@ -92,3 +96,16 @@ export const knowsMaker = (
   maker: string,
   families: readonly TokenizerFamily[] = TOKENIZER_FAMILIES,
 ): boolean => families.some((f) => f.makers.some((m) => m === maker));
+
+/**
+ * Billed as characters divided by about four on every run: no tokenizer does
+ * that on the Chinese run (the leanest known bills 0.47 a character), so the
+ * provider is computing usage itself and hiding the backend's real counts.
+ * UTIM's "gemini-4-argon" billed 80/32/50/92.
+ */
+export function isCharacterEstimate(measured: ScriptVector): boolean {
+  return SCRIPT_VARIANT_KEYS.every((k) => {
+    const ratio = measured[k] / [...SCRIPT_VARIANTS[k]].length;
+    return ratio >= 0.2 && ratio <= 0.3;
+  });
+}

@@ -11,10 +11,14 @@
  * the claimed maker has known vectors, the measured vector matches none of
  * them, it does match another family, and that family is not one relays
  * estimate usage with (OpenAI's).
+ *
+ * Also fails when every run bills about one token per four characters: that
+ * is a provider making up usage so the vocabulary behind it cannot be seen.
  */
 
 import type { ScriptVariant } from "../probes/prompts";
 import {
+  isCharacterEstimate,
   knowsMaker,
   matchTokenizerFamilies,
   type ScriptVector,
@@ -27,6 +31,8 @@ export type TokenizerFamilyState =
   | "foreign"
   /** Matches only an estimator family: the relay may be counting. */
   | "estimated"
+  /** Billed as characters / 4: the provider makes up usage, hiding the backend. */
+  | "char-estimated"
   /** Measured but matches no known family. */
   | "unknown"
   | "unmeasured";
@@ -50,7 +56,11 @@ export function judgeTokenizerFamily(
     families: matched.map((f) => f.id),
     makers: [...new Set(matched.flatMap((f) => f.makers))],
   };
-  if (matched.length === 0) return { state: "unknown", ...base };
+  if (matched.length === 0)
+    return {
+      state: isCharacterEstimate(vector) ? "char-estimated" : "unknown",
+      ...base,
+    };
   if (matched.some((f) => f.makers.some((m) => m === maker)))
     return { state: "own", ...base };
   if (matched.every((f) => f.estimator)) return { state: "estimated", ...base };
@@ -106,8 +116,15 @@ export const tokenizerFamilyRule = defineRule({
   applies: (ctx) => ctx.wire.id !== "gemini",
   judge: async (ctx) => {
     const r = await familyResult(ctx);
-    if (r.state !== "foreign" || !r.vector) return null;
+    if (!r.vector) return null;
     const v = r.vector;
+    if (r.state === "char-estimated")
+      return {
+        severity: "fail",
+        reason: `tokenizer-family: billed ${v.digits}/${v.cjk}/${v.spaces}/${v.code}, about one token per four characters on every run including Chinese, which no tokenizer does: the provider computes usage itself and hides the model's real counts`,
+        data: r,
+      };
+    if (r.state !== "foreign") return null;
     return {
       severity: "fail",
       reason: `tokenizer-family: billed ${v.digits}/${v.cjk}/${v.spaces}/${v.code}, the ${r.families.join("/")} vocabulary (${r.makers.join(", ")}), not ${ctx.maker.id}`,
