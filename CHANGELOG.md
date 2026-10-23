@@ -245,7 +245,7 @@ Breaking:
 
 - `provider` and `resolvedProvider` are `vendor` and `resolvedVendor`;
   `checkSignature` and friends are `checks: { signature, tokenTruth,
-  thinkingFloor, tokenizerFingerprint }`; results carry `findings`.
+thinkingFloor, tokenizerFingerprint }`; results carry `findings`.
 - Subpath exports are `./vendors`, `./rules`, `./models`, `./transport` and
   `./highlight`; the `./*` wildcard is gone.
 - The browser transport no longer assumes `/api/models/verify/probe`; pass
