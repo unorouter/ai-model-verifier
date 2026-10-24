@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.9.4
+
+- OpenAI wire `reasoningUsage`: when no reasoning count is reported but
+  `total_tokens` exceeds prompt plus completion, the difference counts as
+  thinking. Google's OpenAI-compatible endpoint reports thoughts only there
+  (Gemini 3.6 Flash at high effort: 40 prompt, 4 completion, 374 total).
+- `thinking-honored`: a reply with no thought count anywhere and a short
+  completion is `unmeasured`, not `ignored`. Sellers that recompute usage as
+  prompt plus answer (si) hid real Gemini's thinking, so every Google-backed
+  Argon seller read as ignoring effort.
+
 ## 3.9.3
 
 - `thinking-honored`: when the high-effort reply carries Google's thought

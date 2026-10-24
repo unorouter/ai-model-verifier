@@ -51,7 +51,9 @@ function chat(req: ChatRequest, ctx: WireCtx) {
       ...limit,
       messages: req.messages,
       ...(req.reasoningEffort ? { reasoning_effort: req.reasoningEffort } : {}),
-      ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
+      ...(req.temperature !== undefined
+        ? { temperature: req.temperature }
+        : {}),
       ...(req.topP !== undefined ? { top_p: req.topP } : {}),
       ...(req.seed !== undefined ? { seed: req.seed } : {}),
     },
@@ -108,11 +110,26 @@ function reasoningUsage(data: unknown): ReasoningUsage | null {
   const u = d.usage;
   if (!u || typeof u !== "object") return null;
   const details = u.completion_tokens_details;
+  const completion = intOf(u.completion_tokens);
+  const reported = intOf(
+    details && typeof details === "object" ? details.reasoning_tokens : null,
+  );
+  // Google's OpenAI-compatible endpoint counts thoughts only in total_tokens:
+  // Gemini 3.6 Flash at high effort billed 40 prompt, 4 completion, 374 total.
+  const prompt = intOf(u.prompt_tokens);
+  const total = intOf(u.total_tokens);
+  const hidden =
+    prompt !== null && completion !== null && total !== null
+      ? total - prompt - completion
+      : 0;
   return {
-    completion: intOf(u.completion_tokens),
-    reasoning: intOf(
-      details && typeof details === "object" ? details.reasoning_tokens : null,
-    ),
+    completion,
+    reasoning:
+      reported !== null && reported > 0
+        ? reported
+        : hidden > 0
+          ? hidden
+          : reported,
   };
 }
 

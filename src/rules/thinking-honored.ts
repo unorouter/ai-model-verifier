@@ -53,6 +53,19 @@ export function judgeThinkingHonored(
 ): ThinkingHonoredResult {
   if (!usage || (usage.reasoning === null && usage.completion === null))
     return { ...SKIPPED, state: "unmeasured", reason: "no usage in reply" };
+  // No thought count anywhere and a short completion: the seller does not report
+  // thinking (si recomputes usage as prompt plus answer), so nothing to judge.
+  if (
+    usage.reasoning === null &&
+    usage.completion !== null &&
+    usage.completion < min
+  )
+    return {
+      ...SKIPPED,
+      state: "unmeasured",
+      completionTokens: usage.completion,
+      reason: "the reply reports no thought tokens",
+    };
   const thinking =
     usage.reasoning !== null && usage.reasoning > 0
       ? usage.reasoning
