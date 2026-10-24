@@ -10,6 +10,10 @@
  * Reasoning tokens count when the reply reports them; otherwise the completion
  * count stands in, since a relay that folds thoughts into the answer still bills
  * them there.
+ *
+ * A reply carrying Google's thought signature came from Gemini itself, so too
+ * little thought there means effort capped by the seller (gg's cheap Argon
+ * group, 8 tokens at high), not another model: inconclusive, not suspicious.
  */
 
 import type { TransportResult } from "../transport";
@@ -75,6 +79,13 @@ export function judgeThinkingHonored(
   return { state: "thought", ...base };
 }
 
+/** Gemini's own thought signature, on its native wire or passed through an OpenAI-shape relay. */
+export function carriesThoughtSignature(data: unknown): boolean {
+  if (data === null || data === undefined) return false;
+  const text = typeof data === "string" ? data : JSON.stringify(data);
+  return /"thought_?[sS]ignature"\s*:\s*"[A-Za-z0-9+/=_-]{16,}/.test(text);
+}
+
 async function honoredResult(
   ctx: RuleCtx<"askedThinkingReply">,
 ): Promise<ThinkingHonoredResult> {
@@ -98,9 +109,19 @@ export const thinkingHonoredRule = defineRule({
     ctx.facts.thinksWhenAsked && ctx.wire.read.reasoningUsage !== undefined,
   judge: async (ctx) => {
     const r = await honoredResult(ctx);
-    return r.state === "ignored"
-      ? { severity: "fail", reason: `thinking-ignored: ${r.reason}`, data: r }
-      : null;
+    if (r.state !== "ignored") return null;
+    const res = await ctx.evidence("askedThinkingReply");
+    if (res && carriesThoughtSignature(res.data))
+      return {
+        severity: "inconclusive",
+        reason: `thinking-locked: ${r.reason}, but the reply carries Google's thought signature, so the seller caps reasoning on real Gemini`,
+        data: r,
+      };
+    return {
+      severity: "fail",
+      reason: `thinking-ignored: ${r.reason}`,
+      data: r,
+    };
   },
   report: async (ctx) => ({ thinkingHonored: await honoredResult(ctx) }),
 });

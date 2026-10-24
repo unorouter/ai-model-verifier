@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.9.3
+
+- `thinking-honored`: when the high-effort reply carries Google's thought
+  signature (`carriesThoughtSignature`), too little thought is reported as
+  `inconclusive` (`thinking-locked`) instead of `fail`. That reply came from
+  Gemini itself, so the seller capped reasoning; another model behind a persona
+  prompt carries no signature and still fails. gg's cheap Argon group billed 8
+  thought tokens at high effort with signed replies.
+
 ## 3.9.2
 
 - `tokenizer-family` also fails when every run bills about one token per four
