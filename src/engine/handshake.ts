@@ -16,6 +16,8 @@ export type HandshakeOutcome<V extends string> =
 
 const HANDSHAKE_PROMPT = "hi";
 const HANDSHAKE_MAX_TOKENS = 1;
+const HANDSHAKE_RETRIES = 2;
+const HANDSHAKE_RETRY_MS = 1500;
 
 function classifyStatus(
   status: number,
@@ -109,7 +111,17 @@ export async function runHandshake<V extends string>(
   let lastStatus: number | null = null;
 
   for (const wire of order) {
-    const r = await tryWire(ctx, wire);
+    let r = await tryWire(ctx, wire);
+    // A busy moment on the requested wire is not a format verdict: falling back
+    // put LinkAPI's Vertex Argon on its OpenAI route, which drops reasoning_effort.
+    for (
+      let retry = 0;
+      r.outcome === "transient" && retry < HANDSHAKE_RETRIES;
+      retry++
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, HANDSHAKE_RETRY_MS));
+      r = await tryWire(ctx, wire);
+    }
     lastStatus = r.status;
     if (r.outcome === "cors")
       return {

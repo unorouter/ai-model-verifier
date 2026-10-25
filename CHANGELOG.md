@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.9.5
+
+- Handshake: a transient answer (429, 5xx, timeout) on the requested wire is
+  retried twice before falling back to the next wire. One busy moment on
+  LinkAPI's native Gemini route moved Vertex Argon onto its OpenAI route,
+  which drops `reasoning_effort`, and the lane failed `thinking-honored`.
+
 ## 3.9.4
 
 - OpenAI wire `reasoningUsage`: when no reasoning count is reported but
