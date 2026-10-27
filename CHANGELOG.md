@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.9.11
+
+- `tokenizer-family`: the two nonce copies of the Chinese run are no longer
+  compared with each other. A lane that pools accounts may wrap one copy in a
+  hidden prompt and not the other: a7 merchant 4521's claude-opus-5 billed
+  221 and 9830 (8560 of it cache reads), both honest, and failed as made up
+  usage. A copy now fails only when billed below the leanest known family's
+  count for that text alone (61); the leading nonce means no cache can explain
+  a low count. wusrouter's copies billed 28 and 29.
+
 ## 3.9.10
 
 - New rule `censored-history` (evidence, fail): a lane claiming an
