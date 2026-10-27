@@ -99,7 +99,9 @@ async function collectFixedText(ctx: RunCtx): Promise<FixedTextEvidence> {
   return { short, long, diverse };
 }
 
-const SCRIPT_RETRY_MS = 1500;
+// Long enough together to outlast a per minute window: wusrouter allows 15
+// requests a minute per key and a full run sends about 17.
+const SCRIPT_RETRY_MS = [5000, 20000, 40000];
 
 const transient = (r: TransportResult) =>
   r.status === null
@@ -107,29 +109,29 @@ const transient = (r: TransportResult) =>
     : isTransientError(`HTTP ${r.status}`);
 
 async function collectScriptTokens(ctx: RunCtx): Promise<ScriptTokensEvidence> {
-  // One more try on a busy answer: a timed out anchor left wusrouter's made up
-  // counts unmeasured, and an unmeasured family never fails.
   const ask = async (prompt: string) => {
     const send = () =>
       chat(ctx, {
         maxTokens: COUNT_PROBE_MAX_TOKENS,
         messages: [{ role: "user", content: prompt }],
       });
-    const first = await send();
-    if (!transient(first)) return first;
-    await new Promise((resolve) => setTimeout(resolve, SCRIPT_RETRY_MS));
-    return send();
+    let res = await send();
+    for (const wait of SCRIPT_RETRY_MS) {
+      if (!transient(res)) break;
+      await new Promise((resolve) => setTimeout(resolve, wait));
+      res = await send();
+    }
+    return res;
   };
   // The anchor first: a relay that caches prefixes then bills every run the same way.
   const base = await ask(SCRIPT_BASE_PROMPT);
   const run = (k: ScriptVariant) =>
     ask(SCRIPT_BASE_PROMPT + SCRIPT_VARIANTS[k]);
-  const [digits, cjk, spaces, code] = await Promise.all([
-    run("digits"),
-    run("cjk"),
-    run("spaces"),
-    run("code"),
-  ]);
+  // One at a time: four at once tripped per key rate limits on small relays.
+  const digits = await run("digits");
+  const cjk = await run("cjk");
+  const spaces = await run("spaces");
+  const code = await run("code");
   return { base, variants: { digits, cjk, spaces, code } };
 }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.9.7
+
+- Script count runs go one at a time and wait out a busy answer (5s, 20s,
+  40s), long enough for a per minute window. wusrouter allows 15 requests a
+  minute per key and a full run sends about 17, so its count runs always
+  answered 429 and the vocabulary was never measured.
+
 ## 3.9.6
 
 - `tokenizer-family`: a script run billed below a third of the leanest known
