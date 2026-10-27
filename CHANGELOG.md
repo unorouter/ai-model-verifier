@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.9.14
+
+- `tokenizer-family`: new state `scaled` (fail). A known family's vector
+  times one constant on every run (each run within 8%, factor outside 0.9 to
+  1.1) is usage multiplied to overbill or shrunk to hide the vocabulary.
+  Replayed over 367 logged lanes it flags 6 and no clean one: a7:6314
+  "claude-sonnet-5-5" bills Claude times 7.55, ts1's claude-max a Claude relay
+  vector times 2, kdy1's codex-pro "gpt-6-astra" o200k times 1.33, a7:880
+  "deepseek-v4.1-flash" MiniMax times 1.24.
+- Makers carry `origin` (ISO 3166 country) for all 44 built-ins, and an
+  optional `censorsChinaHistory` that defaults to an origin of CN.
+  `censored-history` applies to every maker without it, so Mistral, Meta,
+  Cohere, Nvidia and the rest are judged too, not only four US labs.
+
 ## 3.9.13
 
 - `censored-history` reads the script token runs too: when the lane bills the

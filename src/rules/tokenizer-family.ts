@@ -33,6 +33,7 @@ import {
   impossibleRuns,
   isCharacterEstimate,
   knowsMaker,
+  matchScaledFamily,
   matchTokenizerFamilies,
   TOKENIZER_FAMILIES,
   type ScriptVector,
@@ -49,6 +50,8 @@ export type TokenizerFamilyState =
   | "char-estimated"
   /** Runs billed below what any tokenizer needs for their text: made up usage. */
   | "impossible"
+  /** A known family's vector times one constant: usage multiplied or shrunk. */
+  | "scaled"
   /** Measured but matches no known family. */
   | "unknown"
   | "unmeasured"
@@ -63,6 +66,8 @@ export type TokenizerFamilyResult = {
   families: string[];
   makers: string[];
   reason?: string;
+  /** The family and factor of a scaled vector. */
+  scaled?: { family: string; factor: number };
   /** Runs billed below every tokenizer, with their full prompt counts. */
   impossible?: { run: ScriptVariant; prompt: number }[];
   /** The lowest prompt count of the nonce copies of the Chinese run. */
@@ -83,11 +88,23 @@ export function judgeTokenizerFamily(
     families: matched.map((f) => f.id),
     makers: [...new Set(matched.flatMap((f) => f.makers))],
   };
-  if (matched.length === 0)
-    return {
-      state: isCharacterEstimate(vector) ? "char-estimated" : "unknown",
-      ...base,
-    };
+  if (matched.length === 0) {
+    if (isCharacterEstimate(vector))
+      return { state: "char-estimated", ...base };
+    const scaled = matchScaledFamily(vector);
+    return scaled
+      ? {
+          state: "scaled",
+          ...base,
+          families: [scaled.family.id],
+          makers: [...scaled.family.makers],
+          scaled: {
+            family: scaled.family.id,
+            factor: Math.round(scaled.factor * 100) / 100,
+          },
+        }
+      : { state: "unknown", ...base };
+  }
   if (matched.some((f) => f.makers.some((m) => m === maker)))
     return { state: "own", ...base };
   if (matched.every((f) => f.estimator)) return { state: "estimated", ...base };
@@ -201,6 +218,12 @@ export const tokenizerFamilyRule = defineRule({
       };
     if (!r.vector) return null;
     const v = r.vector;
+    if (r.state === "scaled" && r.scaled)
+      return {
+        severity: "fail",
+        reason: `tokenizer-family: billed ${v.digits}/${v.cjk}/${v.spaces}/${v.code}, the ${r.scaled.family} vocabulary (${r.makers.join(", ")}) times ${r.scaled.factor} on every run: usage is ${r.scaled.factor > 1 ? "multiplied, so every request is overbilled" : "shrunk, hiding the real counts"}`,
+        data: r,
+      };
     if (r.state === "char-estimated")
       return {
         severity: "fail",

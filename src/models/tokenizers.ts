@@ -133,3 +133,33 @@ export function impossibleRuns(
     return n !== null && n < scriptFloor(k);
   });
 }
+
+/** Each run within this share of the scaled family count. */
+const SCALE_TOLERANCE = 0.08;
+/** A factor this close to 1 is ordinary relay noise, not scaling. */
+const SCALE_NEUTRAL = 0.1;
+
+/**
+ * A known family's vector multiplied by one constant on every run: usage
+ * scaled up to overbill or down to hide the vocabulary. a7:6314 "claude-sonnet-5-5"
+ * billed Claude's vector times 7.55, kdy1's codex-pro "gpt-6-astra" o200k times
+ * 1.33, ts1's claude-max a Claude relay vector times exactly 2.
+ */
+export function matchScaledFamily(
+  measured: ScriptVector,
+  families: readonly TokenizerFamily[] = TOKENIZER_FAMILIES,
+): { family: TokenizerFamily; factor: number } | null {
+  let best: { family: TokenizerFamily; factor: number } | null = null;
+  for (const family of families) {
+    const ratios = SCRIPT_VARIANT_KEYS.map(
+      (k) => measured[k] / family.vector[k],
+    );
+    const factor = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+    if (Math.abs(factor - 1) <= SCALE_NEUTRAL) continue;
+    if (!ratios.every((r) => Math.abs(r - factor) / factor <= SCALE_TOLERANCE))
+      continue;
+    if (!best || Math.abs(factor - 1) < Math.abs(best.factor - 1))
+      best = { family, factor };
+  }
+  return best;
+}

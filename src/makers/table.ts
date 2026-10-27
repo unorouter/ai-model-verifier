@@ -14,6 +14,7 @@ export const MAKERS = [
   {
     id: "anthropic",
     name: "Anthropic",
+    origin: "US",
     wire: "anthropic",
     models: ["*claude*", "kiro*"],
     home: ["anthropic"],
@@ -28,6 +29,7 @@ export const MAKERS = [
   {
     id: "openai",
     name: "OpenAI",
+    origin: "US",
     wire: "openai",
     models: [
       "gpt-*",
@@ -49,6 +51,7 @@ export const MAKERS = [
   {
     id: "google",
     name: "Google",
+    origin: "US",
     wire: "gemini",
     models: ["*gemini*", "*gemma*", "antigravity*", "*nano-banana*"],
     home: ["google", "deepmind"],
@@ -62,6 +65,7 @@ export const MAKERS = [
   {
     id: "deepseek",
     name: "DeepSeek",
+    origin: "CN",
     wire: "openai",
     models: ["*deepseek*", "*dsv3*", "*dsv4*", "*dsv5*"],
     home: ["deepseek", "deepseek-ai", "深度求索"],
@@ -77,6 +81,7 @@ export const MAKERS = [
   {
     id: "moonshot",
     name: "Moonshot AI",
+    origin: "CN",
     wire: "openai",
     models: ["*kimi*", "moonshot*"],
     home: ["moonshot", "moonshotai", "月之暗面"],
@@ -88,6 +93,7 @@ export const MAKERS = [
   {
     id: "zhipu",
     name: "Zhipu AI",
+    origin: "CN",
     wire: "openai",
     models: ["*glm*"],
     home: ["zhipu", "zhipuai", "z.ai", "智谱"],
@@ -99,6 +105,7 @@ export const MAKERS = [
   {
     id: "minimax",
     name: "MiniMax",
+    origin: "CN",
     wire: "openai",
     models: ["*minimax*", "abab*"],
     home: ["minimax", "minimaxai", "稀宇"],
@@ -110,6 +117,7 @@ export const MAKERS = [
   {
     id: "xiaomi",
     name: "Xiaomi",
+    origin: "CN",
     wire: "openai",
     models: ["*mimo*"],
     home: ["xiaomi", "小米"],
@@ -121,6 +129,7 @@ export const MAKERS = [
   {
     id: "mistral",
     name: "Mistral AI",
+    origin: "FR",
     wire: "openai",
     models: [
       "*mistral*",
@@ -150,6 +159,7 @@ export const MAKERS = [
   {
     id: "alibaba",
     name: "Alibaba",
+    origin: "CN",
     wire: "openai",
     models: ["*qwen*", "*qwq*", "*qvq*"],
     home: ["alibaba", "qwen", "tongyi", "阿里", "通义"],
@@ -161,6 +171,7 @@ export const MAKERS = [
   {
     id: "meta",
     name: "Meta",
+    origin: "US",
     wire: "openai",
     // l3-*, l31-* and l3-3-* are the community finetunes of Llama 3.
     models: ["*llama*", "l3-*", "l31-*", "*muse-spark*", "*muse-glimmer*"],
@@ -173,6 +184,7 @@ export const MAKERS = [
   {
     id: "xai",
     name: "xAI",
+    origin: "US",
     wire: "openai",
     models: ["*grok*"],
     home: ["xai", "x.ai"],
@@ -184,6 +196,7 @@ export const MAKERS = [
   {
     id: "writer",
     name: "Writer",
+    origin: "US",
     wire: "openai",
     models: ["*palmyra*"],
     // "writer" is ordinary English and would land in every other maker's
@@ -197,6 +210,7 @@ export const MAKERS = [
   {
     id: "tencent",
     name: "Tencent",
+    origin: "CN",
     wire: "openai",
     // No `hy*` glob: it would claim hybrid-* and hyper-* ids.
     models: ["*hunyuan*", "hy3*", "hy4*", "hy-*"],
@@ -209,6 +223,7 @@ export const MAKERS = [
   {
     id: "cohere",
     name: "Cohere",
+    origin: "CA",
     wire: "openai",
     models: [
       "command*",
@@ -228,6 +243,7 @@ export const MAKERS = [
   {
     id: "bytedance",
     name: "ByteDance",
+    origin: "CN",
     wire: "openai",
     models: ["*doubao*", "seed-*", "*-seed-*", "seedream*", "seedance*"],
     home: ["bytedance", "volcengine", "字节跳动", "火山引擎"],
@@ -239,6 +255,7 @@ export const MAKERS = [
   {
     id: "baidu",
     name: "Baidu",
+    origin: "CN",
     wire: "openai",
     models: ["*ernie*"],
     home: ["baidu", "百度"],
@@ -250,6 +267,7 @@ export const MAKERS = [
   {
     id: "stepfun",
     name: "StepFun",
+    origin: "CN",
     wire: "openai",
     models: ["step-*", "*-step-*"],
     home: ["stepfun", "阶跃星辰"],
@@ -262,6 +280,7 @@ export const MAKERS = [
   {
     id: "nvidia",
     name: "NVIDIA",
+    origin: "US",
     wire: "openai",
     models: ["*nemotron*", "*riva-*"],
     home: ["nvidia"],
@@ -276,6 +295,7 @@ export const MAKERS = [
   {
     id: "ibm",
     name: "IBM",
+    origin: "US",
     wire: "openai",
     models: ["*granite*"],
     home: ["ibm"],
@@ -287,6 +307,7 @@ export const MAKERS = [
   {
     id: "liquid",
     name: "Liquid AI",
+    origin: "US",
     wire: "openai",
     models: ["lfm*", "*-lfm-*"],
     home: ["liquid", "liquid ai"],
@@ -298,6 +319,7 @@ export const MAKERS = [
   {
     id: "kwaipilot",
     name: "Kwaipilot",
+    origin: "CN",
     wire: "openai",
     models: ["*kat-coder*"],
     home: ["kwaipilot", "kuaishou", "快手"],
@@ -309,6 +331,7 @@ export const MAKERS = [
   {
     id: "meituan",
     name: "Meituan",
+    origin: "CN",
     wire: "openai",
     models: ["*longcat*"],
     home: ["meituan", "美团"],
@@ -320,6 +343,7 @@ export const MAKERS = [
   {
     id: "inclusionai",
     name: "inclusionAI",
+    origin: "CN",
     wire: "openai",
     models: ["ling-*", "*-ling-*", "ring-*", "*-ring-*"],
     home: ["inclusionai", "ant group", "蚂蚁"],
@@ -331,6 +355,7 @@ export const MAKERS = [
   {
     id: "internlm",
     name: "Shanghai AI Lab",
+    origin: "CN",
     wire: "openai",
     models: ["intern*", "*-intern-*"],
     home: ["shanghai ai lab", "internlm", "上海人工智能实验室", "书生"],
@@ -342,6 +367,7 @@ export const MAKERS = [
   {
     id: "openbmb",
     name: "OpenBMB",
+    origin: "CN",
     wire: "openai",
     models: ["*minicpm*"],
     home: ["openbmb", "modelbest", "面壁"],
@@ -353,6 +379,7 @@ export const MAKERS = [
   {
     id: "sensetime",
     name: "SenseTime",
+    origin: "CN",
     wire: "openai",
     models: ["*sensenova*", "*sensechat*"],
     home: ["sensetime", "商汤"],
@@ -364,6 +391,7 @@ export const MAKERS = [
   {
     id: "rednote",
     name: "rednote",
+    origin: "CN",
     wire: "openai",
     models: ["dots*", "*-dots-*"],
     home: ["rednote", "xiaohongshu", "小红书"],
@@ -375,6 +403,7 @@ export const MAKERS = [
   {
     id: "perplexity",
     name: "Perplexity",
+    origin: "US",
     wire: "openai",
     models: ["sonar*", "*-sonar-*"],
     home: ["perplexity"],
@@ -386,6 +415,7 @@ export const MAKERS = [
   {
     id: "microsoft",
     name: "Microsoft",
+    origin: "US",
     wire: "openai",
     models: ["phi-*", "phi3*", "phi4*", "phi5*", "*-phi-*"],
     home: ["microsoft"],
@@ -397,6 +427,7 @@ export const MAKERS = [
   {
     id: "amazon",
     name: "Amazon",
+    origin: "US",
     wire: "openai",
     models: ["nova-*", "*-nova-*"],
     home: ["amazon", "aws"],
@@ -408,6 +439,7 @@ export const MAKERS = [
   {
     id: "ai21",
     name: "AI21 Labs",
+    origin: "IL",
     wire: "openai",
     models: ["*jamba*"],
     home: ["ai21"],
@@ -419,6 +451,7 @@ export const MAKERS = [
   {
     id: "nous",
     name: "Nous Research",
+    origin: "US",
     wire: "openai",
     models: ["hermes*", "*-hermes-*"],
     home: ["nous", "nous research"],
@@ -430,6 +463,7 @@ export const MAKERS = [
   {
     id: "poolside",
     name: "Poolside",
+    origin: "US",
     wire: "openai",
     models: ["laguna*", "*-laguna-*"],
     home: ["poolside"],
@@ -441,6 +475,7 @@ export const MAKERS = [
   {
     id: "swissai",
     name: "Swiss AI",
+    origin: "CH",
     wire: "openai",
     models: ["*apertus*"],
     home: ["swiss ai", "swiss-ai", "eth zurich", "epfl"],
@@ -452,6 +487,7 @@ export const MAKERS = [
   {
     id: "inception",
     name: "Inception Labs",
+    origin: "US",
     wire: "openai",
     models: ["mercury*"],
     home: ["inception", "inception labs"],
@@ -463,6 +499,7 @@ export const MAKERS = [
   {
     id: "arcee",
     name: "Arcee AI",
+    origin: "US",
     wire: "openai",
     models: ["trinity*", "*-trinity-*", "*arcee*"],
     home: ["arcee"],
@@ -474,6 +511,7 @@ export const MAKERS = [
   {
     id: "nexagi",
     name: "Nex AGI",
+    origin: "CN",
     wire: "openai",
     models: ["nex-*", "*-nex-*"],
     home: ["nex", "nex agi", "nex-agi"],
@@ -485,6 +523,7 @@ export const MAKERS = [
   {
     id: "sarvam",
     name: "Sarvam AI",
+    origin: "IN",
     wire: "openai",
     models: ["sarvam*"],
     home: ["sarvam"],
@@ -496,6 +535,7 @@ export const MAKERS = [
   {
     id: "typhoon",
     name: "SCB 10X",
+    origin: "TH",
     wire: "openai",
     models: ["typhoon*"],
     home: ["scb 10x", "scb10x", "typhoon"],
@@ -507,6 +547,7 @@ export const MAKERS = [
   {
     id: "moondream",
     name: "Moondream",
+    origin: "US",
     wire: "openai",
     models: ["moondream*"],
     home: ["moondream", "m87"],
@@ -518,6 +559,7 @@ export const MAKERS = [
   {
     id: "jetbrains",
     name: "JetBrains",
+    origin: "CZ",
     wire: "openai",
     models: ["mellum*"],
     home: ["jetbrains"],
@@ -529,6 +571,7 @@ export const MAKERS = [
   {
     id: "aion",
     name: "Aion Labs",
+    origin: "IL",
     wire: "openai",
     models: ["aion-*", "*-aion-*"],
     home: ["aion labs", "aion-labs", "aionlabs"],
@@ -540,6 +583,7 @@ export const MAKERS = [
   {
     id: "venice",
     name: "Venice",
+    origin: "US",
     wire: "openai",
     // Venice's own finetunes; the media models under the same prefix are
     // never probed on a text ladder.

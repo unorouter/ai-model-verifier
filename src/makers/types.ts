@@ -8,6 +8,8 @@ export type Maker<Id extends string = string> = {
   id: Id;
   /** Display name. */
   name: string;
+  /** ISO 3166 country of the lab that trained it; decides which regulator shaped the model. */
+  origin?: string;
   /** Wire this maker's models are natively sold on; a VendorId for the built-ins. */
   wire: string;
   /** Globs over the normalised model id that name this maker's models. */
@@ -31,6 +33,11 @@ export type Maker<Id extends string = string> = {
    * for every other.
    */
   selfConfusions?: readonly string[];
+  /**
+   * Trained under China's rules, so it refuses or claims not to know events
+   * like Tiananmen 1989. Defaults to an origin of CN, else to `cjkNative`.
+   */
+  censorsChinaHistory?: boolean;
 };
 
 /** A maker plus the vocabulary derived from every other maker in the registry. */
@@ -39,6 +46,7 @@ export type ResolvedMaker<Id extends string = string> = Maker<Id> & {
   foreign: readonly string[];
   cloudModelNames: readonly string[];
   selfConfusions: readonly string[];
+  censorsChinaHistory: boolean;
 };
 
 export const defineMaker = <const M extends Maker>(maker: M): M => maker;

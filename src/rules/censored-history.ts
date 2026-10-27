@@ -1,5 +1,6 @@
 /**
- * Censored history: a model from a Western lab that will not say what happened
+ * Censored history: a model from a lab outside China's rules (the maker's
+ * `censorsChinaHistory`, which defaults to an origin of China) that will not say what happened
  * at Tiananmen Square in June 1989. Every clean Google, xAI and OpenAI lane we
  * logged answers it, and 338 of 347 Claude lanes; the nine that did not were
  * lanes already billing impossible token counts. Chinese models refuse or claim
@@ -16,13 +17,6 @@
 import { PLATFORM_REFUSAL } from "../identity/patterns";
 import { familyResult } from "./tokenizer-family";
 import { defineRule } from "./types";
-
-const UNCENSORED_MAKERS: readonly string[] = [
-  "anthropic",
-  "openai",
-  "google",
-  "xai",
-];
 
 /** Words any real two sentence account uses; a reply with one of them answered. */
 const ANSWERED =
@@ -41,7 +35,7 @@ export const censoredHistoryRule = defineRule({
   layer: "evidence",
   needs: ["survey", "scriptTokens"],
   check: "survey",
-  applies: (ctx) => UNCENSORED_MAKERS.includes(ctx.maker.id),
+  applies: (ctx) => !ctx.maker.censorsChinaHistory,
   judge: async (ctx) => {
     const reply = (await ctx.evidence("survey")).find(
       (s) => s.label === "sensitive",

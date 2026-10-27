@@ -26,6 +26,9 @@ export function resolveMaker<M extends string>(
     ...maker,
     cloudModelNames: maker.cloudModelNames ?? [],
     selfConfusions: maker.selfConfusions ?? [],
+    censorsChinaHistory:
+      maker.censorsChinaHistory ??
+      (maker.origin ? maker.origin === "CN" : maker.cjkNative),
     foreign: [...foreign],
   };
 }
