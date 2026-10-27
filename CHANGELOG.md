@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.9.8
+
+- `tokenizer-family`: the Chinese script run is sent twice more, each copy
+  behind its own nonce at the start so no prefix or answer cache can tell
+  them apart. Billed more than double apart (and over ten tokens) fails as
+  made up usage: a real tokenizer bills identical text identically.
+  wusrouter's "claude-opus-5.5" billed the copies 126 and 29. The bound is
+  loose on purpose, since a router may serve the copies through a provider
+  that counts and one that estimates (151 against 101). Real Claude on ih and
+  si still bills 101/151/100/149 and passes.
+
 ## 3.9.7
 
 - Script count runs go one at a time and wait out a busy answer (5s, 20s,

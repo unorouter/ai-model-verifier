@@ -36,6 +36,8 @@ export type FixedTextEvidence = {
 export type ScriptTokensEvidence = {
   base: TransportResult;
   variants: Record<ScriptVariant, TransportResult>;
+  /** The Chinese run twice more, each behind its own nonce so no cache can tell them apart. */
+  repeats: [TransportResult, TransportResult];
 };
 
 export type ThinkingReplyEvidence = {
@@ -132,7 +134,15 @@ async function collectScriptTokens(ctx: RunCtx): Promise<ScriptTokensEvidence> {
   const cjk = await run("cjk");
   const spaces = await run("spaces");
   const code = await run("code");
-  return { base, variants: { digits, cjk, spaces, code } };
+  const repeat = () =>
+    ask(`[${ctx.nonce()}] ${SCRIPT_BASE_PROMPT}${SCRIPT_VARIANTS.cjk}`);
+  const first = await repeat();
+  const second = await repeat();
+  return {
+    base,
+    variants: { digits, cjk, spaces, code },
+    repeats: [first, second],
+  };
 }
 
 async function collectCountTokens(

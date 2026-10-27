@@ -19,6 +19,10 @@
  * everything else bill the repeated digits run at 1 to 4 now and then, which
  * reads as a relay cache, not made up counts.
  *
+ * The Chinese run is sent twice more behind two different nonces: a real
+ * tokenizer bills the same text the same way every time, wusrouter billed it
+ * 89, 92, 8 and 40, and every passing Claude lane we logged bills one vector.
+ *
  * Runs that never answered are inconclusive rather than silent: the probes
  * alone call any good persona prompt genuine.
  */
@@ -47,6 +51,8 @@ export type TokenizerFamilyState =
   /** Measured but matches no known family. */
   | "unknown"
   | "unmeasured"
+  /** The same text behind two nonces billed far apart: the counts are made up. */
+  | "unstable"
   /** A run timed out or the endpoint was busy, so nothing could be read. */
   | "unanswered";
 
@@ -58,7 +64,17 @@ export type TokenizerFamilyResult = {
   reason?: string;
   /** Runs billed below every tokenizer, with their full prompt counts. */
   impossible?: { run: ScriptVariant; prompt: number }[];
+  /** Prompt counts of the two nonce copies of the Chinese run. */
+  repeats?: [number, number];
 };
+
+/**
+ * More than double and ten tokens apart is no tokenizer. A router may serve the
+ * two copies through a provider that counts and one that estimates (Claude 151
+ * against o200k's 101 on this text), so a closer pair proves nothing.
+ */
+const REPEAT_UNSTABLE = (a: number, b: number) =>
+  Math.abs(a - b) > 10 && Math.max(a, b) > 2 * Math.min(a, b);
 
 /** Judge one measured vector against the claimed maker. Pure. */
 export function judgeTokenizerFamily(
@@ -103,13 +119,17 @@ async function familyResult(
     spaces: prompt(ev.variants.spaces),
     code: prompt(ev.variants.code),
   };
+  const r1 = prompt(ev.repeats[0]);
+  const r2 = prompt(ev.repeats[1]);
+  if (r1 !== null && r2 !== null && REPEAT_UNSTABLE(r1, r2))
+    return { state: "unstable", ...empty, repeats: [r1, r2] };
   const impossible = impossibleRuns(counts).flatMap((run) => {
     const prompt = counts[run];
     return prompt === null ? [] : [{ run, prompt }];
   });
   if (impossible.length > 0)
     return { state: "impossible", ...empty, impossible };
-  const all = [ev.base, ...Object.values(ev.variants)];
+  const all = [ev.base, ...Object.values(ev.variants), ...ev.repeats];
   const busy = all.find((r) =>
     r.status === null
       ? isTransientError(r.error ?? "")
@@ -155,6 +175,12 @@ export const tokenizerFamilyRule = defineRule({
   applies: (ctx) => ctx.wire.id !== "gemini",
   judge: async (ctx) => {
     const r = await familyResult(ctx);
+    if (r.state === "unstable" && r.repeats)
+      return {
+        severity: "fail",
+        reason: `tokenizer-family: billed the same Chinese text ${r.repeats[0]} and then ${r.repeats[1]} prompt tokens; a real tokenizer bills identical text identically, so the provider makes up usage and hides the model's real counts`,
+        data: r,
+      };
     if (r.state === "impossible" && r.impossible) {
       const runs = r.impossible
         .map((i) => `${i.prompt} for the ${i.run} run`)
