@@ -14,9 +14,8 @@
  *
  * Also fails when every run bills about one token per four characters: that
  * is a provider making up usage so the vocabulary behind it cannot be seen.
- * Same for any run billed below what any tokenizer needs for its text alone.
- * The a7 Claude merchants that did so (3825, 5630, 1169) also refused the
- * Tiananmen question the way Chinese models do, so it was never a cache.
+ * Same for any run billed below what any tokenizer needs for its text alone,
+ * except the digits run on its own, which relays strip as a phone number.
  *
  * The Chinese run is sent twice more, each behind its own leading nonce so no
  * cache can serve it. A copy billed below the leanest family's count for that
@@ -182,9 +181,15 @@ export const tokenizerFamilyRule = defineRule({
       const runs = r.impossible
         .map((i) => `${i.prompt} for the ${i.run} run`)
         .join(", ");
+      // Relays that strip long digit strings as phone or ID numbers bill the
+      // digits run near the anchor while the model is genuine (kdy1's Qwen at 8,
+      // a7 Hunyuan at 2, the other runs normal), so digits alone only notes.
+      const digitsOnly = r.impossible.every((i) => i.run === "digits");
       return {
-        severity: "fail",
-        reason: `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: the provider makes up usage and hides the model's real counts`,
+        severity: digitsOnly ? "note" : "fail",
+        reason: digitsOnly
+          ? `tokenizer-family: billed ${runs}, so the relay strips or rewrites long digit strings before the model sees them`
+          : `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: the provider makes up usage and hides the model's real counts`,
         data: r,
       };
     }

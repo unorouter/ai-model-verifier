@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.9.12
+
+- `tokenizer-family`: when the digits run is the only one billed below every
+  tokenizer, the finding is a note, not a fail. Relays strip long digit
+  strings as phone or ID numbers, so the model never sees them: kdy1's Qwen
+  3.7 and 3.8 Max billed 8, an a7 Hunyuan 2, with every other run normal.
+  A low count on the Chinese, spaces or code run still fails.
+
 ## 3.9.11
 
 - `tokenizer-family`: the two nonce copies of the Chinese run are no longer
