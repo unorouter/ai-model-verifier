@@ -21,7 +21,12 @@ type AnthropicResponse = {
   model?: string;
   content?: unknown;
   stop_reason?: unknown;
-  usage?: { input_tokens?: unknown; output_tokens?: unknown };
+  usage?: {
+    input_tokens?: unknown;
+    output_tokens?: unknown;
+    cache_read_input_tokens?: unknown;
+    cache_creation_input_tokens?: unknown;
+  };
   input_tokens?: unknown;
 };
 
@@ -102,7 +107,15 @@ function reasoningText(data: unknown): string | null {
 function meta(data: unknown): ProbeMeta {
   const d: AnthropicResponse = rec(data) ?? {};
   const u = d.usage;
-  const prompt = intOf(u?.input_tokens);
+  // input_tokens leaves out cache reads and writes: a caching lane (gg's
+  // Claude) billed our script runs 0 to 16 that way and read as made up usage.
+  const input = intOf(u?.input_tokens);
+  const prompt =
+    input === null
+      ? null
+      : input +
+        (intOf(u?.cache_read_input_tokens) ?? 0) +
+        (intOf(u?.cache_creation_input_tokens) ?? 0);
   const completion = intOf(u?.output_tokens);
   return {
     detectedModel: typeof d.model === "string" ? d.model : null,

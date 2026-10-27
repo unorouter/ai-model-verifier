@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.9.9
+
+- Anthropic wire: the prompt count is `input_tokens` plus
+  `cache_read_input_tokens` and `cache_creation_input_tokens`. `input_tokens`
+  alone leaves the cached part out, so a caching lane (gg's Claude, 64 to 193
+  tokens read from cache per run) billed the script runs 0 to 16 and failed
+  `tokenizer-family` as made up usage.
+
 ## 3.9.8
 
 - `tokenizer-family`: the Chinese script run is sent twice more, each copy
