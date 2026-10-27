@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.9.13
+
+- `censored-history` reads the script token runs too: when the lane bills the
+  claimed maker's own tokenizer, a refusal is a relay's no-politics prompt in
+  front of the real model and only notes. kdy1's "claude-特殊渠道" answered
+  "i can't discuss that" while billing Claude's vector to the token.
+
 ## 3.9.12
 
 - `tokenizer-family`: when the digits run is the only one billed below every

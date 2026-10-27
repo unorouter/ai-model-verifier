@@ -100,7 +100,7 @@ export function judgeTokenizerFamily(
   return { state: "foreign", ...base };
 }
 
-async function familyResult(
+export async function familyResult(
   ctx: RuleCtx<"scriptTokens">,
 ): Promise<TokenizerFamilyResult> {
   const ev = await ctx.evidence("scriptTokens");

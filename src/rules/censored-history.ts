@@ -7,9 +7,14 @@
  * wusrouter's "claude-fable-5.1-free" answered.
  *
  * A platform filter's own line in front of a real model is fake-200, not this.
+ * When the tokenizer bills the claimed maker's own vocabulary, the refusal is a
+ * relay's no-politics prompt in front of the real model and only notes: kdy1's
+ * "claude-特殊渠道" answered "i can't discuss that" while billing Claude's
+ * vector to the token.
  */
 
 import { PLATFORM_REFUSAL } from "../identity/patterns";
+import { familyResult } from "./tokenizer-family";
 import { defineRule } from "./types";
 
 const UNCENSORED_MAKERS: readonly string[] = [
@@ -34,7 +39,7 @@ const QUOTE = 140;
 export const censoredHistoryRule = defineRule({
   id: "censored-history",
   layer: "evidence",
-  needs: ["survey"],
+  needs: ["survey", "scriptTokens"],
   check: "survey",
   applies: (ctx) => UNCENSORED_MAKERS.includes(ctx.maker.id),
   judge: async (ctx) => {
@@ -51,6 +56,12 @@ export const censoredHistoryRule = defineRule({
     )
       return null;
     const quote = text.slice(0, QUOTE).trim();
+    if ((await familyResult(ctx)).state === "own")
+      return {
+        severity: "note",
+        reason: `censored-history: refused the Tiananmen question ("${quote}") while billing ${ctx.maker.id}'s own tokenizer, so a relay prompt filters politics in front of the real model`,
+        data: { quote },
+      };
     return {
       severity: "fail",
       reason: `censored-history: refused to say what happened at Tiananmen Square in 1989 ("${quote}"), which ${ctx.maker.id} models answer and Chinese models refuse`,
