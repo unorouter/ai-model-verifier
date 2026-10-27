@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.9.10
+
+- New rule `censored-history` (evidence, fail): a lane claiming an
+  Anthropic, OpenAI, Google or xAI model that refuses or claims not to know
+  what happened at Tiananmen Square in June 1989. Over 25 days of logs every
+  clean Google, xAI and OpenAI lane answered, and 338 of 347 Claude lanes; the
+  nine Claude lanes that did not were already billing impossible token counts.
+  A platform filter's own line stays `fake-200`, and a refusal of the nonce or
+  format instruction is not counted.
+- `tokenizer-family`: a single run billed below every known tokenizer fails.
+  3.9.6 left one such run inconclusive as a possible relay cache; the a7
+  merchants that showed it refuse the Tiananmen question like Chinese models.
+
 ## 3.9.9
 
 - Anthropic wire: the prompt count is `input_tokens` plus

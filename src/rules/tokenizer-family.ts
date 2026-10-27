@@ -14,10 +14,9 @@
  *
  * Also fails when every run bills about one token per four characters: that
  * is a provider making up usage so the vocabulary behind it cannot be seen.
- * Same for two runs billed below what any tokenizer needs for their text
- * alone. One such run is only inconclusive: a7 Claude merchants that pass
- * everything else bill the repeated digits run at 1 to 4 now and then, which
- * reads as a relay cache, not made up counts.
+ * Same for any run billed below what any tokenizer needs for its text alone.
+ * The a7 Claude merchants that did so (3825, 5630, 1169) also refused the
+ * Tiananmen question the way Chinese models do, so it was never a cache.
  *
  * The Chinese run is sent twice more behind two different nonces: a real
  * tokenizer bills the same text the same way every time, wusrouter billed it
@@ -46,7 +45,7 @@ export type TokenizerFamilyState =
   | "estimated"
   /** Billed as characters / 4: the provider makes up usage, hiding the backend. */
   | "char-estimated"
-  /** Runs billed below what any tokenizer needs for their text: made up usage or a cache. */
+  /** Runs billed below what any tokenizer needs for their text: made up usage. */
   | "impossible"
   /** Measured but matches no known family. */
   | "unknown"
@@ -185,17 +184,11 @@ export const tokenizerFamilyRule = defineRule({
       const runs = r.impossible
         .map((i) => `${i.prompt} for the ${i.run} run`)
         .join(", ");
-      return r.impossible.length > 1
-        ? {
-            severity: "fail",
-            reason: `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: the provider makes up usage and hides the model's real counts`,
-            data: r,
-          }
-        : {
-            severity: "inconclusive",
-            reason: `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: made up usage or a cached answer, so the vocabulary could not be read`,
-            data: r,
-          };
+      return {
+        severity: "fail",
+        reason: `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: the provider makes up usage and hides the model's real counts`,
+        data: r,
+      };
     }
     if (r.state === "unanswered" && knowsMaker(ctx.maker.id))
       return {

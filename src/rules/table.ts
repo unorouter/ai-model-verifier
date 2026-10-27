@@ -18,6 +18,7 @@ import { thinkLeakRule } from "./think-leak";
 import { maskedIdentityRule } from "./masked-identity";
 import { maskContradictionRule } from "./mask-contradiction";
 import { fake200Rule } from "./fake-200";
+import { censoredHistoryRule } from "./censored-history";
 import { wrapperLeakRule } from "./wrapper-leak";
 import { thinkingFloorRule } from "./thinking-floor";
 import { thinkingHonoredRule } from "./thinking-honored";
@@ -39,6 +40,7 @@ export const RULES = [
   tokenizerFamilyRule,
   maskedIdentityRule,
   fake200Rule,
+  censoredHistoryRule,
   codingToolRule,
   scamRule,
   cjkLeakRule,
