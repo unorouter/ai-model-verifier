@@ -109,3 +109,27 @@ export function isCharacterEstimate(measured: ScriptVector): boolean {
     return ratio >= 0.2 && ratio <= 0.3;
   });
 }
+
+/**
+ * The fewest tokens any run could bill: a third of the leanest known family on
+ * that run, and a run's full prompt count includes the anchor on top of it.
+ * wusrouter's "claude-fable-5.1-free" billed 4 for the 300 digit run where the
+ * leanest family bills 34, and its "claude-opus-5.5" billed less for that run
+ * than for the anchor alone.
+ */
+export function scriptFloor(
+  k: ScriptVariant,
+  families: readonly TokenizerFamily[] = TOKENIZER_FAMILIES,
+): number {
+  return Math.floor(Math.min(...families.map((f) => f.vector[k])) / 3);
+}
+
+/** Every run whose full prompt count is below what any tokenizer bills for its text alone. */
+export function impossibleRuns(
+  counts: Readonly<Record<ScriptVariant, number | null>>,
+): ScriptVariant[] {
+  return SCRIPT_VARIANT_KEYS.filter((k) => {
+    const n = counts[k];
+    return n !== null && n < scriptFloor(k);
+  });
+}

@@ -11,6 +11,7 @@ import {
   type ScriptVariant,
 } from "../probes/prompts";
 import type { TransportResult } from "../transport";
+import { isTransientError } from "../identity/signals";
 import { callWire, chat, wireCtx, type RunCtx } from "./context";
 import { collectProbes, type ProbeEval } from "./probe-runner";
 import { collectSurvey, type SurveyOutcome } from "./survey-runner";
@@ -98,12 +99,27 @@ async function collectFixedText(ctx: RunCtx): Promise<FixedTextEvidence> {
   return { short, long, diverse };
 }
 
+const SCRIPT_RETRY_MS = 1500;
+
+const transient = (r: TransportResult) =>
+  r.status === null
+    ? isTransientError(r.error ?? "")
+    : isTransientError(`HTTP ${r.status}`);
+
 async function collectScriptTokens(ctx: RunCtx): Promise<ScriptTokensEvidence> {
-  const ask = (prompt: string) =>
-    chat(ctx, {
-      maxTokens: COUNT_PROBE_MAX_TOKENS,
-      messages: [{ role: "user", content: prompt }],
-    });
+  // One more try on a busy answer: a timed out anchor left wusrouter's made up
+  // counts unmeasured, and an unmeasured family never fails.
+  const ask = async (prompt: string) => {
+    const send = () =>
+      chat(ctx, {
+        maxTokens: COUNT_PROBE_MAX_TOKENS,
+        messages: [{ role: "user", content: prompt }],
+      });
+    const first = await send();
+    if (!transient(first)) return first;
+    await new Promise((resolve) => setTimeout(resolve, SCRIPT_RETRY_MS));
+    return send();
+  };
   // The anchor first: a relay that caches prefixes then bills every run the same way.
   const base = await ask(SCRIPT_BASE_PROMPT);
   const run = (k: ScriptVariant) =>

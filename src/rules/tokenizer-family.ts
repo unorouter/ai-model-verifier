@@ -14,10 +14,19 @@
  *
  * Also fails when every run bills about one token per four characters: that
  * is a provider making up usage so the vocabulary behind it cannot be seen.
+ * Same for two runs billed below what any tokenizer needs for their text
+ * alone. One such run is only inconclusive: a7 Claude merchants that pass
+ * everything else bill the repeated digits run at 1 to 4 now and then, which
+ * reads as a relay cache, not made up counts.
+ *
+ * Runs that never answered are inconclusive rather than silent: the probes
+ * alone call any good persona prompt genuine.
  */
 
 import type { ScriptVariant } from "../probes/prompts";
+import { isTransientError } from "../identity/signals";
 import {
+  impossibleRuns,
   isCharacterEstimate,
   knowsMaker,
   matchTokenizerFamilies,
@@ -33,9 +42,13 @@ export type TokenizerFamilyState =
   | "estimated"
   /** Billed as characters / 4: the provider makes up usage, hiding the backend. */
   | "char-estimated"
+  /** Runs billed below what any tokenizer needs for their text: made up usage or a cache. */
+  | "impossible"
   /** Measured but matches no known family. */
   | "unknown"
-  | "unmeasured";
+  | "unmeasured"
+  /** A run timed out or the endpoint was busy, so nothing could be read. */
+  | "unanswered";
 
 export type TokenizerFamilyResult = {
   state: TokenizerFamilyState;
@@ -43,6 +56,8 @@ export type TokenizerFamilyResult = {
   families: string[];
   makers: string[];
   reason?: string;
+  /** Runs billed below every tokenizer, with their full prompt counts. */
+  impossible?: { run: ScriptVariant; prompt: number }[];
 };
 
 /** Judge one measured vector against the claimed maker. Pure. */
@@ -82,6 +97,30 @@ async function familyResult(
     r.status !== null && r.status < 400
       ? (ctx.wire.read.meta(r.data).usage?.prompt ?? null)
       : null;
+  const counts = {
+    digits: prompt(ev.variants.digits),
+    cjk: prompt(ev.variants.cjk),
+    spaces: prompt(ev.variants.spaces),
+    code: prompt(ev.variants.code),
+  };
+  const impossible = impossibleRuns(counts).flatMap((run) => {
+    const prompt = counts[run];
+    return prompt === null ? [] : [{ run, prompt }];
+  });
+  if (impossible.length > 0)
+    return { state: "impossible", ...empty, impossible };
+  const all = [ev.base, ...Object.values(ev.variants)];
+  const busy = all.find((r) =>
+    r.status === null
+      ? isTransientError(r.error ?? "")
+      : isTransientError(`HTTP ${r.status}`),
+  );
+  if (busy)
+    return {
+      state: "unanswered",
+      ...empty,
+      reason: `${busy.status ?? "network"}: ${busy.error ?? "busy"}`,
+    };
   const base = prompt(ev.base);
   if (base === null)
     return {
@@ -116,6 +155,28 @@ export const tokenizerFamilyRule = defineRule({
   applies: (ctx) => ctx.wire.id !== "gemini",
   judge: async (ctx) => {
     const r = await familyResult(ctx);
+    if (r.state === "impossible" && r.impossible) {
+      const runs = r.impossible
+        .map((i) => `${i.prompt} for the ${i.run} run`)
+        .join(", ");
+      return r.impossible.length > 1
+        ? {
+            severity: "fail",
+            reason: `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: the provider makes up usage and hides the model's real counts`,
+            data: r,
+          }
+        : {
+            severity: "inconclusive",
+            reason: `tokenizer-family: billed ${runs}, below what any known tokenizer needs for that text alone: made up usage or a cached answer, so the vocabulary could not be read`,
+            data: r,
+          };
+    }
+    if (r.state === "unanswered" && knowsMaker(ctx.maker.id))
+      return {
+        severity: "inconclusive",
+        reason: `tokenizer-family: the token count runs did not answer (${r.reason}), so the backend's vocabulary was never measured`,
+        data: r,
+      };
     if (!r.vector) return null;
     const v = r.vector;
     if (r.state === "char-estimated")

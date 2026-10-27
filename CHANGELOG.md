@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.9.6
+
+- `tokenizer-family`: a script run billed below a third of the leanest known
+  family on that run (its full prompt count, anchor included) is impossible
+  for any tokenizer. Two such runs fail as made up usage; one is inconclusive,
+  since a7 Claude merchants bill the repeated digits run at 1 to 4 now and
+  then, which reads as a relay cache. wusrouter's "claude-fable-5.1-free"
+  billed 1 for 300 digits and 8 for the Chinese run and passed as genuine.
+- `tokenizer-family`: when a count run times out or the endpoint is busy, the
+  result is inconclusive for a maker with known vectors instead of silent, so
+  a run without a measured vocabulary no longer reads as genuine.
+- Script count runs retry once on a transient answer.
+
 ## 3.9.5
 
 - Handshake: a transient answer (429, 5xx, timeout) on the requested wire is
