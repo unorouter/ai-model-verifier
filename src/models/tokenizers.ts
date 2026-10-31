@@ -70,6 +70,8 @@ export const TOKENIZER_FAMILIES: readonly TokenizerFamily[] = [
   // Qwen 3.8 changed vocabulary: three a7 merchants billed this to the token.
   { id: "qwen3.8", makers: ["alibaba", "agnes"], vector: v(301, 61, 100, 149) },
   { id: "minimax", makers: ["minimax"], vector: v(101, 70, 101, 120) },
+  // Tencent's own hy4-preview endpoint and four OpenRouter hosts billed this to the token.
+  { id: "hy4", makers: ["tencent"], vector: v(101, 71, 101, 120) },
   { id: "ernie", makers: ["baidu"], vector: v(301, 70, 101, 150) },
   { id: "claude-direct", makers: ["anthropic"], vector: v(101, 151, 100, 149) },
   { id: "claude-cloud", makers: ["anthropic"], vector: v(34, 158, 106, 127) },

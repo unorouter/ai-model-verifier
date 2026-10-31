@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.9.16
+
+- New tokenizer family `hy4` (tencent) at 101/71/101/120, measured on
+  Tencent's own hy4-preview endpoint and four other hosts. It sits one token
+  from MiniMax on the Chinese run, so genuine hy4 lanes failed as MiniMax
+  before. DeepSeek's vector (101/61/101/120) still fails for hy4.
+
 ## 3.9.15
 
 - New maker `agnes` (Agnes AI, SG) for `agnes-*` ids. Its models are Qwen
