@@ -365,6 +365,20 @@ export const MAKERS = [
     cjkNative: true,
   },
   {
+    // Agnes AI fine-tunes Qwen: it bills Qwen's vocabulary and keeps its China-trained refusals.
+    id: "agnes",
+    name: "Agnes AI",
+    origin: "SG",
+    wire: "openai",
+    models: ["agnes-*"],
+    home: ["agnes ai", "agnes"],
+    modelNames: ["agnes"],
+    acceptsCloudHost: false,
+    tiers: null,
+    cjkNative: true,
+    censorsChinaHistory: true,
+  },
+  {
     id: "openbmb",
     name: "OpenBMB",
     origin: "CN",

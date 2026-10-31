@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.9.15
+
+- New maker `agnes` (Agnes AI, SG) for `agnes-*` ids. Its models are Qwen
+  fine-tunes: they bill the qwen3.8 vector 301/61/100/149, so that family now
+  lists `agnes` beside `alibaba`, and a Qwen base keeps China's refusals, so
+  `censorsChinaHistory` is set. Before, an unknown maker was judged as OpenAI
+  and every Agnes model failed `tokenizer-family`.
+
 ## 3.9.14
 
 - `tokenizer-family`: new state `scaled` (fail). A known family's vector

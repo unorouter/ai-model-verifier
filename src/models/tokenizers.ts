@@ -68,7 +68,7 @@ export const TOKENIZER_FAMILIES: readonly TokenizerFamily[] = [
     vector: v(301, 72, 101, 120),
   },
   // Qwen 3.8 changed vocabulary: three a7 merchants billed this to the token.
-  { id: "qwen3.8", makers: ["alibaba"], vector: v(301, 61, 100, 149) },
+  { id: "qwen3.8", makers: ["alibaba", "agnes"], vector: v(301, 61, 100, 149) },
   { id: "minimax", makers: ["minimax"], vector: v(101, 70, 101, 120) },
   { id: "ernie", makers: ["baidu"], vector: v(301, 70, 101, 150) },
   { id: "claude-direct", makers: ["anthropic"], vector: v(101, 151, 100, 149) },
